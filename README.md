@@ -1,14 +1,9 @@
-# Project Title
+# ICT302 Project for Repeating Complex Processes App
 
-Welcome to the Project Title! This project is designed to help you get started with [brief description of what the project does].
+This project was created for the purposes of submission to Murdoch University for the module ICT302.
 
 ## Documentation
 
-To get started, please refer to the following documentation sections:
 
-1. **Installation**: Instructions on how to install and set up the project.
-2. **Usage**: Examples and explanations on how to use the project.
-3. **Contributing**: Guidelines for contributing to the project.
-4. **License**: Information regarding the project's license.
 
-For more detailed documentation, please check the [link to detailed documentation if available].
+For more detailed documentation, please check the [https://drive.google.com/drive/u/0/folders/1CGIlZ8KJrql5mX8BVcl7_RVnzSMsC0FV?ths=true] (This requires permission to access. Email liangjun1@live.com to access).
