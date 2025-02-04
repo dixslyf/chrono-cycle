@@ -13,5 +13,5 @@
 }
 
 body {
-  @apply bg-background text-foreground antialiased;
+  @apply bg-palette3 text-palette5 antialiased;
 }

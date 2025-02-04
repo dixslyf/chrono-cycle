@@ -1,4 +1,5 @@
-import SigninForm from "./components/signin"
+import SigninForm from "./components/login/signin"
+import SignupForm from "./components/login/signup"
 
 export default function Home() {
   return (
@@ -6,14 +7,14 @@ export default function Home() {
       {/* section to hold login / signup */}
       <section className="w-full h-full flex justify-center items-center">
         {/* login / signup wrapper */}
-        <div className="border border-red-200 w-2/4 h-3/4 flex">
-          {/* left side*/}
-          <div className="w-1/2 h-auto">
-            <h1>This is the left side</h1>
-          </div>
-          {/* right side */}
-          <div className="w-1/2 h-auto">
+        <div className="border border-red-200 w-2/4 h-3/4 relative overflow-hidden">
+          {/* sign in section */}
+          <div>
             <SigninForm />
+          </div>
+          {/* sign up section */}
+          <div>
+            <SignupForm />
           </div>
         </div>
       </section>
