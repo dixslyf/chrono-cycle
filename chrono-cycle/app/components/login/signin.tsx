@@ -84,10 +84,39 @@ const SigninForm = () =>  {
                 {/* remember me & forget password wrapper */}
                 <div className="w-3/4 flex justify-between text-sm">
                     {/* remember me */}
-                    <div className="flex gap-1 justify-center items-center">
+                    <div className="flex gap-1">
                         {/* Will have to redo the checkbox styling */}
-                        <input type="checkbox" className="w-4 h-4 rounded-md checked:bg-[#8a6d53] checked:border-[#a9927d] checked:text-[#f2f4f3] focus:ring-2 focus:ring-[#5a3d2b] focus:ring-offset-0" id="rmb" name="rmb" checked={rememberMe} onChange={rememberMeHandler} />
-                        <span className="font-medium text-[#a9927d]">Remember Me</span>
+                        <input 
+                            type="checkbox" 
+                            className="
+                            relative peer mt-1
+                            appearance-none w-4 h-4 border-2 border-palette2 bg-white rounded-sm
+                            checked:bg-palette2 checked:border-0
+                            "
+                            id="rmb" 
+                            name="rmb" 
+                            checked={rememberMe} 
+                            onChange={rememberMeHandler} 
+                        />
+                        <label htmlFor="rmb" className="font-medium text-palette2 mt-1">Remember Me</label>
+                        <svg
+                            className="
+                            absolute 
+                            w-4 h-4 mt-1
+                            hidden peer-checked:block
+                            pointer-events-none text-palette3
+                            "
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="4"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        {/* <span className="font-medium text-[#a9927d]">Remember Me</span> */}
                     </div>
 
                     {/* forget password */}
