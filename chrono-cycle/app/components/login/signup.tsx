@@ -5,7 +5,7 @@
 
 const SignupForm = () => {
     return (
-        <div className="w-full h-full border border-cyan-700 flex flex-col gap-10">
+        <div className="w-full h-full flex flex-col gap-10">
             {/* header */}
             <h1 className="text-palette1 font-bold text-3xl p-5">Sign Up</h1>
             <form action="" className="flex flex-col items-center gap-10">

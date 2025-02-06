@@ -8,16 +8,19 @@ interface LeftOverlayProps {
 
 const LeftOverlay: React.FC<LeftOverlayProps> = ({ isAnimated, setAnimate }) => {
     return (
-        <div>
-            <h1>Welcome to ChronoCycle</h1>
-            <h3>Already have an account?</h3>
-            <button className="w-3/4 p-1 rounded-xl bg-palette1 hover:bg[#a08368] transition duration-300 text-palette3"
-            onClick={() => {
-                setAnimate(isAnimated)
-            }}
-            >
-                Sign In
-            </button>
+        <div className="flex flex-col h-full items-center justify-center gap-20">
+            <h1 className="w-4/5 text-5xl text-palette3 font-bold text-center">Welcome to ChronoCycle</h1>
+
+            <div className="w-full flex flex-col items-center gap-3">
+                <h3 className="text-lg text-gray-400">Already have an account?</h3>
+                <button className="w-1/5 p-1 rounded-xl border-palette3 border text-palette3 transition-colors duration-400 hover:bg-[#6e5a42] hover:border-[#b1b1b1] hover:text-[#b1b1b1]"
+                onClick={() => {
+                    setAnimate(!isAnimated)
+                }}
+                >
+                    Sign In
+                </button>
+            </div>
         </div>
     )
 }
