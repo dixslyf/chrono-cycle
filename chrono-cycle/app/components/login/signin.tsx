@@ -85,7 +85,6 @@ const SigninForm = () =>  {
                 <div className="w-3/4 flex justify-between text-sm">
                     {/* remember me */}
                     <div className="flex gap-1">
-                        {/* Will have to redo the checkbox styling */}
                         <input 
                             type="checkbox" 
                             className="
@@ -116,12 +115,11 @@ const SigninForm = () =>  {
                         >
                             <polyline points="20 6 9 17 4 12"></polyline>
                         </svg>
-                        {/* <span className="font-medium text-[#a9927d]">Remember Me</span> */}
                     </div>
 
                     {/* forget password */}
                     <div>
-                        <a href="#">Forget Password?</a>
+                        <a href="#" className=" text-gray-400">Forget Password?</a>
                     </div>
                 </div>
                 
