@@ -31,14 +31,18 @@ const Login = () => {
                         isAnimated ? "translate-x-0" : "-translate-x-[20%]"
                     }`}>
                         {/* overlay left */}
-                            <div>
+                            <div className={`w-1/2 h-full absolute flex justify-center items-center top-0 transform -translate-x-[20%] transition transition-transform duration-700 ease-in-out ${
+                                isAnimated ? "translate-x-0" : "-translate-x-[20%]"    
+                            }`}>
                                 <LeftOverlay 
                                     isAnimated={isAnimated}
                                     setAnimate={setAnimate}
                                 />
                             </div>
                         {/* overlay right */}
-                            <div>
+                            <div className={`w-1/2 h-full absolute flex justify-center items-center top-0 right-0 transform transition transition-transform duration-700 ease-in-out ${
+                               isAnimated ? "translate-x-[20%]" : "translate-x-0"  
+                            }`}>
                                 <RightOverlay 
                                     isAnimated={isAnimated}
                                     setAnimate={setAnimate}

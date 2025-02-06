@@ -1,10 +1,12 @@
 // right overlay function for the login page
-import { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction } from "react";
 
-const RightOverlay = (
-    isAnimated: boolean,
-    setAnimate: Dispatch<SetStateAction<boolean>>
-) => {
+interface RightOverlayProps {
+    isAnimated: boolean;
+    setAnimate: Dispatch<SetStateAction<boolean>>;
+}
+
+const RightOverlay: React.FC<RightOverlayProps> = ({ isAnimated, setAnimate}) => {
     return (
         <div className="w-full h-full border border-red-700">
             <h1>Welcome Back to ChronoCycle</h1>

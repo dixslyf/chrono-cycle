@@ -1,10 +1,12 @@
 // left overlay function for the login page
 import { Dispatch, SetStateAction } from "react";
 
-const LeftOverlay = (
-    isAnimated: boolean,
-    setAnimate: Dispatch<SetStateAction<boolean>>
-) => {
+interface LeftOverlayProps {
+    isAnimated: boolean;
+    setAnimate: Dispatch<SetStateAction<boolean>>;
+}
+
+const LeftOverlay: React.FC<LeftOverlayProps> = ({ isAnimated, setAnimate }) => {
     return (
         <div>
             <h1>Welcome to ChronoCycle</h1>
