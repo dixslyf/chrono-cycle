@@ -9,7 +9,7 @@ interface RightOverlayProps {
 const RightOverlay: React.FC<RightOverlayProps> = ({ isAnimated, setAnimate}) => {
     return (
         <div className="flex flex-col h-full items-center justify-center gap-20">
-            <h1 className="w-4/5 text-5xl text-palette3 font-bold text-center">Welcome Back to ChronoCycle</h1>
+            <h1 className="w-4/5 text-5xl text-palette3 font-bold text-center">Welcome back to ChronoCycle!</h1>
 
             <div className="w-full flex flex-col items-center gap-3">
                 <h3 className="text-lg text-gray-400">Don&apos;t have an account?</h3>
