@@ -61,18 +61,18 @@ const SigninForm = () =>  {
     
                 {/* username input */}
                 <div className="flex flex-col w-3/4 gap-2">
-                    <label htmlFor="uname" className="text-palette5">
+                    <label htmlFor="uname" className="text-palette5 pl-1">
                         Username<span className="text-red-600">*</span>
                     </label>
-                    <input type="text" id="uname" name="uname" onChange={inputHandler} className="rounded-xl bg-[#dfdfdf] text-[#989898] p-1 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1" placeholder="Username" required />
+                    <input type="text" id="uname" name="uname" onChange={inputHandler} className="rounded-xl bg-[#dfdfdf] text-[#989898] p-1 pl-2 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1" placeholder="Username" required />
                 </div>
     
                 {/* password input */}
                 <div className="flex flex-col w-3/4 gap-2">
-                    <label htmlFor="pwd" className="text-[#0a0906]">
+                    <label htmlFor="pwd" className="text-[#0a0906] pl-1">
                         Password<span className="text-red-600">*</span>
                     </label>
-                    <input type="password" id="pwd" name="pwd" onChange={inputHandler} className="rounded-xl bg-[#dfdfdf] text-[#989898] p-1 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1" placeholder="Password" required/>
+                    <input type="password" id="pwd" name="pwd" onChange={inputHandler} className="rounded-xl bg-[#dfdfdf] text-[#989898] p-1 pl-2 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1" placeholder="Password" required/>
                 </div>
     
                 {/* button */}
