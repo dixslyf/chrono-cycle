@@ -84,7 +84,7 @@ const SigninForm = () =>  {
                 {/* remember me & forget password wrapper */}
                 <div className="w-3/4 flex justify-between text-sm">
                     {/* remember me */}
-                    <div className="flex gap-1">
+                    <div className="flex items-center gap-1">
                         <input 
                             type="checkbox" 
                             className="
