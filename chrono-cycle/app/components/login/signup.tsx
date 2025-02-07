@@ -58,29 +58,31 @@ const SignupForm = () => {
                     {successMsg && <p className="text-green-500 text-lg">{successMsg}</p>}
                     {errorMsg && <p className="text-red-500 text-lg">{errorMsg}</p>}
                 </div>
-                <div className="flex flex-col items-center gap-10">
-                    {/* username input */}
-                    <div className="flex flex-col w-3/4 gap-2">
-                        <label htmlFor="username" className=" text-palette5 pl-1">
-                            Username<span className="text-red-600">*</span>
-                        </label>
-                        <input type="text" id="username" name="username" onChange={inputHandler} value={formData.username} className="rounded-xl bg-[#dfdfdf] text-[#989898] p-1 pl-2 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1" placeholder="Username" required />
-                    </div>
-
-                    {/* email input */}
-                    <div className="flex flex-col w-3/4 gap-2">
-                        <label htmlFor="email" className="text-palette5 pl-1">
-                            Email<span className="text-red-600">*</span>
-                        </label>
-                        <input type="email" id="email" name="email" onChange={inputHandler} value={formData.email} className="rounded-xl bg-[#dfdfdf] text-[#989898] p-1 pl-2 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1" placeholder="abc@example.com" required/>
-                    </div>
-
-                    {/* password input */}
-                    <div className="flex flex-col w-3/4 gap-2">
-                        <label htmlFor="password" className="text-palette5 pl-1">
-                            Password<span className="text-red-600">*</span>
-                        </label>
-                        <input type="password" id="password" name="password" onChange={inputHandler} value={formData.password} className="rounded-xl bg-[#dfdfdf] text-[#989898] p-1 pl-2 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1" placeholder="Password" required/>
+                <div className="flex flex-col items-center gap-16">
+                    <div className="w-full flex flex-col items-center gap-5">
+                        {/* username input */}
+                        <div className="flex flex-col w-3/4 gap-2">
+                            <label htmlFor="username" className=" text-palette5 pl-1">
+                                Username<span className="text-red-600">*</span>
+                            </label>
+                            <input type="text" id="username" name="username" onChange={inputHandler} value={formData.username} className="rounded-xl bg-[#dfdfdf] text-[#989898] p-1 pl-2 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1" placeholder="Username" required />
+                        </div>
+    
+                        {/* email input */}
+                        <div className="flex flex-col w-3/4 gap-2">
+                            <label htmlFor="email" className="text-palette5 pl-1">
+                                Email<span className="text-red-600">*</span>
+                            </label>
+                            <input type="email" id="email" name="email" onChange={inputHandler} value={formData.email} className="rounded-xl bg-[#dfdfdf] text-[#989898] p-1 pl-2 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1" placeholder="abc@example.com" required/>
+                        </div>
+    
+                        {/* password input */}
+                        <div className="flex flex-col w-3/4 gap-2">
+                            <label htmlFor="password" className="text-palette5 pl-1">
+                                Password<span className="text-red-600">*</span>
+                            </label>
+                            <input type="password" id="password" name="password" onChange={inputHandler} value={formData.password} className="rounded-xl bg-[#dfdfdf] text-[#989898] p-1 pl-2 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1" placeholder="Password" required/>
+                        </div>
                     </div>
 
                     {/* button */}
