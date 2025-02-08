@@ -19,7 +19,7 @@ const SigninForm = () => {
 
     // hold boolean value for remember me checkbox
     const [rememberMe, setRememberMe] = useState<boolean>(false);
-    const [formData, setFormData] = useState<FormData>(initialForm);
+    const [formData, setFormData] = useState<FormData>(initialForm); // eslint-disable-line @typescript-eslint/no-unused-vars
     const [isSubmitting, setSubmitting] = useState<boolean>(false);
 
     // handler

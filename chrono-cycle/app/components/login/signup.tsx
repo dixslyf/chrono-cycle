@@ -16,7 +16,7 @@ const initalForm: FormData = {
 };
 
 const SignupForm = () => {
-    const [formData, setFormData] = useState<FormData>(initalForm);
+    const [formData, setFormData] = useState<FormData>(initalForm); // eslint-disable-line @typescript-eslint/no-unused-vars
     const [isSubmitting, setSubmitting] = useState<boolean>(false);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
