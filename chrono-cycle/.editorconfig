@@ -8,5 +8,5 @@ charset = utf-8
 trim_trailing_whitespace = true
 
 [*.{js,ts,mjs,jsx,tsx}]
-indent_size = 2
-tab_width = 2
+indent_size = 4
+tab_width = 4
