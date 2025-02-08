@@ -1,0 +1,12 @@
+root = true
+
+[*]
+indent_style = space
+insert_spaces = true
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+
+[*.{js,ts,mjs,jsx,tsx}]
+indent_size = 2
+tab_width = 2
