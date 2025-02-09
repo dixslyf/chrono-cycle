@@ -4,12 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "cross-env DEPLOY_ENV=dev next dev --turbopack",
     "build": "next build",
-    "start": "next start",
+    "start": "cross-env DEPLOY_ENV=prod next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.2.16",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.39.2",
     "next": "15.1.5",
@@ -23,6 +24,7 @@
     "@types/pg": "^8.11.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^7.0.3",
     "drizzle-kit": "^0.30.4",
     "eslint": "^9",
     "eslint-config-next": "15.1.5",
