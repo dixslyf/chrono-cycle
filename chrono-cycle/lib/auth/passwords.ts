@@ -10,7 +10,3 @@ export async function verifyPassword(
 ): Promise<boolean> {
     return await argon2.verify(hashedPassword, password);
 }
-
-export function checkPasswordLength(password: string): boolean {
-    return password.length >= 8;
-}

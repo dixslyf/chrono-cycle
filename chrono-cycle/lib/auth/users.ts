@@ -23,14 +23,6 @@ export async function createUser(
     return result[0];
 }
 
-export function checkUsername(username: string): boolean {
-    return (
-        username.length >= 3 &&
-        username.length <= 255 &&
-        username.trim() == username
-    );
-}
-
 export async function getUserFromUsername(
     username: string,
 ): Promise<User | null> {
