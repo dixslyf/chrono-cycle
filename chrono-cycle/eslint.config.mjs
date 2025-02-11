@@ -3,7 +3,7 @@ import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 
-import { MIGRATIONS_BASE_PATH } from "./drizzle/shared";
+import { MIGRATIONS_BASE_PATH } from "./drizzle/shared.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
