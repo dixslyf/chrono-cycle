@@ -1,6 +1,6 @@
 "use server";
 
-import { createUser } from "@/lib/auth/users";
+import { createUser, getUserFromUsername } from "@/lib/auth/users";
 import db from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import {
@@ -9,12 +9,19 @@ import {
 } from "@/lib/app/components/login/signup";
 
 import { eq } from "drizzle-orm";
+import {
+    signinFormSchema,
+    SigninState,
+} from "@/lib/app/components/login/signin";
+import { verifyPassword } from "@/lib/auth/passwords";
+import { createSession, generateSessionToken } from "@/lib/auth/sessions";
+import { redirect } from "next/navigation";
 
 export async function signup(
     _prevState: SignupState,
     formData: FormData,
 ): Promise<SignupState> {
-    // Validate form fields.
+    // Validate form schema.
     const parseResult = signupFormSchema.safeParse({
         username: formData.get("username"),
         email: formData.get("email"),
@@ -71,4 +78,52 @@ export async function signup(
     // TODO: email verification
 
     return { submitSuccess: true };
+}
+
+export async function signin(
+    _prevState: SigninState,
+    formData: FormData,
+): Promise<SigninState> {
+    // Validate form inputs.
+    const parseResult = signinFormSchema.safeParse({
+        username: formData.get("username"),
+        password: formData.get("password"),
+    });
+
+    if (!parseResult.success) {
+        const formattedZodErrors = parseResult.error.format();
+        return {
+            errorMessage: "Invalid or missing fields",
+            errors: {
+                username: formattedZodErrors.username?._errors[0],
+                password: formattedZodErrors.password?._errors[0],
+            },
+        };
+    }
+
+    const { username, password } = parseResult.data;
+
+    // Check if the user exists.
+    const user = await getUserFromUsername(username);
+    if (!user) {
+        return {
+            errorMessage: "Incorrect username or password",
+        };
+    }
+
+    // Check if the password is correct.
+    const passwordCorrect = await verifyPassword(user.hashedPassword, password);
+    if (!passwordCorrect) {
+        return {
+            errorMessage: "Incorrect username or password",
+        };
+    }
+
+    // Create session.
+    const sessionToken = generateSessionToken();
+    const session = await createSession(sessionToken, user.id);
+
+    // TODO: cookie
+
+    return redirect("/dashboard");
 }
