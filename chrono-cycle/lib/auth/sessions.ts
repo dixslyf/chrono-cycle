@@ -5,6 +5,8 @@ import {
 } from "@/lib/db/schema";
 import db from "@/lib/db";
 
+import { cookies } from "next/headers";
+
 import { eq } from "drizzle-orm";
 import { sha256 } from "@oslojs/crypto/sha2";
 
@@ -12,6 +14,7 @@ import {
     encodeBase32LowerCaseNoPadding,
     encodeHexLowerCase,
 } from "@oslojs/encoding";
+import { cache } from "react";
 
 function sessionIdFromToken(token: string): string {
     // Session ID is the SHA256 hash of the token.
@@ -40,6 +43,8 @@ export async function createSession(
     await db.insert(sessionsTable).values(session);
     return session;
 }
+
+export type SessionValidationResult = { session: Session; user: User } | null;
 
 export async function validateSessionToken(
     token: string,
@@ -82,4 +87,39 @@ export async function invalidateSession(sessionId: string): Promise<void> {
     await db.delete(sessionsTable).where(eq(sessionsTable.id, sessionId));
 }
 
-export type SessionValidationResult = { session: Session; user: User } | null;
+export async function setSessionTokenCookie(
+    token: string,
+    expiresAt: Date,
+): Promise<void> {
+    const cookieStore = await cookies();
+    cookieStore.set("session", token, {
+        httpOnly: true, // Prevent access from JavaScript (for preventing XSS).
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production", // HTTPS in production.
+        expires: expiresAt,
+        path: "/",
+    });
+}
+
+export async function deleteSessionTokenCookie(): Promise<void> {
+    const cookieStore = await cookies();
+    cookieStore.set("session", "", {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 0,
+        path: "/",
+    });
+}
+
+export const getCurrentSession = cache(
+    async (): Promise<SessionValidationResult> => {
+        const cookieStore = await cookies();
+        const token = cookieStore.get("session")?.value ?? null;
+        if (token === null) {
+            return null;
+        }
+        const result = await validateSessionToken(token);
+        return result;
+    },
+);

@@ -14,7 +14,11 @@ import {
     SigninState,
 } from "@/lib/app/components/login/signin";
 import { verifyPassword } from "@/lib/auth/passwords";
-import { createSession, generateSessionToken } from "@/lib/auth/sessions";
+import {
+    createSession,
+    generateSessionToken,
+    setSessionTokenCookie,
+} from "@/lib/auth/sessions";
 import { redirect } from "next/navigation";
 
 export async function signup(
@@ -122,8 +126,7 @@ export async function signin(
     // Create session.
     const sessionToken = generateSessionToken();
     const session = await createSession(sessionToken, user.id);
-
-    // TODO: cookie
+    await setSessionTokenCookie(sessionToken, session.expiresAt);
 
     return redirect("/dashboard");
 }
