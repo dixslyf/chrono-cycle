@@ -2,7 +2,7 @@
 "use client";
 
 import { signin as signinAction } from "@/app/actions/auth";
-import { useState, useActionState } from "react";
+import { useActionState } from "react";
 
 const SigninForm = () => {
     // Server-side action for signing in.
@@ -10,13 +10,6 @@ const SigninForm = () => {
         signinAction,
         {},
     );
-
-    // hold boolean value for remember me checkbox
-    const [rememberMe, setRememberMe] = useState<boolean>(false);
-
-    const rememberMeHandler = () => {
-        setRememberMe(!rememberMe);
-    };
 
     return (
         <div className="w-full h-full flex flex-col gap-10">
@@ -95,20 +88,18 @@ const SigninForm = () => {
                                 appearance-none w-4 h-4 border-2 border-palette2 bg-white rounded-sm
                                 checked:bg-palette2 checked:border-0
                                 "
-                                id="rmb"
-                                name="rmb"
-                                checked={rememberMe}
-                                onChange={rememberMeHandler}
+                                id="remember"
+                                name="remember"
                             />
                             <label
-                                htmlFor="rmb"
+                                htmlFor="remember"
                                 className="font-medium text-palette2 mt-1"
                             >
                                 Remember Me
                             </label>
                             <svg
                                 className="
-                                absolute 
+                                absolute
                                 w-4 h-4 mt-1
                                 hidden peer-checked:block
                                 pointer-events-none text-palette3

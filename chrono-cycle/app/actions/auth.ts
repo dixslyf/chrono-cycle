@@ -92,6 +92,7 @@ export async function signin(
     const parseResult = signinFormSchema.safeParse({
         username: formData.get("username"),
         password: formData.get("password"),
+        remember: formData.get("remember"),
     });
 
     if (!parseResult.success) {
@@ -105,7 +106,7 @@ export async function signin(
         };
     }
 
-    const { username, password } = parseResult.data;
+    const { username, password, remember } = parseResult.data;
 
     // Check if the user exists.
     const user = await getUserFromUsername(username);
@@ -126,7 +127,11 @@ export async function signin(
     // Create session.
     const sessionToken = generateSessionToken();
     const session = await createSession(sessionToken, user.id);
-    await setSessionTokenCookie(sessionToken, session.expiresAt);
+
+    // Create a cookie if "remember me".
+    if (remember) {
+        await setSessionTokenCookie(sessionToken, session.expiresAt);
+    }
 
     return redirect("/dashboard");
 }
