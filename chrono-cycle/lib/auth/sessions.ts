@@ -89,7 +89,7 @@ export async function invalidateSession(sessionId: string): Promise<void> {
 
 export async function setSessionTokenCookie(
     token: string,
-    expiresAt: Date,
+    expiresAt: Date | undefined,
 ): Promise<void> {
     const cookieStore = await cookies();
     cookieStore.set("session", token, {

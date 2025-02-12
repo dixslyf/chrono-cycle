@@ -128,9 +128,12 @@ export async function signin(
     const sessionToken = generateSessionToken();
     const session = await createSession(sessionToken, user.id);
 
-    // Create a cookie if "remember me".
     if (remember) {
+        // If "remember me", create a cookie that lasts until the session expiry.
         await setSessionTokenCookie(sessionToken, session.expiresAt);
+    } else {
+        // Otherwise, set no expiry (meaning the cookie will expire at the end of the browser session).
+        await setSessionTokenCookie(sessionToken, undefined);
     }
 
     return redirect("/dashboard");
