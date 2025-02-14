@@ -16,9 +16,12 @@ body {
   @apply bg-palette3 text-palette5 antialiased;
 }
 
-svg {
-  fill: currentColor;
+/* custom styling for logo */
+.main-logo {
+  fill: currentColor !important;
+  stroke: currentColor !important;
 }
-path { 
-  fill: currentColor;
+
+.main-logo path {
+  fill: currentColor !important;
 }

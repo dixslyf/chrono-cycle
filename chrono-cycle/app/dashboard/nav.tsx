@@ -128,7 +128,7 @@ export default function Navbar() {
             {/* Overlay */}
             {isSidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-10"
+                    className="fixed inset-0 bg-black bg-opacity-50 z-10 transition"
                     onClick={toggleSidebar}
                 />
             )}
