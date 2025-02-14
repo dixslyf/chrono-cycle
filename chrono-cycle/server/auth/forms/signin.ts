@@ -23,7 +23,7 @@ export type SigninFormErrors = {
     password?: string;
 };
 
-export type SigninState = {
+export type SigninFormState = {
     errorMessage?: string;
     errors?: SigninFormErrors;
 };

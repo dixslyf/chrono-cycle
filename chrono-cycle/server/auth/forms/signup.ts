@@ -34,7 +34,7 @@ export type SignupFormErrors = {
     password?: string;
 };
 
-export type SignupState = {
+export type SignupFormState = {
     submitSuccess: boolean;
     errorMessage?: string;
     errors?: SignupFormErrors;

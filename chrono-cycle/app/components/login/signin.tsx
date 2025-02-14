@@ -6,10 +6,7 @@ import { useActionState } from "react";
 
 const SigninForm = () => {
     // Server-side action for signing in.
-    const [signinState, formAction, isPending] = useActionState(
-        signinAction,
-        {},
-    );
+    const [formState, formAction, isPending] = useActionState(signinAction, {});
 
     return (
         <div className="w-full h-full flex flex-col gap-10">
@@ -23,9 +20,9 @@ const SigninForm = () => {
                     {/* TODO: Style this properly. */}
                     {/* Error message for login failure. */}
                     <div className="w-full flex justify-center mb-4 font-semibold">
-                        {signinState?.errorMessage && (
+                        {formState?.errorMessage && (
                             <p className="text-red-500 text-lg">
-                                {signinState.errorMessage}
+                                {formState.errorMessage}
                             </p>
                         )}
                     </div>

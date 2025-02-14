@@ -3,10 +3,13 @@
 import { createUser, getUserFromUsername } from "@/server/auth/users";
 import db from "@/server/db";
 import { users } from "@/server/db/schema";
-import { type SignupState, signupFormSchema } from "@/server/auth/forms/signup";
+import {
+    type SignupFormState,
+    signupFormSchema,
+} from "@/server/auth/forms/signup";
 
 import { eq } from "drizzle-orm";
-import { signinFormSchema, SigninState } from "@/server/auth/forms/signin";
+import { signinFormSchema, SigninFormState } from "@/server/auth/forms/signin";
 import { verifyPassword } from "@/server/auth/passwords";
 import {
     createSession,
@@ -16,9 +19,9 @@ import {
 import { redirect } from "next/navigation";
 
 export async function signup(
-    _prevState: SignupState,
+    _prevState: SignupFormState,
     formData: FormData,
-): Promise<SignupState> {
+): Promise<SignupFormState> {
     // Validate form schema.
     const parseResult = signupFormSchema.safeParse({
         username: formData.get("username"),
@@ -79,9 +82,9 @@ export async function signup(
 }
 
 export async function signin(
-    _prevState: SigninState,
+    _prevState: SigninFormState,
     formData: FormData,
-): Promise<SigninState> {
+): Promise<SigninFormState> {
     // Validate form inputs.
     const parseResult = signinFormSchema.safeParse({
         username: formData.get("username"),
