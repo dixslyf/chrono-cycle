@@ -4,7 +4,8 @@
 import { usePathname } from "next/navigation";
 import { House, LayoutTemplate, CircleHelp, Cog } from "lucide-react";
 import Link from "next/link";
-import IconLogo from "./topIcon";
+import HamburgerMenu from "./menu";
+import Logo from "./logo";
 
 interface SidebarProps {
     isSidebarOpen: boolean;
@@ -22,11 +23,9 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                 }`}
             >
                 {/* logo and close button */}
-                <div
-                    onClick={toggleSidebar}
-                    className="flex flex-row-reverse justify-between"
-                >
-                    <IconLogo isOpen={isSidebarOpen} />
+                <div onClick={toggleSidebar} className="flex justify-between">
+                    <Logo className="text-palette3 h-14 w-auto" />
+                    <HamburgerMenu isOpen={isSidebarOpen} />
                 </div>
                 {/* Navigation links */}
                 <div className="w-full mt-10 p-5 flex flex-col gap-8">
@@ -34,7 +33,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                     <div>
                         <Link
                             href="/dashboard"
-                            className={`flex gap-5 p-3 rounded-lg text-palette3 ${
+                            className={`flex items-center gap-5 p-3 rounded-lg text-palette3 ${
                                 pathname == "/dashboard"
                                     ? "bg-[#FFFFFF18] hover:bg-[#FFFFFF30]"
                                     : "hover:bg-[#FFFFFF18]"
@@ -54,14 +53,14 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                         <Link
                             href="/templates"
                             className={`flex gap-5 p-3 rounded-lg text-palette3 ${
-                                pathname == "/template"
+                                pathname == "/templates"
                                     ? "bg-[#FFFFFF18] hover:bg-[#FFFFFF30]"
                                     : "hover:bg-[#FFFFFF18]"
                             }`}
                         >
                             <LayoutTemplate className="w-10 h-10" />
                             <span className="font-semibold text-2xl">
-                                Template
+                                Templates
                             </span>
                         </Link>
                     </div>
@@ -91,7 +90,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                         >
                             <Cog className="w-10 h-10" />
                             <span className="font-semibold text-2xl">
-                                Setting
+                                Settings
                             </span>
                         </Link>
                     </div>

@@ -3,7 +3,9 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import IconLogo from "./topIcon";
+// import IconLogo from "./topIcon";
+import HamburgerMenu from "./menu";
+import Logo from "./logo";
 import { Bell, User } from "lucide-react";
 import Sidebar from "./sidebar";
 
@@ -43,7 +45,9 @@ const Navbar = () => {
                     onClick={toggleSidebar}
                     className="flex items-center gap-4"
                 >
-                    <IconLogo isOpen={isSidebarOpen} />
+                    {/* <IconLogo isOpen={isSidebarOpen} /> */}
+                    <HamburgerMenu isOpen={isSidebarOpen} />
+                    <Logo className="text-palette3 h-14 w-auto" />
                 </div>
 
                 {/* Notifications & User Profile */}

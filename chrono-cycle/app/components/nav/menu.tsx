@@ -1,14 +1,12 @@
-// react component for logo and hamburger icon
-import Logo from "./logo";
+// react component for hamburger menu
 
-interface IconLogoProps {
+interface HamburgerMenuProps {
     isOpen: boolean;
 }
 
-const IconLogo: React.FC<IconLogoProps> = ({ isOpen }) => {
+const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ isOpen }) => {
     return (
         <>
-            {/* hamburger menu */}
             <button>
                 <div className="grid justify-items-center gap-1.5">
                     <span
@@ -28,10 +26,8 @@ const IconLogo: React.FC<IconLogoProps> = ({ isOpen }) => {
                     ></span>
                 </div>
             </button>
-            {/* logo */}
-            <Logo className="text-palette3 h-14 w-auto" />
         </>
     );
 };
 
-export default IconLogo;
+export default HamburgerMenu;
