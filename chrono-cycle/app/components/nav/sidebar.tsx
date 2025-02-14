@@ -42,7 +42,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                             <div>
                                 <Link
                                     href="/dashboard"
-                                    className={`flex items-center gap-5 p-3 rounded-lg text-palette3 ${
+                                    className={`flex items-center gap-5 p-3 rounded-lg text-palette3 overflow-hidden ${
                                         pathname == "/dashboard"
                                             ? "bg-[#FFFFFF18] hover:bg-[#FFFFFF30]"
                                             : "hover:bg-[#FFFFFF18]"
@@ -58,7 +58,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                             <div>
                                 <Link
                                     href="/templates"
-                                    className={`flex gap-5 p-3 rounded-lg text-palette3 ${
+                                    className={`flex gap-5 p-3 rounded-lg text-palette3 overflow-hidden ${
                                         pathname == "/templates"
                                             ? "bg-[#FFFFFF18] hover:bg-[#FFFFFF30]"
                                             : "hover:bg-[#FFFFFF18]"
@@ -74,7 +74,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                             <div>
                                 <Link
                                     href="/help"
-                                    className={`flex gap-5 p-3 rounded-lg text-palette3 ${
+                                    className={`flex gap-5 p-3 rounded-lg text-palette3 overflow-hidden ${
                                         pathname == "/help"
                                             ? "bg-[#FFFFFF18] hover:bg-[#FFFFFF30]"
                                             : "hover:bg-[#FFFFFF18]"
@@ -90,7 +90,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                             <div>
                                 <Link
                                     href="/settings"
-                                    className={`flex gap-5 p-3 rounded-lg text-palette3 ${
+                                    className={`flex gap-5 p-3 rounded-lg text-palette3 overflow-hidden ${
                                         pathname == "/settings"
                                             ? "bg-[#FFFFFF18] hover:bg-[#FFFFFF30]"
                                             : "hover:bg-[#FFFFFF18]"
