@@ -15,3 +15,13 @@
 body {
   @apply bg-palette3 text-palette5 antialiased;
 }
+
+/* custom styling for logo */
+.main-logo {
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+.main-logo path {
+  fill: currentColor !important;
+}
