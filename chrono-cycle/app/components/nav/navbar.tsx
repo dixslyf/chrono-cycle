@@ -13,12 +13,11 @@ import {
     Cog,
 } from "lucide-react";
 import Link from "next/link";
-import path from "path";
 
 const Navbar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false); // handles sidebar
     const [isNotiOpen, setIsNotiOpen] = useState<boolean>(false); // handles notification dropdown
-    const [notifications, setNotifications] = useState<number>(3); // handles notification numbers // eslint-disable-line @typescript-eslint/no-unused-vars
+    const [notifications, setNotifications] = useState<number>(3); // eslint-disable-line @typescript-eslint/no-unused-vars
     const [isUserOpen, setIsUserOpen] = useState<boolean>(false);
 
     const pathname = usePathname();
@@ -102,7 +101,7 @@ const Navbar = () => {
                     {/* template */}
                     <div>
                         <Link
-                            href="#"
+                            href="/template"
                             className={`flex gap-5 p-3 rounded-lg text-palette3 ${
                                 pathname == "/template"
                                     ? "bg-palette4"
@@ -118,7 +117,7 @@ const Navbar = () => {
                     {/* circle help */}
                     <div>
                         <Link
-                            href="#"
+                            href="/help"
                             className={`flex gap-5 p-3 rounded-lg text-palette3 ${
                                 pathname == "/help"
                                     ? "bg-palette4"
@@ -132,7 +131,7 @@ const Navbar = () => {
                     {/* settings */}
                     <div>
                         <Link
-                            href="#"
+                            href="/setting"
                             className={`flex gap-5 p-3 rounded-lg text-palette3 ${
                                 pathname == "/settings"
                                     ? "bg-palette4"
@@ -141,7 +140,7 @@ const Navbar = () => {
                         >
                             <Cog className="w-10 h-10" />
                             <span className="font-semibold text-3xl">
-                                Settings
+                                Setting
                             </span>
                         </Link>
                     </div>
