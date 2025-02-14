@@ -93,7 +93,7 @@ const Navbar = () => {
                                 className="w-10 h-10"
                                 style={{ fill: "none" }}
                             />
-                            <span className="font-semibold text-3xl">
+                            <span className="font-semibold text-2xl">
                                 Dashboard
                             </span>
                         </Link>
@@ -109,7 +109,7 @@ const Navbar = () => {
                             }`}
                         >
                             <LayoutTemplate className="w-10 h-10" />
-                            <span className="font-semibold text-3xl">
+                            <span className="font-semibold text-2xl">
                                 Template
                             </span>
                         </Link>
@@ -125,7 +125,7 @@ const Navbar = () => {
                             }`}
                         >
                             <CircleHelp className="w-10 h-10" />
-                            <span className="font-semibold text-3xl">Help</span>
+                            <span className="font-semibold text-2xl">Help</span>
                         </Link>
                     </div>
                     {/* settings */}
@@ -139,7 +139,7 @@ const Navbar = () => {
                             }`}
                         >
                             <Cog className="w-10 h-10" />
-                            <span className="font-semibold text-3xl">
+                            <span className="font-semibold text-2xl">
                                 Setting
                             </span>
                         </Link>
