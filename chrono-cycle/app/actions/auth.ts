@@ -3,16 +3,10 @@
 import { createUser, getUserFromUsername } from "@/server/auth/users";
 import db from "@/server/db";
 import { users } from "@/server/db/schema";
-import {
-    type SignupState,
-    signupFormSchema,
-} from "@/server/app/components/login/signup";
+import { type SignupState, signupFormSchema } from "@/server/auth/forms/signup";
 
 import { eq } from "drizzle-orm";
-import {
-    signinFormSchema,
-    SigninState,
-} from "@/server/app/components/login/signin";
+import { signinFormSchema, SigninState } from "@/server/auth/forms/signin";
 import { verifyPassword } from "@/server/auth/passwords";
 import {
     createSession,

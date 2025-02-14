@@ -8,7 +8,7 @@ import {
     type SignupFormData,
     type SignupFormErrors,
     signupFormSchema,
-} from "@/server/app/components/login/signup";
+} from "@/server/auth/forms/signup";
 
 const SignupForm = () => {
     // Server-side action for form submission.
