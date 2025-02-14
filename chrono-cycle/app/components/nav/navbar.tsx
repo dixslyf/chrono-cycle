@@ -85,7 +85,7 @@ const Navbar = () => {
                             href="/dashboard"
                             className={`flex gap-5 p-3 rounded-lg text-palette3 ${
                                 pathname == "/dashboard"
-                                    ? "bg-palette4"
+                                    ? "bg-[#2b2a28]"
                                     : "hover:bg-palette4"
                             }`}
                         >
@@ -101,7 +101,7 @@ const Navbar = () => {
                     {/* template */}
                     <div>
                         <Link
-                            href="/template"
+                            href="/templates"
                             className={`flex gap-5 p-3 rounded-lg text-palette3 ${
                                 pathname == "/template"
                                     ? "bg-palette4"
@@ -131,7 +131,7 @@ const Navbar = () => {
                     {/* settings */}
                     <div>
                         <Link
-                            href="/setting"
+                            href="/settings"
                             className={`flex gap-5 p-3 rounded-lg text-palette3 ${
                                 pathname == "/settings"
                                     ? "bg-palette4"
