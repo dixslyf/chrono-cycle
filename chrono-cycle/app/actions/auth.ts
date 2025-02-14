@@ -1,24 +1,24 @@
 "use server";
 
-import { createUser, getUserFromUsername } from "@/lib/auth/users";
-import db from "@/lib/db";
-import { users } from "@/lib/db/schema";
+import { createUser, getUserFromUsername } from "@/server/auth/users";
+import db from "@/server/db";
+import { users } from "@/server/db/schema";
 import {
     type SignupState,
     signupFormSchema,
-} from "@/lib/app/components/login/signup";
+} from "@/server/app/components/login/signup";
 
 import { eq } from "drizzle-orm";
 import {
     signinFormSchema,
     SigninState,
-} from "@/lib/app/components/login/signin";
-import { verifyPassword } from "@/lib/auth/passwords";
+} from "@/server/app/components/login/signin";
+import { verifyPassword } from "@/server/auth/passwords";
 import {
     createSession,
     generateSessionToken,
     setSessionTokenCookie,
-} from "@/lib/auth/sessions";
+} from "@/server/auth/sessions";
 import { redirect } from "next/navigation";
 
 export async function signup(

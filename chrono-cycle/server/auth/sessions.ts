@@ -1,9 +1,9 @@
-import type { User, Session } from "@/lib/db/schema";
+import type { User, Session } from "@/server/db/schema";
 import {
     sessions as sessionsTable,
     users as usersTable,
-} from "@/lib/db/schema";
-import db from "@/lib/db";
+} from "@/server/db/schema";
+import db from "@/server/db";
 
 import { cookies } from "next/headers";
 
