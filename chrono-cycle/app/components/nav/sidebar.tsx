@@ -36,8 +36,8 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                             href="/dashboard"
                             className={`flex gap-5 p-3 rounded-lg text-palette3 ${
                                 pathname == "/dashboard"
-                                    ? "bg-[#2b2a28]"
-                                    : "hover:bg-palette4"
+                                    ? "bg-[#FFFFFF18] hover:bg-[#FFFFFF30]"
+                                    : "hover:bg-[#FFFFFF18]"
                             }`}
                         >
                             <House
@@ -55,8 +55,8 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                             href="/templates"
                             className={`flex gap-5 p-3 rounded-lg text-palette3 ${
                                 pathname == "/template"
-                                    ? "bg-palette4"
-                                    : "hover:bg-palette4"
+                                    ? "bg-[#FFFFFF18] hover:bg-[#FFFFFF30]"
+                                    : "hover:bg-[#FFFFFF18]"
                             }`}
                         >
                             <LayoutTemplate className="w-10 h-10" />
@@ -71,8 +71,8 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                             href="/help"
                             className={`flex gap-5 p-3 rounded-lg text-palette3 ${
                                 pathname == "/help"
-                                    ? "bg-palette4"
-                                    : "hover:bg-palette4"
+                                    ? "bg-[#FFFFFF18] hover:bg-[#FFFFFF30]"
+                                    : "hover:bg-[#FFFFFF18]"
                             }`}
                         >
                             <CircleHelp className="w-10 h-10" />
@@ -85,8 +85,8 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                             href="/settings"
                             className={`flex gap-5 p-3 rounded-lg text-palette3 ${
                                 pathname == "/settings"
-                                    ? "bg-palette4"
-                                    : "hover:bg-palette4"
+                                    ? "bg-[#FFFFFF18] hover:bg-[#FFFFFF30]"
+                                    : "hover:bg-[#FFFFFF18]"
                             }`}
                         >
                             <Cog className="w-10 h-10" />
