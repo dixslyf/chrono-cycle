@@ -1,7 +1,8 @@
 // main navbar
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import IconLogo from "./topIcon";
 import { Bell, User } from "lucide-react";
 import Sidebar from "./sidebar";
@@ -11,10 +12,17 @@ const Navbar = () => {
     const [isNotiOpen, setIsNotiOpen] = useState<boolean>(false); // handles notification dropdown
     const [notifications, setNotifications] = useState<number>(3); // eslint-disable-line @typescript-eslint/no-unused-vars
     const [isUserOpen, setIsUserOpen] = useState<boolean>(false);
+    const pathname = usePathname();
 
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
+    // useCallback used to prevent unnecessary re-renders
+    const toggleSidebar = useCallback(() => {
+        setIsSidebarOpen((prev) => !prev);
+    }, []);
+
+    // close sidebar when the route changes
+    useEffect(() => {
+        setIsSidebarOpen(false);
+    }, [pathname]);
 
     // toggle notification dropdown
     const toggleNoti = () => {

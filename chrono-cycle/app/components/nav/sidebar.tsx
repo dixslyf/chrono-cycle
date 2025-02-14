@@ -1,5 +1,6 @@
 // side bar component
 "use client";
+// import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { House, LayoutTemplate, CircleHelp, Cog } from "lucide-react";
 import Link from "next/link";
