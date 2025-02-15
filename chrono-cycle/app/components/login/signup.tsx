@@ -2,7 +2,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { signup as signupAction } from "@/app/actions/auth";
+import { signup as signupAction } from "@/server/auth/actions";
 import {
     type SignupFormData,
     type SignupFormErrors,

@@ -1,7 +1,7 @@
 // sign in component
 "use client";
 
-import { signin as signinAction } from "@/app/actions/auth";
+import { signin as signinAction } from "@/server/auth/actions";
 import { useActionState } from "react";
 
 const SigninForm = () => {
