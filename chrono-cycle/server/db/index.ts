@@ -69,4 +69,13 @@ async function initDb(): Promise<NodePgDatabase | PgliteDatabase> {
     return await prodDb();
 }
 
-export default await initDb();
+let db: NodePgDatabase | PgliteDatabase | null = null;
+async function getDb(): Promise<NodePgDatabase | PgliteDatabase> {
+    if (!db) {
+        db = await initDb();
+        return db;
+    }
+    return db;
+}
+
+export default getDb;

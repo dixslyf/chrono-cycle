@@ -3,7 +3,7 @@ import {
     sessions as sessionsTable,
     users as usersTable,
 } from "@/server/db/schema";
-import db from "@/server/db";
+import getDb from "@/server/db";
 
 import { cookies } from "next/headers";
 
@@ -40,7 +40,10 @@ export async function createSession(
         userId,
         expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // Session lasts for 30 days.
     };
+
+    const db = await getDb();
     await db.insert(sessionsTable).values(session);
+
     return session;
 }
 
@@ -49,6 +52,8 @@ export type SessionValidationResult = { session: Session; user: User } | null;
 export async function validateSessionToken(
     token: string,
 ): Promise<SessionValidationResult> {
+    const db = await getDb();
+
     const sessionId = sessionIdFromToken(token);
 
     // Select the session and the user matching the sessionId.
@@ -84,6 +89,7 @@ export async function validateSessionToken(
 }
 
 export async function invalidateSession(sessionId: string): Promise<void> {
+    const db = await getDb();
     await db.delete(sessionsTable).where(eq(sessionsTable.id, sessionId));
 }
 

@@ -1,7 +1,7 @@
 "use server";
 
 import { createUser, getUserFromUsername } from "@/server/auth/users";
-import db from "@/server/db";
+import getDb from "@/server/db";
 import { users } from "@/server/db/schema";
 import {
     type SignupFormState,
@@ -43,6 +43,8 @@ export async function signup(
     }
 
     const { username, email, password } = parseResult.data;
+
+    const db = await getDb();
 
     // Check with the database if username is already taken.
     const matching_users = await db

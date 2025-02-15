@@ -1,5 +1,5 @@
 import type { User } from "@/server/db/schema/users";
-import db from "@/server/db";
+import getDb from "@/server/db";
 import { users } from "@/server/db/schema";
 import { hashPassword } from "@/server/auth/passwords";
 
@@ -10,6 +10,8 @@ export async function createUser(
     email: string,
     password: string,
 ): Promise<User> {
+    const db = await getDb();
+
     const hashedPassword = await hashPassword(password);
     const result = await db
         .insert(users)
@@ -26,6 +28,8 @@ export async function createUser(
 export async function getUserFromUsername(
     username: string,
 ): Promise<User | null> {
+    const db = await getDb();
+
     const result = await db
         .select()
         .from(users)
@@ -39,8 +43,9 @@ export async function getUserFromUsername(
 }
 
 export async function getUserFromEmail(email: string): Promise<User | null> {
-    const result = await db.select().from(users).where(eq(users.email, email));
+    const db = await getDb();
 
+    const result = await db.select().from(users).where(eq(users.email, email));
     if (result.length < 1) {
         return null;
     }
