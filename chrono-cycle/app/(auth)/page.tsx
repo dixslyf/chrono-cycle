@@ -1,13 +1,13 @@
 import { getCurrentSession } from "@/server/auth/sessions";
-import Login from "@/app/components/login/login";
+import Auth from "@/app/components/auth/auth";
 
 import { redirect } from "next/navigation";
 
-export default async function Auth() {
+export default async function AuthPage() {
     const sessionResult = await getCurrentSession();
     if (sessionResult) {
         return redirect("/dashboard");
     }
 
-    return <Login />;
+    return <Auth />;
 }
