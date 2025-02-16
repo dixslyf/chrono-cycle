@@ -1,30 +1,27 @@
 "use server";
 
-import { createUser, getUserFromUsername } from "@/lib/auth/users";
-import db from "@/lib/db";
-import { users } from "@/lib/db/schema";
+import { createUser, getUserFromUsername } from "@/server/auth/users";
+import db from "@/server/db";
+import { users } from "@/server/db/schema";
 import {
-    type SignupState,
+    type SignupFormState,
     signupFormSchema,
-} from "@/lib/app/components/login/signup";
+} from "@/server/auth/forms/signup";
 
 import { eq } from "drizzle-orm";
-import {
-    signinFormSchema,
-    SigninState,
-} from "@/lib/app/components/login/signin";
-import { verifyPassword } from "@/lib/auth/passwords";
+import { signinFormSchema, SigninFormState } from "@/server/auth/forms/signin";
+import { verifyPassword } from "@/server/auth/passwords";
 import {
     createSession,
     generateSessionToken,
     setSessionTokenCookie,
-} from "@/lib/auth/sessions";
+} from "@/server/auth/sessions";
 import { redirect } from "next/navigation";
 
 export async function signup(
-    _prevState: SignupState,
+    _prevState: SignupFormState,
     formData: FormData,
-): Promise<SignupState> {
+): Promise<SignupFormState> {
     // Validate form schema.
     const parseResult = signupFormSchema.safeParse({
         username: formData.get("username"),
@@ -85,9 +82,9 @@ export async function signup(
 }
 
 export async function signin(
-    _prevState: SigninState,
+    _prevState: SigninFormState,
     formData: FormData,
-): Promise<SigninState> {
+): Promise<SigninFormState> {
     // Validate form inputs.
     const parseResult = signinFormSchema.safeParse({
         username: formData.get("username"),

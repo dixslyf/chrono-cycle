@@ -1,11 +1,12 @@
 "use client";
+
 import { useState } from "react";
 import SigninForm from "./signin";
 import SignupForm from "./signup";
 import LeftOverlay from "./leftOverlay";
 import RightOverlay from "./rightOverlay";
 
-const Login = () => {
+const Auth = () => {
     const [isSignUpActive, setSignUpActive] = useState<boolean>(false);
     return (
         <section className="w-full h-full flex justify-center items-center">
@@ -78,4 +79,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default Auth;

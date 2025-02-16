@@ -1,7 +1,7 @@
-import type { User } from "@/lib/db/schema/users";
-import db from "@/lib/db";
-import { users } from "@/lib/db/schema";
-import { hashPassword } from "@/lib/auth/passwords";
+import type { User } from "@/server/db/schema/users";
+import db from "@/server/db";
+import { users } from "@/server/db/schema";
+import { hashPassword } from "@/server/auth/passwords";
 
 import { eq } from "drizzle-orm";
 

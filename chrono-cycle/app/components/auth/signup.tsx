@@ -2,19 +2,18 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { signup as signupAction } from "@/app/actions/auth";
+import { signup as signupAction } from "@/server/auth/actions";
 import {
-    type SignupState,
     type SignupFormData,
     type SignupFormErrors,
     signupFormSchema,
-} from "@/lib/app/components/login/signup";
+} from "@/server/auth/forms/signup";
 
 const SignupForm = () => {
     // Server-side action for form submission.
-    const [signupState, formAction, isPending] = useActionState(signupAction, {
+    const [formState, formAction, isPending] = useActionState(signupAction, {
         submitSuccess: false,
-    } satisfies SignupState);
+    });
 
     // Client-side states (form data and errors) for real-time form validation.
     const [formData, setFormData] = useState<SignupFormData>({
@@ -55,15 +54,14 @@ const SignupForm = () => {
             <form action={formAction}>
                 {/* error or success message */}
                 <div className="w-full flex justify-center mb-4 font-semibold">
-                    {signupState?.submitSuccess &&
-                        !signupState?.errorMessage && (
-                            <p className="text-green-500 text-lg">
-                                Account successfully created! Please sign in.
-                            </p>
-                        )}
-                    {signupState?.errorMessage && (
+                    {formState?.submitSuccess && !formState?.errorMessage && (
+                        <p className="text-green-500 text-lg">
+                            Account successfully created! Please sign in.
+                        </p>
+                    )}
+                    {formState?.errorMessage && (
                         <p className="text-red-500 text-lg">
-                            {`${signupState.errorMessage}`}
+                            {`${formState.errorMessage}`}
                         </p>
                     )}
                 </div>
