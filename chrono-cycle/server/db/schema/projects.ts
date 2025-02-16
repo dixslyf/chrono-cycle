@@ -1,0 +1,44 @@
+import { InferSelectModel } from "drizzle-orm";
+import {
+    pgTable,
+    serial,
+    timestamp,
+    integer,
+    text,
+    unique,
+    date,
+} from "drizzle-orm/pg-core";
+import projectTemplates from "./projectTemplates";
+
+export const projects = pgTable(
+    "projects",
+    {
+        id: serial("id").primaryKey().unique(),
+        userId: integer("user_id").notNull(),
+        name: text("name").notNull().unique(),
+        description: text("description").notNull(),
+        createdAt: timestamp("created_at", {
+            withTimezone: true,
+            mode: "date",
+        })
+            .notNull()
+            .defaultNow(),
+        updatedAt: timestamp("created_at", {
+            withTimezone: true,
+            mode: "date",
+        })
+            .notNull()
+            .defaultNow(),
+        startsAt: date("starts_at", {
+            mode: "date",
+        }).notNull(),
+        projectTemplateId: integer("project_template_id").references(
+            () => projectTemplates.id,
+        ),
+    },
+    (t) => [unique("unique_user_id_name").on(t.userId, t.name)],
+);
+
+export type Project = InferSelectModel<typeof projects>;
+
+export default projects;
