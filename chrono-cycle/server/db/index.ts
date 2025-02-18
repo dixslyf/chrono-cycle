@@ -3,7 +3,7 @@ import { sql } from "drizzle-orm";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { PgliteDatabase } from "drizzle-orm/pglite";
 
-async function dev_db(): Promise<PgliteDatabase> {
+async function devDb(): Promise<PgliteDatabase> {
     console.log("Using development database");
 
     // Use file-based postgres database using pglite.
@@ -17,7 +17,7 @@ async function dev_db(): Promise<PgliteDatabase> {
     return db;
 }
 
-async function prod_db(): Promise<NodePgDatabase> {
+async function prodDb(): Promise<NodePgDatabase> {
     console.log("Using production database");
 
     if (!process.env.DB_URL) {
@@ -48,7 +48,7 @@ async function prod_db(): Promise<NodePgDatabase> {
     return db;
 }
 
-async function init_db(): Promise<NodePgDatabase | PgliteDatabase> {
+async function initDb(): Promise<NodePgDatabase | PgliteDatabase> {
     let deploy_env = process.env.DEPLOY_ENV;
     if (!deploy_env || !["dev", "prod"].includes(deploy_env)) {
         console.warn(
@@ -58,7 +58,7 @@ async function init_db(): Promise<NodePgDatabase | PgliteDatabase> {
     }
 
     if (deploy_env === "dev") {
-        return await dev_db();
+        return await devDb();
     }
 
     console.assert(
@@ -66,7 +66,16 @@ async function init_db(): Promise<NodePgDatabase | PgliteDatabase> {
         `Assertion failed: Unknown deployment environment "${deploy_env}"`,
     );
 
-    return await prod_db();
+    return await prodDb();
 }
 
-export default await init_db();
+let db: NodePgDatabase | PgliteDatabase | null = null;
+async function getDb(): Promise<NodePgDatabase | PgliteDatabase> {
+    if (!db) {
+        db = await initDb();
+        return db;
+    }
+    return db;
+}
+
+export default getDb;
