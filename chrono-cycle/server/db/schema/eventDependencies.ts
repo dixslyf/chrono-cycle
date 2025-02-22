@@ -7,7 +7,7 @@ export const eventDependencies = pgTable(
     "event_dependencies",
     {
         parentId: integer("parent_id").references(() => events.id),
-        childId: integer("parent_id").references(() => events.id),
+        childId: integer("child_id").references(() => events.id),
         dependencyType: dependencyTypeEnum("dependency_type").notNull(),
         lagDays: integer("lag_days").notNull(),
     },

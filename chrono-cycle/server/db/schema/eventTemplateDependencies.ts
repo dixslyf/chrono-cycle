@@ -7,7 +7,7 @@ export const eventTemplateDependencies = pgTable(
     "event_template_dependencies",
     {
         parentId: integer("parent_id").references(() => eventTemplates.id),
-        childId: integer("parent_id").references(() => eventTemplates.id),
+        childId: integer("child_id").references(() => eventTemplates.id),
         dependencyType: dependencyTypeEnum("dependency_type").notNull(),
         lagDays: integer("lag_days").notNull(),
     },
