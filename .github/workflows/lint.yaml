@@ -17,5 +17,8 @@ jobs:
       - name: Build
         run: npm run build --prefix chrono-cycle -- --no-lint
 
+      - name: Test
+        run: npm run test --prefix chrono-cycle
+
       - name: Lint
         run: npm run lint --prefix chrono-cycle
