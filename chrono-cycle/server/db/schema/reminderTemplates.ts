@@ -1,10 +1,5 @@
 import { InferSelectModel } from "drizzle-orm";
-import {
-    pgTable,
-    serial,
-    integer,
-    time,
-} from "drizzle-orm/pg-core";
+import { pgTable, serial, integer, time } from "drizzle-orm/pg-core";
 import eventTemplates from "./eventTemplates";
 
 export const reminderTemplates = pgTable("reminder_templates", {

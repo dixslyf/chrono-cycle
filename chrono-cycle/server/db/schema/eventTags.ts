@@ -6,8 +6,12 @@ import events from "./events";
 export const eventTags = pgTable(
     "event_tags",
     {
-        eventId: integer("event_id").references(() => events.id),
-        tagId: integer("tag_id").references(() => tags.id),
+        eventId: integer("event_id")
+            .notNull()
+            .references(() => events.id),
+        tagId: integer("tag_id")
+            .notNull()
+            .references(() => tags.id),
     },
     (t) => [primaryKey({ columns: [t.eventId, t.tagId] })],
 );
