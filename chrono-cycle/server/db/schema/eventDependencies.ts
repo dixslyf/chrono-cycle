@@ -6,8 +6,12 @@ import dependencyTypeEnum from "./dependencyType";
 export const eventDependencies = pgTable(
     "event_dependencies",
     {
-        parentId: integer("parent_id").references(() => events.id),
-        childId: integer("child_id").references(() => events.id),
+        parentId: integer("parent_id")
+            .notNull()
+            .references(() => events.id),
+        childId: integer("child_id")
+            .notNull()
+            .references(() => events.id),
         dependencyType: dependencyTypeEnum("dependency_type").notNull(),
         lagDays: integer("lag_days").notNull(),
     },

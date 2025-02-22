@@ -28,7 +28,9 @@ export const projectTemplates = pgTable(
             .notNull()
             .defaultNow(),
     },
-    (t) => [unique("unique_user_id_name").on(t.userId, t.name)],
+    (t) => [
+        unique("project_templates_unique_user_id_name").on(t.userId, t.name),
+    ],
 );
 
 export type ProjectTemplate = InferSelectModel<typeof projectTemplates>;
