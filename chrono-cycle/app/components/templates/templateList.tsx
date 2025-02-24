@@ -104,6 +104,7 @@ const TemplateList = () => {
                                     </select>
                                 </div>
                             </div>
+                            <button type="submit">Create Template</button>
                         </form>
                     </div>
                 </div>
