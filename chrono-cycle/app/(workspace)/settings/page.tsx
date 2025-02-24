@@ -1,9 +1,20 @@
 // setting page
+import SettingsForm from "@/app/components/settings/settingsForm";
 
 export default function Setting() {
     return (
         <>
-            <h1>This is the settings page</h1>
+            {/* title */}
+            <section>
+                <h1>Settings</h1>
+                <span>Manage your settings and preferences</span>
+                <hr />
+            </section>
+
+            {/* Options section */}
+            <section>
+                <SettingsForm />
+            </section>
         </>
     );
 }
