@@ -13,10 +13,14 @@ import { signinFormSchema, SigninFormState } from "@/server/auth/forms/signin";
 import { verifyPassword } from "@/server/auth/passwords";
 import {
     createSession,
+    deleteSessionTokenCookie,
     generateSessionToken,
+    getCurrentSession,
+    invalidateSession,
     setSessionTokenCookie,
 } from "@/server/auth/sessions";
 import { redirect } from "next/navigation";
+import { SignoutFormState } from "@/server/auth/forms/signout";
 
 export async function signup(
     _prevState: SignupFormState,
@@ -136,4 +140,16 @@ export async function signin(
     }
 
     return redirect("/dashboard");
+}
+
+export async function signout(): Promise<SignoutFormState> {
+    const sessionResults = await getCurrentSession();
+    if (!sessionResults) {
+        return { signoutSuccess: false, message: "Not authenticated" };
+    }
+
+    invalidateSession(sessionResults.session.id);
+    deleteSessionTokenCookie();
+
+    return redirect("/");
 }
