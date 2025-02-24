@@ -17,6 +17,18 @@ const eslintConfig = [
     eslintPluginPrettierRecommended,
     {
         ignores: [`${MIGRATIONS_BASE_PATH}/*`],
+        rules: {
+            // Ignore unused variables, arguments or caught errors that start with `_`.
+            // Also, lower the rule to "warn" instead of "error".
+            "@typescript-eslint/no-unused-vars": [
+                "warn",
+                {
+                    argsIgnorePattern: "^_",
+                    varsIgnorePattern: "^_",
+                    caughtErrorsIgnorePattern: "^_",
+                },
+            ],
+        },
     },
 ];
 
