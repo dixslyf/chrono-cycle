@@ -11,7 +11,7 @@ const TemplateList = () => {
     // use the setTags function to initialise tags
     const [tags, setTags] = useState<string[]>([]);
 
-    const toggleModel = () => {
+    const toggleModal = () => {
         setIsModalOpen((prev) => !prev);
     };
 
@@ -21,7 +21,7 @@ const TemplateList = () => {
     }, []);
 
     // handle tag change
-    const handleTageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleTagChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selected = Array.from(
             e.target.selectedOptions,
             (option) => option.value,
@@ -32,7 +32,7 @@ const TemplateList = () => {
     return (
         <>
             {/* add template button */}
-            <AddTemplateButton toggleModel={toggleModel} />
+            <AddTemplateButton toggleModal={toggleModal} />
 
             {/* template creation modal */}
             {isModalOpen && (
@@ -51,7 +51,7 @@ const TemplateList = () => {
                                     placeholder="Task name"
                                 />
 
-                                <button onClick={toggleModel}>
+                                <button onClick={toggleModal}>
                                     <X />
                                 </button>
                             </div>
@@ -89,7 +89,7 @@ const TemplateList = () => {
                                         id="tag"
                                         multiple
                                         value={selectedTags}
-                                        onChange={handleTageChange}
+                                        onChange={handleTagChange}
                                     >
                                         {selectedTags.length === 0 && (
                                             <option value="" disabled>

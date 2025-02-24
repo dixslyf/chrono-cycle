@@ -3,14 +3,14 @@
 import { Plus } from "lucide-react";
 
 interface TemplateProps {
-    toggleModel: () => void;
+    toggleModal: () => void;
 }
 
-const AddTemplateButton: React.FC<TemplateProps> = ({ toggleModel }) => {
+const AddTemplateButton: React.FC<TemplateProps> = ({ toggleModal }) => {
     return (
         <>
             <button
-                onClick={toggleModel}
+                onClick={toggleModal}
                 className="flex items-center justify-center w-full"
                 type="button"
             >
