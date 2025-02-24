@@ -1,12 +1,12 @@
 // main navbar
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-// import IconLogo from "./topIcon";
+import Link from "next/link";
 import HamburgerMenu from "./menu";
 import Logo from "./logo";
-import { Bell, User } from "lucide-react";
+import { Bell, User, UserPen, LogOut } from "lucide-react";
 import Sidebar from "./sidebar";
 
 const Navbar = () => {
@@ -15,6 +15,8 @@ const Navbar = () => {
     const [notifications, setNotifications] = useState<number>(3); // eslint-disable-line @typescript-eslint/no-unused-vars
     const [isUserOpen, setIsUserOpen] = useState<boolean>(false);
     const pathname = usePathname();
+
+    const profileContainerRef = useRef<HTMLDivElement | null>(null);
 
     // useCallback used to prevent unnecessary re-renders
     const toggleSidebar = useCallback(() => {
@@ -33,8 +35,24 @@ const Navbar = () => {
 
     // toggle profile dropdown
     const toggleProfile = () => {
-        setIsUserOpen(!isUserOpen);
+        setIsUserOpen((prev) => !prev);
     };
+
+    // close profile dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                profileContainerRef.current &&
+                !profileContainerRef.current.contains(event.target as Node)
+            ) {
+                setIsUserOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () =>
+            document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     return (
         <>
@@ -61,9 +79,39 @@ const Navbar = () => {
                             </span>
                         )}
                     </button>
-                    <button onClick={toggleProfile}>
-                        <User className="w-8 h-8" />
-                    </button>
+
+                    <div className="relative" ref={profileContainerRef}>
+                        <button
+                            onClick={toggleProfile}
+                            className="flex items-center focus:outline-none"
+                        >
+                            <User className="w-8 h-8" />
+                        </button>
+
+                        {/* profile downdown */}
+                        {isUserOpen && (
+                            <div className="absolute right-0 mt-5 w-48 bg-palette3 text-palette5 rounded-xl shadow-xl overflow-hidden">
+                                <ul>
+                                    <li className="bg-palette2">
+                                        <User />
+                                        User
+                                    </li>
+                                    <li className="hover:bg-[#00000030]">
+                                        <Link href="/profile">
+                                            <UserPen />
+                                            Profile
+                                        </Link>
+                                    </li>
+                                    <li className="hover:bg-[#00000030]">
+                                        <button className="w-full">
+                                            <LogOut />
+                                            Logout
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </nav>
 
