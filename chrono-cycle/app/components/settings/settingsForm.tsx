@@ -54,8 +54,8 @@ const SettingsForm = () => {
                 <section>
                     {/* title */}
                     <div>
-                        <h1>Notification</h1>
-                        <span>update your notification configurations</span>
+                        <h1>Notifications</h1>
+                        <span>Update your notification preferences</span>
                     </div>
 
                     {/* email notifications */}
