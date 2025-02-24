@@ -1,13 +1,20 @@
 // main navbar
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import {
+    useState,
+    useCallback,
+    useEffect,
+    useRef,
+    useActionState,
+} from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import HamburgerMenu from "./menu";
 import Logo from "./logo";
 import { Bell, User, UserPen, LogOut } from "lucide-react";
 import Sidebar from "./sidebar";
+import { signout as signoutAction } from "@/server/auth/actions";
 
 const Navbar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false); // handles sidebar
@@ -15,6 +22,12 @@ const Navbar = () => {
     const [notifications, setNotifications] = useState<number>(3); // eslint-disable-line @typescript-eslint/no-unused-vars
     const [isUserOpen, setIsUserOpen] = useState<boolean>(false);
     const pathname = usePathname();
+
+    // Server-side action for logging out.
+    const [_signoutState, signoutFormAction, _signoutPending] = useActionState(
+        signoutAction,
+        null,
+    );
 
     const profileContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -103,10 +116,15 @@ const Navbar = () => {
                                         </Link>
                                     </li>
                                     <li className="hover:bg-[#00000030]">
-                                        <button className="w-full">
-                                            <LogOut />
-                                            Logout
-                                        </button>
+                                        <form action={signoutFormAction}>
+                                            <button
+                                                type="submit"
+                                                className="w-full"
+                                            >
+                                                <LogOut />
+                                                Logout
+                                            </button>
+                                        </form>
                                     </li>
                                 </ul>
                             </div>
