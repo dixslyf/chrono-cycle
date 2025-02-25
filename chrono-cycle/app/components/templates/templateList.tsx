@@ -4,10 +4,9 @@ import AddTemplateButton from "./addTemplateButton";
 import React, { useState, useActionState, useEffect } from "react";
 import { X } from "lucide-react";
 import { createProjectTemplate } from "@/server/project-templates/create/action";
-import { listProjectTemplates } from "@/server/project-templates/list/action";
-import { ListProjectTemplatesResult } from "@/server/project-templates/list/data";
+import { ProjectTemplateBasicInfo } from "@/server/project-templates/list/data";
 
-const TemplateList = () => {
+function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
     const [formState, formAction, _formPending] = useActionState(
         createProjectTemplate,
         { submitSuccess: false },
@@ -24,40 +23,12 @@ const TemplateList = () => {
         setIsModalOpen((prev) => !prev);
     };
 
+    // Close modal window on creation success.
     useEffect(() => {
-        if (formState.submitSuccess) {
+        if (modalMode == "create" && formState.submitSuccess) {
             setIsModalOpen(false);
         }
-    }, [formState]);
-
-    // Project templates list.
-    const [listProjectTemplatesResult, setListProjectTemplatesResult] =
-        useState<ListProjectTemplatesResult | null>();
-
-    // Fetch the project templates on load.
-    useEffect(() => {
-        listProjectTemplates().then((result) =>
-            setListProjectTemplatesResult(result),
-        );
-    }, []);
-
-    // Append the created project template to the list if successfully created.
-    useEffect(() => {
-        if (
-            !formState.createdProjectTemplate ||
-            !listProjectTemplatesResult?.projectTemplates
-        ) {
-            return;
-        }
-        const updated = {
-            ...listProjectTemplatesResult,
-            projectTemplates: [
-                ...listProjectTemplatesResult.projectTemplates,
-                formState.createdProjectTemplate,
-            ],
-        };
-        setListProjectTemplatesResult(updated);
-    }, [formState, listProjectTemplatesResult]);
+    }, [formState, modalMode]);
 
     // handles clickable rows to view template
     const handelRowClick = (template: any) => {
@@ -87,29 +58,18 @@ const TemplateList = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {!listProjectTemplatesResult?.success ? (
-                            <tr>
-                                <td colSpan={4}>
-                                    {listProjectTemplatesResult?.errorMessage}
-                                </td>
+                        {entries.map((info) => (
+                            <tr
+                                key={info.name}
+                                className="cursor-pointer"
+                                onClick={() => handelRowClick(info)}
+                            >
+                                <td>{info.name}</td>
+                                <td>{info.description}</td>
+                                <td>{info.createdAt.toString()}</td>
+                                <td>{info.updatedAt.toString()}</td>
                             </tr>
-                        ) : (
-                            (
-                                listProjectTemplatesResult?.projectTemplates ??
-                                []
-                            ).map((info) => (
-                                <tr
-                                    key={info.name}
-                                    className="cursor-pointer"
-                                    onClick={() => handelRowClick(info)}
-                                >
-                                    <td>{info.name}</td>
-                                    <td>{info.description}</td>
-                                    <td>{info.createdAt.toString()}</td>
-                                    <td>{info.updatedAt.toString()}</td>
-                                </tr>
-                            ))
-                        )}
+                        ))}
                     </tbody>
                 </table>
             </div>
@@ -199,6 +159,6 @@ const TemplateList = () => {
             )}
         </>
     );
-};
+}
 
 export default TemplateList;

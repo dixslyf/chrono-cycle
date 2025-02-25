@@ -6,6 +6,7 @@ import {
     CreateProjectTemplateFormState,
 } from "./formData";
 import { insertProjectTemplateDb, isDuplicateProjectTemplateName } from "./lib";
+import { revalidatePath } from "next/cache";
 
 export async function createProjectTemplate(
     _prevState: CreateProjectTemplateFormState,
@@ -50,6 +51,8 @@ export async function createProjectTemplate(
     }
 
     const inserted = await insertProjectTemplateDb(name, description, userId);
+
+    revalidatePath("/templates");
     return {
         submitSuccess: true,
         createdProjectTemplate: {
