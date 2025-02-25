@@ -32,7 +32,7 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
     }, [formState, modalMode]);
 
     // handles clickable rows to view template
-    const handelRowClick = (template: ProjectTemplateBasicInfo) => {
+    const handleRowClick = (template: ProjectTemplateBasicInfo) => {
         setModalMode("view");
         setSelectedTemplate(template);
         setIsModalOpen(true);
@@ -63,7 +63,7 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
                             <tr
                                 key={info.name}
                                 className="cursor-pointer"
-                                onClick={() => handelRowClick(info)}
+                                onClick={() => handleRowClick(info)}
                             >
                                 <td>{info.name}</td>
                                 <td>{info.description}</td>
