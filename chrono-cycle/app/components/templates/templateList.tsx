@@ -2,9 +2,10 @@
 
 import AddTemplateButton from "./addTemplateButton";
 import React, { useState, useActionState, useEffect } from "react";
-import { X } from "lucide-react";
+import { Trash, X } from "lucide-react";
 import { createProjectTemplate } from "@/server/project-templates/create/action";
 import { ProjectTemplateBasicInfo } from "@/server/project-templates/list/data";
+import { deleteProjectTemplateAction } from "@/server/project-templates/delete/action";
 
 function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
     const [formState, formAction, _formPending] = useActionState(
@@ -22,6 +23,22 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
 
     const toggleModal = () => {
         setIsModalOpen((prev) => !prev);
+    };
+
+    // Template deletion.
+    const [deleteErrorMessage, setDeleteErrorMessage] = useState<string>("");
+    const handleDelete = async () => {
+        const result = await deleteProjectTemplateAction(
+            selectedTemplate?.name as string, // selectedTemplate shouldn't be null.
+        );
+
+        if (!result.success) {
+            setDeleteErrorMessage(result.errorMessage as string); // Guaranteed to be a string.
+            return;
+        }
+
+        // Close the modal window.
+        setIsModalOpen(false);
     };
 
     // Close modal window on creation success.
@@ -153,6 +170,12 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
                                         {selectedTemplate?.updatedAt.toString()}
                                     </div>
                                 </div>
+
+                                {/* Deletion. */}
+                                <div>{deleteErrorMessage}</div>
+                                <button onClick={() => handleDelete()}>
+                                    <Trash />
+                                </button>
                             </div>
                         )}
                     </div>
