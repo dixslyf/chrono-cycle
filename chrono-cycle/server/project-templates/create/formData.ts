@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ProjectTemplateBasicInfo } from "../list/data";
 
 export const nameSchema = z
     .string()
@@ -22,6 +23,7 @@ export type CreateProjectTemplateFormErrors = {
 
 export type CreateProjectTemplateFormState = {
     submitSuccess: boolean;
+    createdProjectTemplate?: ProjectTemplateBasicInfo;
     errorMessage?: string;
     errors?: CreateProjectTemplateFormErrors;
 };

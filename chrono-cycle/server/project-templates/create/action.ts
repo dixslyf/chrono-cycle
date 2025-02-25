@@ -49,6 +49,14 @@ export async function createProjectTemplate(
         };
     }
 
-    await insertProjectTemplateDb(name, description, userId);
-    return { submitSuccess: true };
+    const inserted = await insertProjectTemplateDb(name, description, userId);
+    return {
+        submitSuccess: true,
+        createdProjectTemplate: {
+            name: inserted.name,
+            description: inserted.description,
+            createdAt: inserted.createdAt,
+            updatedAt: inserted.updatedAt,
+        },
+    };
 }
