@@ -4,6 +4,8 @@ import AddTemplateButton from "./addTemplateButton";
 import React, { useState, useActionState, useEffect } from "react";
 import { X } from "lucide-react";
 import { createProjectTemplate } from "@/server/project-templates/create/action";
+import { listProjectTemplates } from "@/server/project-templates/list/action";
+import { ListProjectTemplatesResult } from "@/server/project-templates/list/data";
 
 const TemplateList = () => {
     const [formState, formAction, _formPending] = useActionState(
@@ -22,8 +24,54 @@ const TemplateList = () => {
         }
     }, [formState]);
 
+    // Project templates list.
+    const [listProjectTemplatesResult, setListProjectTemplatesResult] =
+        useState<ListProjectTemplatesResult | null>();
+
+    // Fetch the project templates on load.
+    useEffect(() => {
+        listProjectTemplates().then((result) =>
+            setListProjectTemplatesResult(result),
+        );
+    }, []);
+
+    // Append the created project template to the list if successfully created.
+    useEffect(() => {
+        const updated = Object.assign({}, listProjectTemplatesResult);
+        if (!formState.createdProjectTemplate || !updated?.projectTemplates) {
+            return;
+        }
+
+        // Append created project template to list.
+        updated.projectTemplates = [
+            ...updated.projectTemplates,
+            formState.createdProjectTemplate,
+        ];
+        setListProjectTemplatesResult(updated);
+    }, [formState, listProjectTemplatesResult]);
+
     return (
         <>
+            {/* List of project templates. */}
+            <div>
+                {!listProjectTemplatesResult?.success
+                    ? listProjectTemplatesResult?.errorMessage
+                    : listProjectTemplatesResult?.projectTemplates?.map(
+                        (info) => (
+                            <div key={info.name} className="flex gap-4">
+                                <div>Name: {info.name}</div>
+                                <div>Description: {info.description}</div>
+                                <div>
+                                    Created at: {info.createdAt.toString()}
+                                </div>
+                                <div>
+                                    Updated at: {info.updatedAt.toString()}
+                                </div>
+                            </div>
+                        ),
+                    )}
+            </div>
+
             {/* add template button */}
             <AddTemplateButton toggleModal={toggleModal} />
 
