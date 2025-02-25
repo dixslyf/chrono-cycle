@@ -1,7 +1,7 @@
 "use client";
 
 import AddTemplateButton from "./addTemplateButton";
-import React, { useState, useActionState } from "react";
+import React, { useState, useActionState, useEffect } from "react";
 import { X } from "lucide-react";
 import { createProjectTemplate } from "@/server/project-templates/create/action";
 
@@ -15,6 +15,12 @@ const TemplateList = () => {
     const toggleModal = () => {
         setIsModalOpen((prev) => !prev);
     };
+
+    useEffect(() => {
+        if (formState.submitSuccess) {
+            setIsModalOpen(false);
+        }
+    }, [formState]);
 
     return (
         <>
