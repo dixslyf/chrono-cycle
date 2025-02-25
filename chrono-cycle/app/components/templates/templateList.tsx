@@ -17,7 +17,8 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
     // modal mode with create and view modes
     const [modalMode, setModalMode] = useState<"create" | "view">("create");
     // selected template for view mode
-    const [selectedTemplate, setSelectedTemplate] = useState<any>(null); // might need to change the `any` tag
+    const [selectedTemplate, setSelectedTemplate] =
+        useState<ProjectTemplateBasicInfo | null>(null);
 
     const toggleModal = () => {
         setIsModalOpen((prev) => !prev);
@@ -31,7 +32,7 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
     }, [formState, modalMode]);
 
     // handles clickable rows to view template
-    const handelRowClick = (template: any) => {
+    const handelRowClick = (template: ProjectTemplateBasicInfo) => {
         setModalMode("view");
         setSelectedTemplate(template);
         setIsModalOpen(true);
@@ -143,13 +144,13 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
                                 <div>
                                     <label>Created AT:</label>
                                     <div>
-                                        {selectedTemplate.createdAt.toString()}
+                                        {selectedTemplate?.createdAt.toString()}
                                     </div>
                                 </div>
                                 <div>
                                     <label>Updated At:</label>
                                     <div>
-                                        {selectedTemplate.updatedAt.toString()}
+                                        {selectedTemplate?.updatedAt.toString()}
                                     </div>
                                 </div>
                             </div>
