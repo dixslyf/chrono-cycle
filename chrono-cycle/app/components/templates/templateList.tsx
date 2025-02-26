@@ -17,6 +17,24 @@ import { CreateResult } from "@/server/project-templates/create/data";
 import { ValidationIssues } from "@/server/common/errors";
 import { DeleteResult } from "@/server/project-templates/delete/data";
 
+function getCreateErrorMessage(createState: CreateResult) {
+    return match(createState)
+        .with(
+            { left: { _errorKind: "AuthenticationError" } },
+            () => "Authentication failed",
+        )
+        .with(
+            { left: { _errorKind: "ValidationError" } },
+            () => "Invalid or missing fields",
+        )
+        .with(
+            { left: { _errorKind: "DuplicateNameError" } },
+            () => "Project template name is already used",
+        )
+        .with({ right: P.any }, () => "")
+        .exhaustive();
+}
+
 function getDeleteErrorMessage(deleteState: DeleteResult) {
     return match(deleteState)
         .with(
@@ -188,6 +206,8 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
                                 </div>
                                 <div>
                                     {/* FIXME: Dumping errors here for now. */}
+                                    {createState &&
+                                        getCreateErrorMessage(createState)}
                                     {Object.entries(
                                         extractValidationIssues(createState),
                                     ).map(([fieldName, errMsg]) => (
