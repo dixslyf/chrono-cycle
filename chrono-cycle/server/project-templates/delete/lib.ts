@@ -1,4 +1,5 @@
 import { and, eq } from "drizzle-orm";
+import * as O from "fp-ts/Option";
 
 import getDb from "@/server/db";
 import { projectTemplates as projectTemplatesTable } from "@/server/db/schema/projectTemplates";
@@ -7,7 +8,7 @@ import { ProjectTemplateBasicInfo } from "@/server/project-templates/list/data";
 export async function deleteProjectTemplate(
     projectTemplateName: string,
     userId: number,
-): Promise<ProjectTemplateBasicInfo | null> {
+): Promise<O.Option<ProjectTemplateBasicInfo>> {
     const db = await getDb();
     const deleted = await db
         .delete(projectTemplatesTable)
@@ -20,13 +21,13 @@ export async function deleteProjectTemplate(
         .returning();
 
     if (deleted.length === 0) {
-        return null;
+        return O.none;
     }
 
-    return {
+    return O.some({
         name: deleted[0].name,
         description: deleted[0].description,
         createdAt: deleted[0].createdAt,
         updatedAt: deleted[0].updatedAt,
-    };
+    });
 }

@@ -15,6 +15,30 @@ import { ProjectTemplateBasicInfo } from "@/server/project-templates/list/data";
 import { deleteProjectTemplateAction } from "@/server/project-templates/delete/action";
 import { CreateResult } from "@/server/project-templates/create/data";
 import { ValidationIssues } from "@/server/common/errors";
+import { DeleteResult } from "@/server/project-templates/delete/data";
+
+function getDeleteErrorMessage(deleteState: DeleteResult) {
+    return match(deleteState)
+        .with(
+            {
+                _tag: "Left",
+                left: {
+                    _errorKind: "AuthenticationError",
+                },
+            },
+            () => "Authentication failed",
+        )
+        .with(
+            {
+                _tag: "Left",
+                left: {
+                    _errorKind: "DoesNotExistError",
+                },
+            },
+            () => "Project template does not exist",
+        )
+        .otherwise(() => "");
+}
 
 function extractValidationIssues(
     createState: CreateResult | null,
@@ -57,7 +81,7 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
     // Template deletion.
     const [deleteState, deleteAction, _deletePending] = useActionState(
         deleteProjectTemplateAction,
-        { success: false },
+        null,
     );
 
     const handleDelete = async () => {
@@ -74,7 +98,7 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
 
     // Close modal window on deletion success.
     useEffect(() => {
-        if (modalMode == "view" && deleteState.success) {
+        if (modalMode == "view" && deleteState && E.isRight(deleteState)) {
             setIsModalOpen(false);
         }
     }, [deleteState, modalMode]);
@@ -202,8 +226,8 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
 
                                 {/* Deletion. */}
                                 <div>
-                                    {!deleteState.success &&
-                                        deleteState.errorMessage}
+                                    {deleteState &&
+                                        getDeleteErrorMessage(deleteState)}
                                 </div>
                                 <button onClick={() => handleDelete()}>
                                     <Trash />
