@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 const SettingsForm = () => {
-    const [dateFormat, setDataFormat] = useState<string>("MM/dd/yyyy");
+    const [dateFormat, setDataFormat] = useState<string>("MM/DD/YYYY");
     const daysOfWeek: string[] = [
         "Sunday",
         "Monday",

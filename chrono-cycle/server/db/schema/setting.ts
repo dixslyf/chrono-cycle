@@ -1,6 +1,7 @@
 import { InferSelectModel } from "drizzle-orm";
 import { pgTable, serial, varchar, boolean, integer } from "drizzle-orm/pg-core";
-import users from "./users"; 
+import users from "./users";
+import notificationMethods from "./notificationMethods"; 
 
 export const settings = pgTable("settings", {
     id: serial("id").primaryKey().unique(), 
@@ -11,10 +12,9 @@ export const settings = pgTable("settings", {
         .notNull(),
     dataFormat: varchar("data_format", { length: 10 }) 
         .notNull(),
-    emailNotification: boolean("email_notification") 
-        .notNull(),
-    desktopNotification: boolean("desktop_notification") 
-        .notNull(),
+    notificationMethodId: integer("notification_method_id").references(
+        () => notificationMethods.id,
+    ),
 });
 
 export type Setting = InferSelectModel<typeof settings>;
