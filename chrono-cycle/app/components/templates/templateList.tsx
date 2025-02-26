@@ -1,16 +1,21 @@
 "use client";
 
 import AddTemplateButton from "./addTemplateButton";
-import React, { useState, useActionState, useEffect } from "react";
-import { X } from "lucide-react";
+import React, {
+    useState,
+    useActionState,
+    useEffect,
+    startTransition,
+} from "react";
+import { Trash, X } from "lucide-react";
 import { createProjectTemplate } from "@/server/project-templates/create/action";
 import { ProjectTemplateBasicInfo } from "@/server/project-templates/list/data";
+import { deleteProjectTemplateAction } from "@/server/project-templates/delete/action";
 
 function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
-    const [formState, formAction, _formPending] = useActionState(
-        createProjectTemplate,
-        { submitSuccess: false },
-    );
+    // Action state for creating a project template.
+    const [createFormState, createFormAction, _createFormPending] =
+        useActionState(createProjectTemplate, { submitSuccess: false });
 
     // modal state and mode
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -24,12 +29,30 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
         setIsModalOpen((prev) => !prev);
     };
 
+    // Template deletion.
+    const [deleteState, deleteAction, _deletePending] = useActionState(
+        deleteProjectTemplateAction,
+        { success: false },
+    );
+
+    const handleDelete = async () => {
+        // Name is guaranteed to be a string.
+        startTransition(() => deleteAction(selectedTemplate?.name as string));
+    };
+
     // Close modal window on creation success.
     useEffect(() => {
-        if (modalMode == "create" && formState.submitSuccess) {
+        if (modalMode == "create" && createFormState.submitSuccess) {
             setIsModalOpen(false);
         }
-    }, [formState, modalMode]);
+    }, [createFormState, modalMode]);
+
+    // Close modal window on deletion success.
+    useEffect(() => {
+        if (modalMode == "view" && deleteState.success) {
+            setIsModalOpen(false);
+        }
+    }, [deleteState, modalMode]);
 
     // handles clickable rows to view template
     const handleRowClick = (template: ProjectTemplateBasicInfo) => {
@@ -94,7 +117,7 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
                             </button>
                         </div>
                         {modalMode === "create" ? (
-                            <form action={formAction}>
+                            <form action={createFormAction}>
                                 {/* template form */}
                                 {/* title and close button */}
                                 <div>
@@ -117,16 +140,16 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
                                 <div>
                                     {/* FIXME: Dumping errors here for now. */}
                                     <div className="text-red">
-                                        {!formState.submitSuccess &&
-                                            formState.errorMessage}
+                                        {!createFormState.submitSuccess &&
+                                            createFormState.errorMessage}
                                     </div>
                                     <div className="text-red">
-                                        {!formState.submitSuccess &&
-                                            formState.errors?.name}
+                                        {!createFormState.submitSuccess &&
+                                            createFormState.errors?.name}
                                     </div>
                                     <div className="text-red">
-                                        {!formState.submitSuccess &&
-                                            formState.errors?.description}
+                                        {!createFormState.submitSuccess &&
+                                            createFormState.errors?.description}
                                     </div>
                                 </div>
                                 <button type="submit">Create Template</button>
@@ -153,6 +176,15 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
                                         {selectedTemplate?.updatedAt.toString()}
                                     </div>
                                 </div>
+
+                                {/* Deletion. */}
+                                <div>
+                                    {!deleteState.success &&
+                                        deleteState.errorMessage}
+                                </div>
+                                <button onClick={() => handleDelete()}>
+                                    <Trash />
+                                </button>
                             </div>
                         )}
                     </div>
