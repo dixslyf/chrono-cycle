@@ -1,8 +1,5 @@
-export type ListProjectTemplatesResult = {
-    success: boolean;
-    projectTemplates?: ProjectTemplateBasicInfo[];
-    errorMessage?: string;
-};
+import { AuthenticationError } from "@/server/common/errors";
+import * as E from "fp-ts/Either";
 
 export type ProjectTemplateBasicInfo = {
     name: string;
@@ -10,3 +7,7 @@ export type ProjectTemplateBasicInfo = {
     createdAt: Date;
     updatedAt: Date;
 };
+
+export type ListError = AuthenticationError;
+
+export type ListResult = E.Either<ListError, ProjectTemplateBasicInfo[]>;
