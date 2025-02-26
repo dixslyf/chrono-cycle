@@ -38,24 +38,15 @@ function getCreateErrorMessage(createState: CreateResult) {
 function getDeleteErrorMessage(deleteState: DeleteResult) {
     return match(deleteState)
         .with(
-            {
-                _tag: "Left",
-                left: {
-                    _errorKind: "AuthenticationError",
-                },
-            },
+            { left: { _errorKind: "AuthenticationError" } },
             () => "Authentication failed",
         )
         .with(
-            {
-                _tag: "Left",
-                left: {
-                    _errorKind: "DoesNotExistError",
-                },
-            },
+            { left: { _errorKind: "DoesNotExistError" } },
             () => "Project template does not exist",
         )
-        .otherwise(() => "");
+        .with({ right: P.any }, () => "")
+        .exhaustive();
 }
 
 function extractValidationIssues(
