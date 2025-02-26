@@ -1,19 +1,20 @@
 "use server";
 
+import * as E from "fp-ts/Either";
+import * as O from "fp-ts/Option";
+import { pipe } from "fp-ts/function";
+
 import { getCurrentSession } from "@/server/auth/sessions";
 import { retrieveProjectTemplate } from "./lib";
-import { RetrieveProjectTemplateResult } from "./data";
+import { RetrieveResult } from "./data";
 
 export async function retrieveProjectTemplateAction(
     projectTemplateName: string,
-): Promise<RetrieveProjectTemplateResult> {
+): Promise<RetrieveResult> {
     // Verify user identity.
     const sessionResults = await getCurrentSession();
     if (!sessionResults) {
-        return {
-            success: false,
-            errorMessage: "Authentication failed",
-        };
+        return E.left({ _errorKind: "AuthenticationError" });
     }
 
     // Check that the user owns the project template.
@@ -25,15 +26,9 @@ export async function retrieveProjectTemplateAction(
         userId,
     );
 
-    if (!projectTemplate) {
-        return {
-            success: false,
-            errorMessage: "Project template does not exist",
-        };
-    }
-
-    return {
-        success: true,
+    return pipe(
         projectTemplate,
-    };
+        O.map((pt) => E.right(pt)),
+        O.getOrElse(() => E.left({ _errorKind: "DoesNotExistError" })),
+    );
 }
