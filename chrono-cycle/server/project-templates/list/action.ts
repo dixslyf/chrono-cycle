@@ -1,25 +1,19 @@
 "use server";
 
+import * as E from "fp-ts/Either";
+
 import { getCurrentSession } from "@/server/auth/sessions";
 import { getProjectTemplatesForUser } from "./lib";
-import { ListProjectTemplatesResult } from "./data";
+import { ListResult } from "./data";
 
-export async function listProjectTemplates(): Promise<ListProjectTemplatesResult> {
+export async function listProjectTemplatesAction(): Promise<ListResult> {
     // Verify user identity.
     const sessionResults = await getCurrentSession();
     if (!sessionResults) {
-        return {
-            success: false,
-            errorMessage: "Authentication failed",
-        };
+        return E.left({ _errorKind: "AuthenticationError" });
     }
 
     // Fetch project templates for the user.
     const userId = sessionResults.user.id;
-    const result = {
-        success: true,
-        projectTemplates: await getProjectTemplatesForUser(userId),
-    };
-
-    return result;
+    return E.right(await getProjectTemplatesForUser(userId));
 }

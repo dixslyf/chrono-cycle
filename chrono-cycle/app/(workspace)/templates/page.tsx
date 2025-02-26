@@ -1,9 +1,14 @@
 // template page
+
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
+
 import TemplateList from "@/app/components/templates/templateList";
-import { listProjectTemplates } from "@/server/project-templates/list/action";
+import { listProjectTemplatesAction } from "@/server/project-templates/list/action";
+import { ProjectTemplateBasicInfo } from "@/server/project-templates/list/data";
 
 export default async function Templates() {
-    const result = await listProjectTemplates();
+    const result = await listProjectTemplatesAction();
     return (
         <>
             {/* <h1>This is the template page</h1> */}
@@ -16,8 +21,16 @@ export default async function Templates() {
             <section className="w-full flex justify-center">
                 <div className="w-5/6">
                     {/* Error message when fetching the entries fail */}
-                    {!result.success && <div>{result.errorMessage}</div>}
-                    <TemplateList entries={result.projectTemplates || []} />
+                    {/* There is only one possible error (authentication error), so we don't need to differentiate. */}
+                    <div>{E.isLeft(result) ? "AuthenticationError" : ""}</div>
+                    <TemplateList
+                        entries={pipe(
+                            result,
+                            E.getOrElse(
+                                (_) => [] as ProjectTemplateBasicInfo[],
+                            ),
+                        )}
+                    />
                 </div>
             </section>
         </>

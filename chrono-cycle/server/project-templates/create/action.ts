@@ -1,42 +1,37 @@
 "use server";
 
+import * as E from "fp-ts/Either";
+
 import { getCurrentSession } from "@/server/auth/sessions";
-import {
-    createProjectTemplateFormSchema,
-    CreateProjectTemplateFormState,
-} from "./formData";
+import { formSchema, CreateResult } from "./data";
 import { insertProjectTemplateDb, isDuplicateProjectTemplateName } from "./lib";
 import { revalidatePath } from "next/cache";
 
-export async function createProjectTemplate(
-    _prevState: CreateProjectTemplateFormState,
+export async function createProjectTemplateAction(
+    _prevState: CreateResult | null,
     formData: FormData,
-): Promise<CreateProjectTemplateFormState> {
+): Promise<CreateResult> {
     // Validate form schema.
-    const parseResult = createProjectTemplateFormSchema.safeParse({
+    const parseResult = formSchema.safeParse({
         name: formData.get("name"),
         description: formData.get("description"),
     });
 
     if (!parseResult.success) {
         const formattedZodErrors = parseResult.error.format();
-        return {
-            submitSuccess: false,
-            errorMessage: "Invalid or missing fields",
-            errors: {
-                name: formattedZodErrors.name?._errors[0],
-                description: formattedZodErrors.description?._errors[0],
+        return E.left({
+            _errorKind: "ValidationError",
+            issues: {
+                name: formattedZodErrors.name?._errors || [],
+                description: formattedZodErrors.description?._errors || [],
             },
-        };
+        });
     }
 
     // Verify user identity.
     const sessionResults = await getCurrentSession();
     if (!sessionResults) {
-        return {
-            submitSuccess: false,
-            errorMessage: "Authentication failed",
-        };
+        return E.left({ _errorKind: "AuthenticationError" });
     }
 
     const { name, description } = parseResult.data;
@@ -44,22 +39,16 @@ export async function createProjectTemplate(
 
     // Check if name is taken.
     if (await isDuplicateProjectTemplateName(name, userId)) {
-        return {
-            submitSuccess: false,
-            errorMessage: "Project template name has already been used",
-        };
+        return E.left({ _errorKind: "DuplicateNameError" });
     }
 
     const inserted = await insertProjectTemplateDb(name, description, userId);
 
     revalidatePath("/templates");
-    return {
-        submitSuccess: true,
-        createdProjectTemplate: {
-            name: inserted.name,
-            description: inserted.description,
-            createdAt: inserted.createdAt,
-            updatedAt: inserted.updatedAt,
-        },
-    };
+    return E.right({
+        name: inserted.name,
+        description: inserted.description,
+        createdAt: inserted.createdAt,
+        updatedAt: inserted.updatedAt,
+    });
 }

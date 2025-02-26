@@ -8,14 +8,72 @@ import React, {
     startTransition,
 } from "react";
 import { Trash, X } from "lucide-react";
-import { createProjectTemplate } from "@/server/project-templates/create/action";
+import { match, P } from "ts-pattern";
+import * as E from "fp-ts/Either";
+import { createProjectTemplateAction } from "@/server/project-templates/create/action";
 import { ProjectTemplateBasicInfo } from "@/server/project-templates/list/data";
 import { deleteProjectTemplateAction } from "@/server/project-templates/delete/action";
+import { CreateResult } from "@/server/project-templates/create/data";
+import { ValidationIssues } from "@/server/common/errors";
+import { DeleteResult } from "@/server/project-templates/delete/data";
+
+function getCreateErrorMessage(createState: CreateResult) {
+    return match(createState)
+        .with(
+            { left: { _errorKind: "AuthenticationError" } },
+            () => "Authentication failed",
+        )
+        .with(
+            { left: { _errorKind: "ValidationError" } },
+            () => "Invalid or missing fields",
+        )
+        .with(
+            { left: { _errorKind: "DuplicateNameError" } },
+            () => "Project template name is already used",
+        )
+        .with({ right: P.any }, () => "")
+        .exhaustive();
+}
+
+function getDeleteErrorMessage(deleteState: DeleteResult) {
+    return match(deleteState)
+        .with(
+            { left: { _errorKind: "AuthenticationError" } },
+            () => "Authentication failed",
+        )
+        .with(
+            { left: { _errorKind: "DoesNotExistError" } },
+            () => "Project template does not exist",
+        )
+        .with({ right: P.any }, () => "")
+        .exhaustive();
+}
+
+function extractValidationIssues(
+    createState: CreateResult | null,
+): ValidationIssues<"name" | "description"> {
+    const noIssue = { name: [], description: [] };
+    if (!createState) {
+        return noIssue;
+    }
+
+    return match(createState)
+        .with(
+            {
+                _tag: "Left",
+                left: { _errorKind: "ValidationError", issues: P.select() },
+            },
+            (issues) => issues,
+        )
+        .otherwise(() => noIssue);
+}
 
 function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
     // Action state for creating a project template.
-    const [createFormState, createFormAction, _createFormPending] =
-        useActionState(createProjectTemplate, { submitSuccess: false });
+    const [createState, createAction, _createPending] = useActionState(
+        createProjectTemplateAction,
+        null,
+    );
 
     // modal state and mode
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -32,7 +90,7 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
     // Template deletion.
     const [deleteState, deleteAction, _deletePending] = useActionState(
         deleteProjectTemplateAction,
-        { success: false },
+        null,
     );
 
     const handleDelete = async () => {
@@ -42,14 +100,14 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
 
     // Close modal window on creation success.
     useEffect(() => {
-        if (modalMode == "create" && createFormState.submitSuccess) {
+        if (modalMode == "create" && createState && E.isRight(createState)) {
             setIsModalOpen(false);
         }
-    }, [createFormState, modalMode]);
+    }, [createState, modalMode]);
 
     // Close modal window on deletion success.
     useEffect(() => {
-        if (modalMode == "view" && deleteState.success) {
+        if (modalMode == "view" && deleteState && E.isRight(deleteState)) {
             setIsModalOpen(false);
         }
     }, [deleteState, modalMode]);
@@ -117,7 +175,7 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
                             </button>
                         </div>
                         {modalMode === "create" ? (
-                            <form action={createFormAction}>
+                            <form action={createAction}>
                                 {/* template form */}
                                 {/* title and close button */}
                                 <div>
@@ -139,18 +197,18 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
                                 </div>
                                 <div>
                                     {/* FIXME: Dumping errors here for now. */}
-                                    <div className="text-red">
-                                        {!createFormState.submitSuccess &&
-                                            createFormState.errorMessage}
-                                    </div>
-                                    <div className="text-red">
-                                        {!createFormState.submitSuccess &&
-                                            createFormState.errors?.name}
-                                    </div>
-                                    <div className="text-red">
-                                        {!createFormState.submitSuccess &&
-                                            createFormState.errors?.description}
-                                    </div>
+                                    {createState &&
+                                        getCreateErrorMessage(createState)}
+                                    {Object.entries(
+                                        extractValidationIssues(createState),
+                                    ).map(([fieldName, errMsg]) => (
+                                        <div
+                                            key={fieldName}
+                                            className="text-red"
+                                        >
+                                            {errMsg}
+                                        </div>
+                                    ))}
                                 </div>
                                 <button type="submit">Create Template</button>
                             </form>
@@ -179,8 +237,8 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
 
                                 {/* Deletion. */}
                                 <div>
-                                    {!deleteState.success &&
-                                        deleteState.errorMessage}
+                                    {deleteState &&
+                                        getDeleteErrorMessage(deleteState)}
                                 </div>
                                 <button onClick={() => handleDelete()}>
                                     <Trash />
