@@ -3,10 +3,10 @@
 import { getCurrentSession } from "@/server/auth/sessions";
 import { deleteProjectTemplate } from "./lib";
 import { DeleteProjectTemplateResult } from "./data";
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 export async function deleteProjectTemplateAction(
+    _previousState: DeleteProjectTemplateResult,
     name: string,
 ): Promise<DeleteProjectTemplateResult> {
     // Verify user identity.
