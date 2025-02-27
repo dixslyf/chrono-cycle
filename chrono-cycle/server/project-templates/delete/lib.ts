@@ -4,6 +4,7 @@ import * as O from "fp-ts/Option";
 import getDb from "@/server/db";
 import { projectTemplates as projectTemplatesTable } from "@/server/db/schema/projectTemplates";
 import { ProjectTemplateOverview } from "../common/data";
+import { encodeId } from "@/server/common/identifiers";
 
 export async function deleteProjectTemplate(
     projectTemplateName: string,
@@ -25,6 +26,7 @@ export async function deleteProjectTemplate(
     }
 
     return O.some({
+        id: encodeId(deleted[0].id),
         name: deleted[0].name,
         description: deleted[0].description,
         createdAt: deleted[0].createdAt,
