@@ -15,12 +15,18 @@ import Logo from "./logo";
 import { Bell, User, UserPen, LogOut } from "lucide-react";
 import Sidebar from "./sidebar";
 import { signout as signoutAction } from "@/server/auth/actions";
+import {
+    MenuContent,
+    MenuItem,
+    MenuRoot,
+    MenuTrigger,
+    Text,
+} from "@chakra-ui/react";
 
 const Navbar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false); // handles sidebar
     const [isNotiOpen, setIsNotiOpen] = useState<boolean>(false); // handles notification dropdown
     const [notifications, setNotifications] = useState<number>(3); // eslint-disable-line @typescript-eslint/no-unused-vars
-    const [isUserOpen, setIsUserOpen] = useState<boolean>(false);
     const pathname = usePathname();
 
     // Server-side action for logging out.
@@ -28,8 +34,6 @@ const Navbar = () => {
         signoutAction,
         null,
     );
-
-    const profileContainerRef = useRef<HTMLDivElement | null>(null);
 
     // useCallback used to prevent unnecessary re-renders
     const toggleSidebar = useCallback(() => {
@@ -45,27 +49,6 @@ const Navbar = () => {
     const toggleNoti = () => {
         setIsNotiOpen(!isNotiOpen);
     };
-
-    // toggle profile dropdown
-    const toggleProfile = () => {
-        setIsUserOpen((prev) => !prev);
-    };
-
-    // close profile dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (
-                profileContainerRef.current &&
-                !profileContainerRef.current.contains(event.target as Node)
-            ) {
-                setIsUserOpen(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () =>
-            document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
 
     return (
         <>
@@ -93,42 +76,45 @@ const Navbar = () => {
                         )}
                     </button>
 
-                    <div className="relative" ref={profileContainerRef}>
-                        <button
-                            onClick={toggleProfile}
-                            className="flex items-center focus:outline-none"
-                        >
-                            <User className="w-8 h-8" />
-                        </button>
-
-                        {/* profile downdown */}
-                        {isUserOpen && (
-                            <div className="absolute right-0 mt-5 w-48 bg-palette3 text-palette5 rounded-xl shadow-xl overflow-hidden">
-                                <ul>
-                                    <li className="bg-palette2">
-                                        <User />
-                                        User
-                                    </li>
-                                    <li className="hover:bg-[#00000030]">
-                                        <Link href="/profile">
-                                            <UserPen />
-                                            Profile
-                                        </Link>
-                                    </li>
-                                    <li className="hover:bg-[#00000030]">
-                                        <form action={signoutFormAction}>
-                                            <button
-                                                type="submit"
-                                                className="w-full"
-                                            >
-                                                <LogOut />
-                                                Logout
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                        )}
+                    <div className="relative">
+                        <MenuRoot>
+                            <MenuTrigger asChild>
+                                <button className="focus:outline-none">
+                                    <User className="w-8 h-8" />
+                                </button>
+                            </MenuTrigger>
+                            <MenuContent className="absolute right-0 bg-palette3 p-0 rounded-lg">
+                                <Text className="text-palette3 flex gap-2 bg-palette2 p-2 font-semibold text-lg">
+                                    <User />
+                                    User
+                                </Text>
+                                <MenuItem
+                                    asChild
+                                    value="profile"
+                                    className="text-palette5 text-lg hover:bg-[#00000030] transition-colors duration-200 ease-linear"
+                                >
+                                    <Link href="/profile">
+                                        <UserPen />
+                                        Profile
+                                    </Link>
+                                </MenuItem>
+                                <MenuItem
+                                    asChild
+                                    value="logout"
+                                    className="text-palette5 text-lg hover:bg-[#00000030] transition-colors duration-200 ease-linear"
+                                >
+                                    <form action={signoutFormAction}>
+                                        <button
+                                            type="submit"
+                                            className="flex gap-2 focus:outline-none"
+                                        >
+                                            <LogOut />
+                                            Logout
+                                        </button>
+                                    </form>
+                                </MenuItem>
+                            </MenuContent>
+                        </MenuRoot>
                     </div>
                 </div>
             </nav>
