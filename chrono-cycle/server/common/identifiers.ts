@@ -1,16 +1,25 @@
 import Sqids from "sqids";
+import { z } from "zod";
 
-const alphabet: string =
-    "2na6ICdpxG73S8myYUJ40ckNL5htTosvgWuR1AqfzwZX9OKFDMBHPVbQjrieEl";
+const SQIDS_CONFIG = {
+    alphabet: "2na6ICdpxG73S8myYUJ40ckNL5htTosvgWuR1AqfzwZX9OKFDMBHPVbQjrieEl",
+    minLength: 16,
+};
 
 let sqids: Sqids | null = null;
 
+export const encodedIdSchema = z
+    .string()
+    .nonempty("Identifier should not be empty")
+    .min(
+        SQIDS_CONFIG.minLength,
+        "Identifier should be at least 16 characters long",
+    )
+    .regex(/^\S*$/, "Identifer should not contain whitespace");
+
 export function getSqids(): Sqids {
     if (!sqids) {
-        sqids = new Sqids({
-            alphabet,
-            minLength: 16,
-        });
+        sqids = new Sqids(SQIDS_CONFIG);
     }
 
     return sqids;
