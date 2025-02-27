@@ -3,7 +3,7 @@
 import * as E from "fp-ts/Either";
 
 import { getCurrentSession } from "@/server/auth/sessions";
-import { formSchema, CreateResult, DuplicateNameError } from "./data";
+import { createFormSchema, CreateResult, DuplicateNameError } from "./data";
 import { insertProjectTemplateDb, isDuplicateProjectTemplateName } from "./lib";
 import { revalidatePath } from "next/cache";
 import { AuthenticationError, ValidationError } from "@/server/common/errors";
@@ -13,7 +13,7 @@ export async function createProjectTemplateAction(
     formData: FormData,
 ): Promise<CreateResult> {
     // Validate form schema.
-    const parseResult = formSchema.safeParse({
+    const parseResult = createFormSchema.safeParse({
         name: formData.get("name"),
         description: formData.get("description"),
     });

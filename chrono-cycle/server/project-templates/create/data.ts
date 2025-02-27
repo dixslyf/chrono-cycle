@@ -1,8 +1,8 @@
 import * as E from "fp-ts/Either";
 
 import { z } from "zod";
-import { ProjectTemplateBasicInfo } from "../list/data";
 
+import { ProjectTemplateOverview } from "../common/data";
 import { AuthenticationError, ValidationError } from "@/server/common/errors";
 
 export const nameSchema = z
@@ -11,12 +11,12 @@ export const nameSchema = z
 
 export const descriptionSchema = z.string();
 
-export const formSchema = z.object({
+export const createFormSchema = z.object({
     name: nameSchema,
     description: descriptionSchema,
 });
 
-export type CreateFormData = z.output<typeof formSchema>;
+export type CreateFormData = z.output<typeof createFormSchema>;
 
 export type DuplicateNameError = {
     _errorKind: "DuplicateNameError";
@@ -26,9 +26,11 @@ export function DuplicateNameError(): DuplicateNameError {
     return { _errorKind: "DuplicateNameError" };
 }
 
+export type CreateReturnData = ProjectTemplateOverview;
+
 export type CreateError =
     | ValidationError<"name" | "description">
     | AuthenticationError
     | DuplicateNameError;
 
-export type CreateResult = E.Either<CreateError, ProjectTemplateBasicInfo>;
+export type CreateResult = E.Either<CreateError, CreateReturnData>;

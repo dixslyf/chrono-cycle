@@ -2,11 +2,11 @@ import { eq } from "drizzle-orm";
 
 import getDb from "@/server/db";
 import { projectTemplates as projectTemplatesTable } from "@/server/db/schema/projectTemplates";
-import { ProjectTemplateBasicInfo } from "./data";
+import { ProjectTemplateOverview } from "../common/data";
 
 export async function getProjectTemplatesForUser(
     userId: number,
-): Promise<ProjectTemplateBasicInfo[]> {
+): Promise<ProjectTemplateOverview[]> {
     const db = await getDb();
     const selected = await db
         .select()

@@ -5,7 +5,7 @@ import { pipe } from "fp-ts/function";
 
 import TemplateList from "@/app/components/templates/templateList";
 import { listProjectTemplatesAction } from "@/server/project-templates/list/action";
-import { ProjectTemplateBasicInfo } from "@/server/project-templates/list/data";
+import { ProjectTemplateOverview } from "@/server/project-templates/common/data";
 
 export default async function Templates() {
     const result = await listProjectTemplatesAction();
@@ -26,9 +26,7 @@ export default async function Templates() {
                     <TemplateList
                         entries={pipe(
                             result,
-                            E.getOrElse(
-                                (_) => [] as ProjectTemplateBasicInfo[],
-                            ),
+                            E.getOrElse((_) => [] as ProjectTemplateOverview[]),
                         )}
                     />
                 </div>
