@@ -1,36 +1,47 @@
 import Sqids from "sqids";
 import { z } from "zod";
 
-const SQIDS_CONFIG = {
-    alphabet: "2na6ICdpxG73S8myYUJ40ckNL5htTosvgWuR1AqfzwZX9OKFDMBHPVbQjrieEl",
+const COMMON_SQIDS_CONFIG = {
     minLength: 16,
 };
 
-let sqids: Sqids | null = null;
+const sqidses = {
+    projectTemplate: new Sqids({
+        alphabet:
+            "RQdSlkis95wmHvOeMayNnCGZ4DrKEzjuUIxbFJtAqo73PVT1X8WBLYh2fgp6c0",
+        ...COMMON_SQIDS_CONFIG,
+    }),
+    eventTemplate: new Sqids({
+        alphabet:
+            "2na6ICdpxG73S8myYUJ40ckNL5htTosvgWuR1AqfzwZX9OKFDMBHPVbQjrieEl",
+        ...COMMON_SQIDS_CONFIG,
+    }),
+};
+
+function genEncodeId(entityType: keyof typeof sqidses) {
+    return function(id: number): string {
+        const sqids = sqidses[entityType];
+        return sqids.encode([id]);
+    };
+}
+
+function genDecodeId(entityType: keyof typeof sqidses) {
+    return function(encodedId: string): number {
+        const sqids = sqidses[entityType];
+        return sqids.decode(encodedId)[0];
+    };
+}
 
 export const encodedIdSchema = z
     .string()
     .nonempty("Identifier should not be empty")
     .min(
-        SQIDS_CONFIG.minLength,
+        COMMON_SQIDS_CONFIG.minLength,
         "Identifier should be at least 16 characters long",
     )
     .regex(/^\S*$/, "Identifer should not contain whitespace");
 
-export function getSqids(): Sqids {
-    if (!sqids) {
-        sqids = new Sqids(SQIDS_CONFIG);
-    }
-
-    return sqids;
-}
-
-export function encodeId(id: number): string {
-    const sqid = getSqids();
-    return sqid.encode([id]);
-}
-
-export function decodeId(encodedId: string): number {
-    const sqid = getSqids();
-    return sqid.decode(encodedId)[0];
-}
+export const encodeProjectTemplateId = genEncodeId("projectTemplate");
+export const decodeProjectTemplateId = genDecodeId("projectTemplate");
+export const encodeEventTemplateId = genEncodeId("eventTemplate");
+export const decodeEventTemplateId = genDecodeId("eventTemplate");

@@ -7,7 +7,7 @@ import { createFormSchema, CreateResult, DuplicateNameError } from "./data";
 import { insertProjectTemplateDb, isDuplicateProjectTemplateName } from "./lib";
 import { revalidatePath } from "next/cache";
 import { AuthenticationError, ValidationError } from "@/server/common/errors";
-import { encodeId } from "@/server/common/identifiers";
+import { encodeProjectTemplateId } from "@/server/common/identifiers";
 
 export async function createProjectTemplateAction(
     _prevState: CreateResult | null,
@@ -47,7 +47,7 @@ export async function createProjectTemplateAction(
 
     revalidatePath("/templates");
     return E.right({
-        id: encodeId(inserted.id),
+        id: encodeProjectTemplateId(inserted.id),
         name: inserted.name,
         description: inserted.description,
         createdAt: inserted.createdAt,
