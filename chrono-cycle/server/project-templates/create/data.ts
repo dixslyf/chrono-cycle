@@ -4,16 +4,11 @@ import { z } from "zod";
 
 import { ProjectTemplateOverview } from "../common/data";
 import { AuthenticationError, ValidationError } from "@/server/common/errors";
-
-export const nameSchema = z
-    .string()
-    .nonempty("Please enter a name for the project template.");
-
-export const descriptionSchema = z.string();
+import { projectTemplateInsertSchema } from "@/server/db/schema/projectTemplates";
 
 export const createFormSchema = z.object({
-    name: nameSchema,
-    description: descriptionSchema,
+    name: projectTemplateInsertSchema.shape.name,
+    description: projectTemplateInsertSchema.shape.description,
 });
 
 export type CreateFormData = z.output<typeof createFormSchema>;
