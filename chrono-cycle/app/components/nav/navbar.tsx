@@ -1,13 +1,7 @@
 // main navbar
 "use client";
 
-import {
-    useState,
-    useCallback,
-    useEffect,
-    useRef,
-    useActionState,
-} from "react";
+import { useState, useCallback, useEffect, useActionState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import HamburgerMenu from "./menu";
@@ -26,7 +20,7 @@ import {
 const Navbar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false); // handles sidebar
     const [isNotiOpen, setIsNotiOpen] = useState<boolean>(false); // handles notification dropdown
-    const [notifications, setNotifications] = useState<number>(3); // eslint-disable-line @typescript-eslint/no-unused-vars
+    const [notifications, _setNotifications] = useState<number>(3); // eslint-disable-line @typescript-eslint/no-unused-vars
     const pathname = usePathname();
 
     // Server-side action for logging out.
