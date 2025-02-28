@@ -16,17 +16,22 @@ const sqidses = {
             "2na6ICdpxG73S8myYUJ40ckNL5htTosvgWuR1AqfzwZX9OKFDMBHPVbQjrieEl",
         ...COMMON_SQIDS_CONFIG,
     }),
+    tag: new Sqids({
+        alphabet:
+            "Co5GjZLnANYE6ImUuF7k2x48r3OQiHy0VcSTbfRDlWavsPhgKXdzpt9JqMeBw1",
+        ...COMMON_SQIDS_CONFIG,
+    }),
 };
 
 function genEncodeId(entityType: keyof typeof sqidses) {
-    return function (id: number): string {
+    return function(id: number): string {
         const sqids = sqidses[entityType];
         return sqids.encode([id]);
     };
 }
 
 function genDecodeId(entityType: keyof typeof sqidses) {
-    return function (encodedId: string): number {
+    return function(encodedId: string): number {
         const sqids = sqidses[entityType];
         return sqids.decode(encodedId)[0];
     };
@@ -43,5 +48,9 @@ export const encodedIdSchema = z
 
 export const encodeProjectTemplateId = genEncodeId("projectTemplate");
 export const decodeProjectTemplateId = genDecodeId("projectTemplate");
+
 export const encodeEventTemplateId = genEncodeId("eventTemplate");
 export const decodeEventTemplateId = genDecodeId("eventTemplate");
+
+export const encodeTagId = genEncodeId("tag");
+export const decodeTagId = genDecodeId("tag");
