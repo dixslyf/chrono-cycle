@@ -7,7 +7,7 @@ import {
     ValidationError,
 } from "@/server/common/errors";
 import { eventTemplateInsertSchema } from "@/server/db/schema/eventTemplates";
-import { EventTemplate } from "@/server/event-templates/common/data";
+import { EventTemplate } from "@/server/common/data";
 import { encodedIdSchema } from "@/server/common/identifiers";
 
 export const createFormDataSchema = z.object({

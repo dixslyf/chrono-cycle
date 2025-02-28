@@ -6,7 +6,7 @@ import {
     InternalError,
     ValidationError,
 } from "@/server/common/errors";
-import { EventTemplate } from "@/server/event-templates/common/data";
+import { EventTemplate } from "@/server/common/data";
 import { encodedIdSchema } from "@/server/common/identifiers";
 
 export const listFormDataSchema = z.object({

@@ -3,7 +3,7 @@ import * as O from "fp-ts/Option";
 
 import getDb from "@/server/db";
 import { projectTemplates as projectTemplatesTable } from "@/server/db/schema/projectTemplates";
-import { ProjectTemplateOverview } from "../common/data";
+import { ProjectTemplateOverview } from "@/server/common/data";
 import { encodeProjectTemplateId } from "@/server/common/identifiers";
 
 export async function deleteProjectTemplate(

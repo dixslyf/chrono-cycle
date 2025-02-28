@@ -5,13 +5,13 @@ import getDb from "@/server/db";
 import { ListError, ListResult } from "./data";
 import { eventTemplates } from "@/server/db/schema/eventTemplates";
 import { DoesNotExistError, InternalError } from "@/server/common/errors";
+import { EventTemplate } from "@/server/common/data";
 import {
     decodeProjectTemplateId,
     encodeEventTemplateId,
     encodeProjectTemplateId,
 } from "@/server/common/identifiers";
 import { projectTemplates } from "@/server/db/schema";
-import { EventTemplate } from "@/server/event-templates/common/data";
 
 export async function listEventTemplates(
     userId: number,

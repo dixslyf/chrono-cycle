@@ -1,5 +1,5 @@
 import * as E from "fp-ts/Either";
-import { ProjectTemplateOverview } from "../common/data";
+import { ProjectTemplateOverview } from "@/server/common/data";
 
 export type ListReturnData = ProjectTemplateOverview;
 

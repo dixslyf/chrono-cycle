@@ -2,7 +2,7 @@ import * as E from "fp-ts/Either";
 
 import { z } from "zod";
 
-import { ProjectTemplateOverview } from "../common/data";
+import { ProjectTemplateOverview } from "@/server/common/data";
 import { ValidationError } from "@/server/common/errors";
 import { projectTemplateInsertSchema } from "@/server/db/schema/projectTemplates";
 
