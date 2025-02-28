@@ -25,9 +25,7 @@ export const settings = pgTable("settings", {
 
     dateFormat: dateFormatEnum("date_format").notNull(),
 
-    emailNotification: boolean("email_notification")
-        .notNull()
-        .default(false),
+    emailNotification: boolean("email_notification").notNull().default(false),
 
     desktopNotification: boolean("desktop_notification")
         .notNull()
