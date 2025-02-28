@@ -19,10 +19,10 @@ export const reminderNotificationMethods = pgTable(
     (t) => [primaryKey({ columns: [t.reminderId, t.notificationMethodId] })],
 );
 
-export type ReminderNotificationMethod = InferSelectModel<
+export type DbReminderNotificationMethod = InferSelectModel<
     typeof reminderNotificationMethods
 >;
-export type ReminderNotificationMethodInsert = InferInsertModel<
+export type DbReminderNotificationMethodInsert = InferInsertModel<
     typeof reminderNotificationMethods
 >;
 

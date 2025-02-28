@@ -19,8 +19,8 @@ export const users = pgTable("users", {
         .defaultNow(),
 });
 
-export type User = InferSelectModel<typeof users>;
-export type UserInsert = InferInsertModel<typeof users>;
+export type DbUser = InferSelectModel<typeof users>;
+export type DbUserInsert = InferInsertModel<typeof users>;
 
 export const userSelectSchema = createSelectSchema(users);
 export const userInsertSchema = createInsertSchema(users);

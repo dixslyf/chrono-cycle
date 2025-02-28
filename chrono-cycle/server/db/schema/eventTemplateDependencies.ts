@@ -23,10 +23,10 @@ export const eventTemplateDependencies = pgTable(
     (t) => [primaryKey({ columns: [t.parentId, t.childId] })],
 );
 
-export type EventTemplateDependency = InferSelectModel<
+export type DbEventTemplateDependency = InferSelectModel<
     typeof eventTemplateDependencies
 >;
-export type EventTemplateDependencyInsert = InferInsertModel<
+export type DbEventTemplateDependencyInsert = InferInsertModel<
     typeof eventTemplateDependencies
 >;
 

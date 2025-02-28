@@ -21,8 +21,10 @@ export const eventTemplateTags = pgTable(
     (t) => [primaryKey({ columns: [t.eventTemplateId, t.tagId] })],
 );
 
-export type EventTemplateTag = InferSelectModel<typeof eventTemplateTags>;
-export type EventTemplateTagInsert = InferInsertModel<typeof eventTemplateTags>;
+export type DbEventTemplateTag = InferSelectModel<typeof eventTemplateTags>;
+export type DbEventTemplateTagInsert = InferInsertModel<
+    typeof eventTemplateTags
+>;
 
 export const eventTemplateTagSelectSchema =
     createSelectSchema(eventTemplateTags);

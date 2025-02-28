@@ -38,8 +38,8 @@ export const projectTemplates = pgTable(
     ],
 );
 
-export type ProjectTemplate = InferSelectModel<typeof projectTemplates>;
-export type ProjectTemplateInsert = InferInsertModel<typeof projectTemplates>;
+export type DbProjectTemplate = InferSelectModel<typeof projectTemplates>;
+export type DbProjectTemplateInsert = InferInsertModel<typeof projectTemplates>;
 
 export const projectTemplateSelectSchema = createSelectSchema(projectTemplates);
 export const projectTemplateInsertSchema = createInsertSchema(projectTemplates);

@@ -11,8 +11,8 @@ export const tags = pgTable("tags", {
     name: text("name").notNull(),
 });
 
-export type Tag = InferSelectModel<typeof tags>;
-export type TagInsert = InferInsertModel<typeof tags>;
+export type DbTag = InferSelectModel<typeof tags>;
+export type DbTagInsert = InferInsertModel<typeof tags>;
 
 export const tagSelectSchema = createSelectSchema(tags);
 export const tagInsertSchema = createInsertSchema(tags);

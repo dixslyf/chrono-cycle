@@ -11,8 +11,8 @@ export const notificationMethods = pgTable("notification_methods", {
     name: text("name").notNull(),
 });
 
-export type NotificationMethod = InferSelectModel<typeof notificationMethods>;
-export type NotificationMethodInsert = InferInsertModel<
+export type DbNotificationMethod = InferSelectModel<typeof notificationMethods>;
+export type DbNotificationMethodInsert = InferInsertModel<
     typeof notificationMethods
 >;
 

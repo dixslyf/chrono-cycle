@@ -33,8 +33,8 @@ export const userSettings = pgTable("user_settings", {
         .default(false),
 });
 
-export type UserSettings = InferSelectModel<typeof userSettings>;
-export type UserSettingsInsert = InferInsertModel<typeof userSettings>;
+export type DbUserSettings = InferSelectModel<typeof userSettings>;
+export type DbUserSettingsInsert = InferInsertModel<typeof userSettings>;
 
 export const userSettingsSelectSchema = createSelectSchema(userSettings);
 export const userSettingsInsertSchema = createInsertSchema(userSettings);

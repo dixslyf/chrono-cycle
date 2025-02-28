@@ -48,8 +48,8 @@ export const events = pgTable("events", {
     ),
 });
 
-export type Event = InferSelectModel<typeof events>;
-export type EventInsert = InferInsertModel<typeof events>;
+export type DbEvent = InferSelectModel<typeof events>;
+export type DbEventInsert = InferInsertModel<typeof events>;
 
 export const eventSelectSchema = createSelectSchema(events);
 export const eventInsertSchema = createInsertSchema(events);

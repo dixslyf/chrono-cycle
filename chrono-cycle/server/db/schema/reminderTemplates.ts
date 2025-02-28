@@ -16,8 +16,10 @@ export const reminderTemplates = pgTable("reminder_templates", {
     time: time("time").notNull(),
 });
 
-export type ReminderTemplate = InferSelectModel<typeof reminderTemplates>;
-export type ReminderTemplateInsert = InferInsertModel<typeof reminderTemplates>;
+export type DbReminderTemplate = InferSelectModel<typeof reminderTemplates>;
+export type DbReminderTemplateInsert = InferInsertModel<
+    typeof reminderTemplates
+>;
 
 export const reminderTemplateSelectSchema =
     createSelectSchema(reminderTemplates);

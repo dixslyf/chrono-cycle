@@ -23,10 +23,10 @@ export const reminderTemplateNotificationMethods = pgTable(
     ],
 );
 
-export type ReminderTemplateNotificationMethod = InferSelectModel<
+export type DbReminderTemplateNotificationMethod = InferSelectModel<
     typeof reminderTemplateNotificationMethods
 >;
-export type ReminderTemplateNotificationMethodInsert = InferInsertModel<
+export type DbReminderTemplateNotificationMethodInsert = InferInsertModel<
     typeof reminderTemplateNotificationMethods
 >;
 

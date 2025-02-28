@@ -34,8 +34,8 @@ export const eventTemplates = pgTable("event_templates", {
         .references(() => projectTemplates.id),
 });
 
-export type EventTemplate = InferSelectModel<typeof eventTemplates>;
-export type EventTemplateInsert = InferInsertModel<typeof eventTemplates>;
+export type DbEventTemplate = InferSelectModel<typeof eventTemplates>;
+export type DbEventTemplateInsert = InferInsertModel<typeof eventTemplates>;
 
 export const eventTemplateSelectSchema = createSelectSchema(eventTemplates);
 export const eventTemplateInsertSchema = createInsertSchema(eventTemplates);

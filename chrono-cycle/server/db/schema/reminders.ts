@@ -20,8 +20,8 @@ export const reminders = pgTable("reminders", {
     ),
 });
 
-export type Reminder = InferSelectModel<typeof reminders>;
-export type ReminderInsert = InferInsertModel<typeof reminders>;
+export type DbReminder = InferSelectModel<typeof reminders>;
+export type DbReminderInsert = InferInsertModel<typeof reminders>;
 
 export const reminderSelectSchema = createSelectSchema(reminders);
 export const reminderInsertSchema = createInsertSchema(reminders);

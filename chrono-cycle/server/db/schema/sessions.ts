@@ -18,8 +18,8 @@ export const sessions = pgTable("sessions", {
     }).notNull(),
 });
 
-export type Session = InferSelectModel<typeof sessions>;
-export type SessionInsert = InferInsertModel<typeof sessions>;
+export type DbSession = InferSelectModel<typeof sessions>;
+export type DbSessionInsert = InferInsertModel<typeof sessions>;
 
 export const sessionSelectSchema = createSelectSchema(sessions);
 export const sessionInsertSchema = createInsertSchema(sessions);

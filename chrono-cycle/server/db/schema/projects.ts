@@ -44,8 +44,8 @@ export const projects = pgTable(
     (t) => [unique("projects_unique_user_id_name").on(t.userId, t.name)],
 );
 
-export type Project = InferSelectModel<typeof projects>;
-export type ProjectInsert = InferInsertModel<typeof projects>;
+export type DbProject = InferSelectModel<typeof projects>;
+export type DbProjectInsert = InferInsertModel<typeof projects>;
 
 export const projectSelectSchema = createSelectSchema(projects);
 export const projectInsertSchema = createInsertSchema(projects);
