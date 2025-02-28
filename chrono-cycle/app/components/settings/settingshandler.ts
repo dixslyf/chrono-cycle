@@ -1,16 +1,26 @@
-"use server";
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { notificationMethods } from '@/server/db/schema/notificationMethods';
 import { settings } from '@/server/db/schema/settings';
+import { users } from '@/server/db/schema/users';
+import { eq } from "drizzle-orm";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const db = drizzle(pool);
 
+interface UpdateSettingsBody {
+    startDayOfWeek: string;
+    dateFormat: string;
+    emailNotification?: boolean;
+    desktopNotification?: boolean;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { userId } = req.query;
+
+    if (isNaN(Number(userId))) {
+        return res.status(400).json({ error: 'Invalid user ID' });
+    }
 
     // Handle GET request to fetch user settings
     if (req.method === 'GET') {
@@ -18,22 +28,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const userSettings = await db
                 .select()
                 .from(settings)
-                .where(settings.userId.eq(Number(userId)));
+                .where(eq(settings.userId, Number(userId))); 
 
             if (userSettings.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
             }
 
             const userSetting = userSettings[0];
-            const notificationMethod = await db
-                .select()
-                .from(notificationMethods)
-                .where(notificationMethods.id.eq(userSetting.notificationMethodId));
 
             return res.status(200).json({
                 startDayOfWeek: userSetting.startDayOfWeek,
                 dateFormat: userSetting.dateFormat,
-                notificationMethodId: userSetting.notificationMethodId,
+                emailNotification: userSetting.emailNotification,
+                desktopNotification: userSetting.desktopNotification,
             });
         } catch (error) {
             console.error("Error fetching user settings:", error);
@@ -43,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Handle PUT request to update user settings
     else if (req.method === 'PUT') {
-        const { startDayOfWeek, dateFormat, notificationMethodId } = req.body;
+        const { startDayOfWeek, dateFormat, emailNotification, desktopNotification } = req.body as UpdateSettingsBody;
 
         // Validate required fields
         if (!startDayOfWeek || !dateFormat) {
@@ -51,27 +58,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         try {
-            // Check if the notification method exists
-            if (notificationMethodId !== null) {
-                const notificationMethodExists = await db
-                    .select()
-                    .from(notificationMethods)
-                    .where(notificationMethods.id.eq(notificationMethodId));
-
-                if (notificationMethodExists.length === 0) {
-                    return res.status(400).json({ error: 'Invalid notification method' });
-                }
-            }
-
             // Update settings in the database
             const updatedSettings = await db
                 .update(settings)
                 .set({
                     startDayOfWeek,
                     dateFormat,
-                    notificationMethodId,
+                    emailNotification,
+                    desktopNotification,
                 })
-                .where(settings.userId.eq(Number(userId)));
+                .where(eq(settings.userId, Number(userId))); 
 
             if (updatedSettings.rowCount === 0) {
                 return res.status(404).json({ error: 'User not found or no changes made' });

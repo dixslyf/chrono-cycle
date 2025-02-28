@@ -1,16 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from 'next/navigation';
 
 const SettingsForm = ({ userId, router }: { userId: number; router: any }) => {
     const [dateFormat, setDateFormat] = useState<string>("MM/dd/yyyy");
     const [startDayOfWeek, setStartDayOfWeek] = useState<string>("Sunday");
     const [emailNotifications, setEmailNotifications] = useState<boolean>(false);
     const [desktopNotifications, setDesktopNotifications] = useState<boolean>(false);
-    const [notificationMethodId, setNotificationMethodId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const Router = useRouter();
 
     const daysOfWeek: string[] = [
         "Sunday",
@@ -26,15 +23,15 @@ const SettingsForm = ({ userId, router }: { userId: number; router: any }) => {
     useEffect(() => {
         const fetchUserSettings = async () => {
             try {
-                const response = await fetch(`@/app/components/settings/settingshandler/${userId}`);
+                const response = await fetch(`./settingshandler/userId=${userId}`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch user settings");
                 }
-
                 const data = await response.json();
                 setStartDayOfWeek(data.startDayOfWeek);
                 setDateFormat(data.dateFormat);
-                setNotificationMethodId(data.notificationMethodId);
+                setEmailNotifications(data.emailNotification);
+                setDesktopNotifications(data.desktopNotification);
             } catch (error) {
                 console.error("Error fetching user settings:", error);
             } finally {
@@ -48,35 +45,9 @@ const SettingsForm = ({ userId, router }: { userId: number; router: any }) => {
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        // Determine the notification method ID based on user selection
-        const methodName = emailNotifications ? 'emailNotifications' : desktopNotifications ? 'desktopNotifications' : '';
-        let notificationMethodId = null;
-
-        if (methodName) {
-            try {
-                const response = await fetch('/api/notificationMethods', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ name: methodName }),
-                });
-
-                if (!response.ok) {
-                    throw new Error("Failed to fetch notification method ID");
-                }
-
-                const result = await response.json();
-                notificationMethodId = result.id;
-            } catch (error) {
-                console.error("Error fetching notification method ID:", error);
-                return;
-            }
-        }
-
         // Update user settings
         try {
-            const response = await fetch(`@/app/components/settings/settingshandler/${userId}`, {
+            const response = await fetch(`./settingshandler/userId=${userId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -84,7 +55,8 @@ const SettingsForm = ({ userId, router }: { userId: number; router: any }) => {
                 body: JSON.stringify({
                     startDayOfWeek,
                     dateFormat,
-                    notificationMethodId,
+                    emailNotification: emailNotifications,
+                    desktopNotification: desktopNotifications,
                 }),
             });
 

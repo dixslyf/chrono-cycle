@@ -1,7 +1,6 @@
 import { InferSelectModel } from "drizzle-orm";
-import { pgTable, varchar, integer } from "drizzle-orm/pg-core";
+import { pgTable, varchar, integer, boolean } from "drizzle-orm/pg-core";
 import users from "./users";
-import notificationMethods from "./notificationMethods"; 
 
 export const settings = pgTable("settings", {
     userId: integer("user_id")
@@ -10,9 +9,12 @@ export const settings = pgTable("settings", {
         .notNull(),
     startDayOfWeek: varchar("start_day_of_week", { length: 10 }).notNull(),
     dateFormat: varchar("date_format", { length: 10 }).notNull(),
-    notificationMethodId: integer("notification_method_id")
-        .references(() => notificationMethods.id)
-        .notNull(),
+    emailNotification: boolean("email_notification")
+        .notNull() 
+        .default(false), 
+    desktopNotification: boolean("desktop_notification")
+        .notNull() 
+        .default(false), 
 });
 
 export type Setting = InferSelectModel<typeof settings>;
