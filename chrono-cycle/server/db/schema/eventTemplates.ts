@@ -1,4 +1,9 @@
-import { InferSelectModel } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import {
+    createSelectSchema,
+    createUpdateSchema,
+    createInsertSchema,
+} from "drizzle-zod";
 import {
     pgTable,
     serial,
@@ -15,7 +20,7 @@ export const eventTemplates = pgTable("event_templates", {
     name: text("name").notNull(),
     offsetDays: integer("offset_days").notNull(),
     duration: integer("duration").notNull(),
-    note: text("note"),
+    note: text("note").notNull(),
     eventType: eventTypeEnum("event_type").notNull(),
     autoReschedule: boolean("auto_reschedule").notNull(),
     updatedAt: timestamp("created_at", {
@@ -24,11 +29,16 @@ export const eventTemplates = pgTable("event_templates", {
     })
         .notNull()
         .defaultNow(),
-    projectTemplateId: integer("project_template_id").references(
-        () => projectTemplates.id,
-    ),
+    projectTemplateId: integer("project_template_id")
+        .notNull()
+        .references(() => projectTemplates.id),
 });
 
-export type EventTemplate = InferSelectModel<typeof eventTemplates>;
+export type DbEventTemplate = InferSelectModel<typeof eventTemplates>;
+export type DbEventTemplateInsert = InferInsertModel<typeof eventTemplates>;
+
+export const eventTemplateSelectSchema = createSelectSchema(eventTemplates);
+export const eventTemplateInsertSchema = createInsertSchema(eventTemplates);
+export const eventTemplateUpdateSchema = createUpdateSchema(eventTemplates);
 
 export default eventTemplates;

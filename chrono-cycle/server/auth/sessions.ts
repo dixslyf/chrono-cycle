@@ -1,4 +1,4 @@
-import type { User, Session } from "@/server/db/schema";
+import type { DbUser, DbSession } from "@/server/db/schema";
 import {
     sessions as sessionsTable,
     users as usersTable,
@@ -34,8 +34,8 @@ export function generateSessionToken(): string {
 export async function createSession(
     token: string,
     userId: number,
-): Promise<Session> {
-    const session: Session = {
+): Promise<DbSession> {
+    const session: DbSession = {
         id: sessionIdFromToken(token),
         userId,
         expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // Session lasts for 30 days.
@@ -47,7 +47,10 @@ export async function createSession(
     return session;
 }
 
-export type SessionValidationResult = { session: Session; user: User } | null;
+export type SessionValidationResult = {
+    session: DbSession;
+    user: DbUser;
+} | null;
 
 export async function validateSessionToken(
     token: string,

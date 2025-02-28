@@ -1,7 +1,12 @@
-import { InferSelectModel } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { pgTable, integer, primaryKey } from "drizzle-orm/pg-core";
 import reminderTemplates from "./reminderTemplates";
 import notificationMethods from "./notificationMethods";
+import {
+    createInsertSchema,
+    createSelectSchema,
+    createUpdateSchema,
+} from "drizzle-zod";
 
 export const reminderTemplateNotificationMethods = pgTable(
     "reminder_template_notification_methods",
@@ -18,8 +23,18 @@ export const reminderTemplateNotificationMethods = pgTable(
     ],
 );
 
-export type ReminderTemplateNotificationMethod = InferSelectModel<
+export type DbReminderTemplateNotificationMethod = InferSelectModel<
     typeof reminderTemplateNotificationMethods
 >;
+export type DbReminderTemplateNotificationMethodInsert = InferInsertModel<
+    typeof reminderTemplateNotificationMethods
+>;
+
+export const reminderTemplateNotificationMethodsSelectSchema =
+    createSelectSchema(reminderTemplateNotificationMethods);
+export const reminderTemplateNotificationMethodsInsertSchema =
+    createInsertSchema(reminderTemplateNotificationMethods);
+export const reminderTemplateNotificationMethodsUpdateSchema =
+    createUpdateSchema(reminderTemplateNotificationMethods);
 
 export default reminderTemplateNotificationMethods;

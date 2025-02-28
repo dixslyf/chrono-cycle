@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 
 import getDb from "@/server/db";
 import {
-    ProjectTemplate,
+    DbProjectTemplate,
     projectTemplates as projectTemplatesTable,
 } from "@/server/db/schema/projectTemplates";
 
@@ -10,7 +10,7 @@ export async function insertProjectTemplateDb(
     name: string,
     description: string,
     userId: number,
-): Promise<ProjectTemplate> {
+): Promise<DbProjectTemplate> {
     const db = await getDb();
     const inserted = await db
         .insert(projectTemplatesTable)

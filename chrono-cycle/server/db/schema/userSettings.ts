@@ -1,6 +1,11 @@
-import { InferSelectModel } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { pgEnum, pgTable, integer, boolean } from "drizzle-orm/pg-core";
 import users from "./users";
+import {
+    createInsertSchema,
+    createSelectSchema,
+    createUpdateSchema,
+} from "drizzle-zod";
 
 export const startDayOfWeekEnum = pgEnum("start_day_of_week", [
     "Monday",
@@ -28,6 +33,11 @@ export const userSettings = pgTable("user_settings", {
         .default(false),
 });
 
-export type UserSettings = InferSelectModel<typeof userSettings>;
+export type DbUserSettings = InferSelectModel<typeof userSettings>;
+export type DbUserSettingsInsert = InferInsertModel<typeof userSettings>;
+
+export const userSettingsSelectSchema = createSelectSchema(userSettings);
+export const userSettingsInsertSchema = createInsertSchema(userSettings);
+export const userSettingsUpdateSchema = createUpdateSchema(userSettings);
 
 export default userSettings;
