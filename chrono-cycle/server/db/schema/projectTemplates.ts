@@ -1,4 +1,4 @@
-import { InferSelectModel } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
     pgTable,
     serial,
@@ -7,6 +7,11 @@ import {
     text,
     unique,
 } from "drizzle-orm/pg-core";
+import {
+    createInsertSchema,
+    createSelectSchema,
+    createUpdateSchema,
+} from "drizzle-zod";
 
 export const projectTemplates = pgTable(
     "project_templates",
@@ -34,5 +39,10 @@ export const projectTemplates = pgTable(
 );
 
 export type ProjectTemplate = InferSelectModel<typeof projectTemplates>;
+export type ProjectTemplateInsert = InferInsertModel<typeof projectTemplates>;
+
+export const projectTemplateSelectSchema = createSelectSchema(projectTemplates);
+export const projectTemplateInsertSchema = createInsertSchema(projectTemplates);
+export const projectTemplateUpdateSchema = createUpdateSchema(projectTemplates);
 
 export default projectTemplates;

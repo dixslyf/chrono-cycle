@@ -1,4 +1,4 @@
-import { InferSelectModel } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
     pgTable,
     serial,
@@ -11,6 +11,11 @@ import {
 import eventTypeEnum from "./eventType";
 import projects from "./projects";
 import eventTemplates from "./eventTemplates";
+import {
+    createInsertSchema,
+    createSelectSchema,
+    createUpdateSchema,
+} from "drizzle-zod";
 
 export const statusEnum = pgEnum("status", [
     "none",
@@ -44,5 +49,10 @@ export const events = pgTable("events", {
 });
 
 export type Event = InferSelectModel<typeof events>;
+export type EventInsert = InferInsertModel<typeof events>;
+
+export const eventSelectSchema = createSelectSchema(events);
+export const eventInsertSchema = createInsertSchema(events);
+export const eventUpdateSchema = createUpdateSchema(events);
 
 export default events;

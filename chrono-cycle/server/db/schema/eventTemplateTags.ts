@@ -1,7 +1,12 @@
-import { InferSelectModel } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { pgTable, integer, primaryKey } from "drizzle-orm/pg-core";
 import tags from "./tags";
 import eventTemplates from "./eventTemplates";
+import {
+    createInsertSchema,
+    createSelectSchema,
+    createUpdateSchema,
+} from "drizzle-zod";
 
 export const eventTemplateTags = pgTable(
     "event_template_tags",
@@ -17,5 +22,13 @@ export const eventTemplateTags = pgTable(
 );
 
 export type EventTemplateTag = InferSelectModel<typeof eventTemplateTags>;
+export type EventTemplateTagInsert = InferInsertModel<typeof eventTemplateTags>;
+
+export const eventTemplateTagSelectSchema =
+    createSelectSchema(eventTemplateTags);
+export const eventTemplateTagInsertSchema =
+    createInsertSchema(eventTemplateTags);
+export const eventTemplateTagUpdateSchema =
+    createUpdateSchema(eventTemplateTags);
 
 export default eventTemplateTags;

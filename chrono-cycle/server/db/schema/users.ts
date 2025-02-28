@@ -1,5 +1,10 @@
-import { InferSelectModel } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { pgTable, serial, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+    createInsertSchema,
+    createSelectSchema,
+    createUpdateSchema,
+} from "drizzle-zod";
 
 export const users = pgTable("users", {
     id: serial("id").primaryKey().unique(),
@@ -15,5 +20,10 @@ export const users = pgTable("users", {
 });
 
 export type User = InferSelectModel<typeof users>;
+export type UserInsert = InferInsertModel<typeof users>;
+
+export const userSelectSchema = createSelectSchema(users);
+export const userInsertSchema = createInsertSchema(users);
+export const userUpdateSchema = createUpdateSchema(users);
 
 export default users;
