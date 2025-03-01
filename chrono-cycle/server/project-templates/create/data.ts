@@ -22,6 +22,10 @@ export type DuplicateNameError = {
     _errorKind: "DuplicateNameError";
 };
 
+export function DuplicateNameError(): DuplicateNameError {
+    return { _errorKind: "DuplicateNameError" };
+}
+
 export type CreateError =
     | ValidationError<"name" | "description">
     | AuthenticationError
