@@ -1,10 +1,10 @@
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
 import * as T from "fp-ts/Task";
 import * as A from "fp-ts/Array";
 import { pipe } from "fp-ts/function";
-import getDb from "@/server/db";
+import getFuncDb from "@/server/db/functional";
 import {
     CreateError,
     CreateFormData,
@@ -31,7 +31,7 @@ export async function createEventTemplate(
     userId: number,
     info: CreateFormData,
 ): Promise<CreateResult> {
-    const db = await getDb();
+    const fDb = await getFuncDb();
 
     const projectTemplateRealId = decodeProjectTemplateId(
         info.projectTemplateId,
@@ -40,36 +40,33 @@ export async function createEventTemplate(
     // Task to check if the project template exists.
     const checkProjectTemplateExistsTask = () =>
         pipe(
-            TE.tryCatch(
-                () =>
-                    db
-                        .select()
-                        .from(projectTemplates)
-                        .where(
-                            and(
-                                eq(projectTemplates.id, projectTemplateRealId),
-                                eq(projectTemplates.userId, userId),
-                            ),
+            fDb.do((db) =>
+                db
+                    .select()
+                    .from(projectTemplates)
+                    .where(
+                        and(
+                            eq(projectTemplates.id, projectTemplateRealId),
+                            eq(projectTemplates.userId, userId),
                         ),
-                (_err) =>
-                    InternalError(
-                        "An error occurred while querying the database",
-                    ) satisfies CreateError as CreateError,
+                    ),
             ),
             TE.chain((projectTemplateResult) => {
                 if (projectTemplateResult.length < 1) {
-                    return TE.left(DoesNotExistError());
+                    return TE.left(
+                        DoesNotExistError() satisfies CreateError as CreateError,
+                    );
                 }
 
                 if (projectTemplateResult.length > 1) {
                     return TE.left(
                         InternalError(
                             "Unexpected multiple matching project templates",
-                        ),
+                        ) satisfies CreateError as CreateError,
                     );
                 }
 
-                return TE.right(projectTemplateResult);
+                return TE.right(undefined);
             }),
         );
 
@@ -95,20 +92,16 @@ export async function createEventTemplate(
     // Task to insert the event template.
     const insertEventTemplateTask = () =>
         pipe(
-            TE.tryCatch(
-                () =>
-                    db
-                        .insert(eventTemplates)
-                        .values({
-                            projectTemplateId: projectTemplateRealId,
-                            ...eventTemplatePartialInsert,
-                        } satisfies DbEventTemplateInsert)
-                        .returning(),
-                (_err) =>
-                    InternalError(
-                        "An error occurred while inserting into the database",
-                    ) satisfies CreateError as CreateError,
+            fDb.do((db) =>
+                db
+                    .insert(eventTemplates)
+                    .values({
+                        projectTemplateId: projectTemplateRealId,
+                        ...eventTemplatePartialInsert,
+                    } satisfies DbEventTemplateInsert)
+                    .returning(),
             ),
+            TE.mapError((err) => err satisfies CreateError as CreateError),
             TE.map((insertResult) => insertResult[0]), // We've only inserted one value.
             TE.map((et) => {
                 // Map to return type.
@@ -124,43 +117,33 @@ export async function createEventTemplate(
 
     // Task to insert into the junction table linking tags and event templates.
     const linkTagsTask = (eventTemplate: EventTemplate, tags: Tag[]) =>
-        TE.tryCatch(
-            () =>
-                db.insert(eventTemplateTags).values(
-                    tags.map((tag) => ({
-                        eventTemplateId: decodeEventTemplateId(
-                            eventTemplate.id,
-                        ),
-                        tagId: decodeTagId(tag.id),
-                    })),
-                ),
-            (_err) =>
-                InternalError(
-                    "An error occurred while inserting into the database",
-                ) satisfies CreateError as CreateError,
+        pipe(
+            fDb.do<void>((db) =>
+                db
+                    .insert(eventTemplateTags)
+                    .values(
+                        tags.map((tag) => ({
+                            eventTemplateId: decodeEventTemplateId(
+                                eventTemplate.id,
+                            ),
+                            tagId: decodeTagId(tag.id),
+                        })),
+                    )
+                    .then(() => undefined),
+            ),
+            TE.mapError((err) => err satisfies CreateError as CreateError),
         );
 
     // Tie everything together.
     const { projectTemplateId, ...eventTemplatePartialInsert } = info;
     const insertTask: TE.TaskEither<CreateError, EventTemplate> = pipe(
-        checkProjectTemplateExistsTask(),
-        // Start database transaction.
-        TE.chain(() =>
-            TE.tryCatch(
-                () => db.execute(sql`BEGIN`),
-                (_err) =>
-                    InternalError(
-                        "An error occurred while starting a database transaction",
-                    ) satisfies CreateError as CreateError,
-            ),
-        ),
         // Try inserting the event template.
-        TE.chain(insertEventTemplateTask),
+        insertEventTemplateTask(),
         // Ensure that all tags exist.
-        TE.chain((et) =>
+        TE.chain((eventTemplate) =>
             pipe(
                 ensureTagsExistTask(),
-                TE.map((tags) => ({ eventTemplate: et, tags })),
+                TE.map((tags) => ({ eventTemplate: eventTemplate, tags })),
             ),
         ),
         // Link the tags with the event template.
@@ -170,31 +153,11 @@ export async function createEventTemplate(
                 TE.map(() => eventTemplate), // Ignore the return of `linkTagsTask`, just return the `EventTemplate`.
             ),
         ),
-        // Finally, commit on success.
-        TE.chain((eventTemplate) =>
-            TE.tryCatch(
-                () => db.execute(sql`COMMIT`).then(() => eventTemplate), // Ignore the return of the execution and just return the event template.
-                (_err) =>
-                    InternalError(
-                        "An error occurred while committing a database transaction",
-                    ) satisfies CreateError as CreateError,
-            ),
-        ),
-        // And roll back on error.
-        TE.orElse((err) =>
-            pipe(
-                TE.tryCatch(
-                    () => db.execute(sql`ROLLBACK`).then(() => err),
-                    (_err) =>
-                        InternalError(
-                            "An error occurred while rolling back a database transaction",
-                        ),
-                ),
-                TE.chain((err) => TE.left(err)),
-            ),
-        ),
     );
 
-    const result = await insertTask();
-    return result;
+    const task = pipe(
+        checkProjectTemplateExistsTask(),
+        TE.chain(() => fDb.transaction<CreateError, EventTemplate>(insertTask)),
+    );
+    return await task();
 }
