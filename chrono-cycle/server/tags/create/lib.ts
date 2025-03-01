@@ -1,27 +1,58 @@
 import { eq, and } from "drizzle-orm";
 import * as E from "fp-ts/Either";
+import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 
 import getDb from "@/server/db";
-import { CreateResult } from "./data";
+import { CreateError, CreateResult, TagExistsError } from "./data";
 import { InternalError } from "@/server/common/errors";
 import { encodeTagId } from "@/server/common/identifiers";
-import { tags, users, DbTagInsert } from "@/server/db/schema";
+import { tags, users, DbTagInsert, DbTag } from "@/server/db/schema";
 import { Tag, tagNameSchema } from "@/server/common/data";
 
-export async function checkTagExists(
+export async function getTagIfExists(
     userId: number,
     tagName: string,
-): Promise<boolean> {
+): Promise<E.Either<CreateError, O.Option<Tag>>> {
     const db = await getDb();
 
-    const selected = await db
-        .select()
-        .from(tags)
-        .where(and(eq(users.id, userId), eq(tags.name, tagName)));
+    const task = pipe(
+        TE.tryCatch(
+            () =>
+                db
+                    .select()
+                    .from(tags)
+                    .where(and(eq(users.id, userId), eq(tags.name, tagName))),
+            (_err) =>
+                ({
+                    _errorKind: "InternalError",
+                    context: "An error occurred while querying the database",
+                }) satisfies InternalError,
+        ),
+        TE.chain((selected): TE.TaskEither<InternalError, O.Option<Tag>> => {
+            if (selected.length < 1) {
+                // Tag not found.
+                return TE.right(O.none);
+            } else if (selected.length > 1) {
+                return TE.left({
+                    _errorKind: "InternalError",
+                    context:
+                        "Unexpected multiple matching tags while querying the database",
+                });
+            } else {
+                // selected.length === 1; i.e., tag has been found.
+                // Convert to the output type.
+                const tag = {
+                    id: encodeTagId(selected[0].id),
+                    name: selected[0].name,
+                } satisfies Tag;
+                return TE.right(O.some(tag));
+            }
+        }),
+    );
 
-    return selected.length > 0;
+    return await task();
 }
 
 export async function createTag(
@@ -40,29 +71,38 @@ export async function createTag(
         });
     }
 
-    // Check if the tag already exists.
-    if (await checkTagExists(userId, tagName)) {
-        return E.left({ _errorKind: "TagExistsError" });
-    }
-
-    // Insert the tag.
+    // Try insert the tag.
     const insertTask = pipe(
-        TE.tryCatch(
-            () =>
-                db
-                    .insert(tags)
-                    .values({
-                        userId,
-                        name: tagName,
-                    } satisfies DbTagInsert)
-                    .returning(),
-            (_err) =>
-                ({
-                    _errorKind: "InternalError",
-                    context:
-                        "An error occurred while inserting into the database.",
-                }) satisfies InternalError,
-        ),
+        TE.fromEither(await getTagIfExists(userId, tagName)),
+        // Check if the tag already exists.
+        TE.chain(function(
+            maybeTag: O.Option<Tag>,
+        ): TE.TaskEither<CreateError, DbTag[]> {
+            // If the tag already exists, then error out.
+            if (O.isSome(maybeTag)) {
+                return TE.left({
+                    _errorKind: "TagExistsError",
+                } satisfies TagExistsError);
+            }
+
+            // Otherwise, we try inserting the tag.
+            return TE.tryCatch(
+                () =>
+                    db
+                        .insert(tags)
+                        .values({
+                            userId,
+                            name: tagName,
+                        } satisfies DbTagInsert)
+                        .returning(),
+                (_err) =>
+                    ({
+                        _errorKind: "InternalError",
+                        context:
+                            "An error occurred while inserting into the database.",
+                    }) satisfies InternalError,
+            );
+        }),
         TE.map((insertResult) => insertResult[0]), // We've only inserted one value.
         TE.map((dbTag) => {
             // Map to return type.
@@ -70,6 +110,69 @@ export async function createTag(
                 id: encodeTagId(dbTag.id),
                 name: dbTag.name,
             } satisfies Tag;
+        }),
+    );
+
+    return await insertTask();
+}
+
+export async function ensureTagExists(
+    userId: number,
+    tagName: string,
+): Promise<CreateResult> {
+    const db = await getDb();
+
+    // Validate tag name schema.
+    const parseResult = tagNameSchema.safeParse(tagName);
+    if (!parseResult.success) {
+        const formattedErrors = parseResult.error.format();
+        return E.left({
+            _errorKind: "ValidationError",
+            issues: { name: formattedErrors._errors },
+        });
+    }
+
+    // Try inserting the tag.
+    const insertTask = pipe(
+        TE.fromEither(await getTagIfExists(userId, tagName)),
+        // Check if the tag already exists.
+        TE.chain(function(
+            maybeTag: O.Option<Tag>,
+        ): TE.TaskEither<CreateError, Tag> {
+            return pipe(
+                maybeTag,
+                O.map((tag) => TE.right(tag)), // Map to TE.TaskEither.
+                // If the tag already exists, then just return it.
+                // Otherwise, we have to try inserting.
+                O.getOrElse(() =>
+                    pipe(
+                        TE.tryCatch(
+                            () =>
+                                db
+                                    .insert(tags)
+                                    .values({
+                                        userId,
+                                        name: tagName,
+                                    } satisfies DbTagInsert)
+                                    .returning(),
+                            (_err) =>
+                                ({
+                                    _errorKind: "InternalError",
+                                    context:
+                                        "An error occurred while inserting into the database.",
+                                }) satisfies InternalError,
+                        ),
+                        TE.map((insertResult) => insertResult[0]), // We've only inserted one value.
+                        TE.map((dbTag) => {
+                            // Map to return type.
+                            return {
+                                id: encodeTagId(dbTag.id),
+                                name: dbTag.name,
+                            } satisfies Tag;
+                        }),
+                    ),
+                ),
+            );
         }),
     );
 
