@@ -7,6 +7,7 @@ import { pipe } from "fp-ts/function";
 import { getCurrentSession } from "@/server/auth/sessions";
 import { retrieveProjectTemplate } from "./lib";
 import { RetrieveResult } from "./data";
+import { AuthenticationError, DoesNotExistError } from "@/server/common/errors";
 
 export async function retrieveProjectTemplateAction(
     projectTemplateName: string,
@@ -14,7 +15,7 @@ export async function retrieveProjectTemplateAction(
     // Verify user identity.
     const sessionResults = await getCurrentSession();
     if (!sessionResults) {
-        return E.left({ _errorKind: "AuthenticationError" });
+        return E.left(AuthenticationError());
     }
 
     // Check that the user owns the project template.
@@ -29,6 +30,6 @@ export async function retrieveProjectTemplateAction(
     return pipe(
         projectTemplate,
         O.map((pt) => E.right(pt)),
-        O.getOrElse(() => E.left({ _errorKind: "DoesNotExistError" })),
+        O.getOrElse(() => E.left(DoesNotExistError())),
     );
 }
