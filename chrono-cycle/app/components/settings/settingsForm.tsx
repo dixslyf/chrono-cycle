@@ -3,11 +3,6 @@
 import { useState, useEffect, startTransition, useActionState } from "react";
 import { updateSettings, fetchSettings } from "@/server/settings/actions";
 
-interface FormStatus {
-    success: boolean;
-    message: string;
-}
-
 const SettingsForm = () => {
     const [startDayOfWeek, setStartDayOfWeek] = useState<string>("Monday");
     const [dateFormat, setDateFormat] = useState<string>("DD/MM/YYYY");
@@ -18,23 +13,8 @@ const SettingsForm = () => {
 
     // Define the action state using useActionState
     const [formStatus, submitAction, isSubmitting] = useActionState(
-        async (previousState: FormStatus, formData: FormData) => {
-            try {
-                const response = await updateSettings(formData);
-                return {
-                    success: response.submitSuccess,
-                    message: response.submitSuccess
-                        ? "Settings updated successfully!"
-                        : response.errorMessage || "An error occurred.",
-                };
-            } catch (error) {
-                return {
-                    success: false,
-                    message: "An error occurred while updating settings.",
-                };
-            }
-        },
-        { success: false, message: "" },
+        updateSettings,
+        { submitSuccess: false },
     );
 
     // Fetch settings on component mount
@@ -152,15 +132,14 @@ const SettingsForm = () => {
             </section>
 
             <section>
+                <p>
+                    {formStatus.submitSuccess
+                        ? "Settings updated successfully!"
+                        : formStatus.errorMessage}
+                </p>
                 <button type="submit" disabled={isSubmitting}>
                     {isSubmitting ? "Saving..." : "Save Changes"}
                 </button>
-
-                {formStatus.message && (
-                    <p className={formStatus.success ? "success" : "error"}>
-                        {formStatus.message}
-                    </p>
-                )}
             </section>
         </form>
     );

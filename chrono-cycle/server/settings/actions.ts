@@ -35,6 +35,7 @@ interface UpdateSettingsFormState {
 
 // Define the server-side action for updating settings
 export const updateSettings = async (
+    _previousState: UpdateSettingsFormState,
     formData: FormData,
 ): Promise<UpdateSettingsFormState> => {
     // Validate form schema
@@ -134,13 +135,16 @@ export const fetchSettings = async (): Promise<UpdateSettingsFormState> => {
             .limit(1);
 
         if (userSetting.length === 0) {
-            userSetting = await db.insert(userSettings).values({
-                userId: userId,
-                startDayOfWeek: "Monday",
-                dateFormat: "MM/DD/YYYY",
-                enableEmailNotifications: false,
-                enableDesktopNotifications: false,
-            }).returning();
+            userSetting = await db
+                .insert(userSettings)
+                .values({
+                    userId: userId,
+                    startDayOfWeek: "Monday",
+                    dateFormat: "MM/DD/YYYY",
+                    enableEmailNotifications: false,
+                    enableDesktopNotifications: false,
+                })
+                .returning();
         }
         const settingsData = userSetting[0];
 
