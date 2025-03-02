@@ -1,6 +1,10 @@
 "use server";
 
-import { createUser, getUserFromUsername } from "@/server/auth/users";
+import {
+    createUser,
+    createUserSettings,
+    getUserFromUsername,
+} from "@/server/auth/users";
 import getDb from "@/server/db";
 import { users } from "@/server/db/schema";
 import {
@@ -80,7 +84,8 @@ export async function signup(
         };
     }
 
-    await createUser(username, email, password);
+    const user = await createUser(username, email, password);
+    await createUserSettings(user.id);
 
     // TODO: email verification
 

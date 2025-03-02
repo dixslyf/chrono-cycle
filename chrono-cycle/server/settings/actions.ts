@@ -6,6 +6,7 @@ import getDb from "@/server/db";
 import { userSettings } from "@/server/db/schema/userSettings";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { getUserSettings } from "../auth/users";
 
 const db = await getDb();
 
@@ -125,28 +126,15 @@ export const fetchSettings = async (): Promise<UpdateSettingsFormState> => {
     }
 
     const userId = sessionResults.user.id;
-
     try {
         // Fetch user settings from the database
-        let userSetting = await db
-            .select()
-            .from(userSettings)
-            .where(eq(userSettings.userId, userId))
-            .limit(1);
-
-        if (userSetting.length === 0) {
-            userSetting = await db
-                .insert(userSettings)
-                .values({
-                    userId: userId,
-                    startDayOfWeek: "Monday",
-                    dateFormat: "MM/DD/YYYY",
-                    enableEmailNotifications: false,
-                    enableDesktopNotifications: false,
-                })
-                .returning();
+        const settingsData = await getUserSettings(userId);
+        if (!settingsData) {
+            return {
+                submitSuccess: false,
+                errorMessage: "Unexpected missing settings",
+            };
         }
-        const settingsData = userSetting[0];
 
         return {
             submitSuccess: true,
