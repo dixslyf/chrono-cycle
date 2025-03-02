@@ -7,6 +7,7 @@ import { getCurrentSession } from "@/server/auth/sessions";
 import { deleteProjectTemplate } from "./lib";
 import { DeleteResult } from "./data";
 import { revalidatePath } from "next/cache";
+import { AuthenticationError, DoesNotExistError } from "@/server/common/errors";
 
 export async function deleteProjectTemplateAction(
     _previousState: DeleteResult | null,
@@ -15,7 +16,7 @@ export async function deleteProjectTemplateAction(
     // Verify user identity.
     const sessionResults = await getCurrentSession();
     if (!sessionResults) {
-        return E.left({ _errorKind: "AuthenticationError" });
+        return E.left(AuthenticationError());
     }
 
     const userId = sessionResults.user.id;
@@ -23,7 +24,7 @@ export async function deleteProjectTemplateAction(
     // Project template names are unique, so we don't need the project template ID.
     const deleted = await deleteProjectTemplate(name, userId);
     if (O.isNone(deleted)) {
-        return E.left({ _errorKind: "DoesNotExistError" });
+        return E.left(DoesNotExistError());
     }
 
     revalidatePath("/templates");
