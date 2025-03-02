@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "cross-env DEPLOY_ENV=dev next dev --turbopack",
+    "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "cross-env DEPLOY_ENV=prod next start",
+    "start": "next start",
     "lint": "next lint",
     "test": "jest"
   },
@@ -40,7 +40,6 @@
     "@types/pg": "^8.11.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "cross-env": "^7.0.3",
     "drizzle-kit": "^0.30.4",
     "eslint": "^9",
     "eslint-config-next": "15.1.5",

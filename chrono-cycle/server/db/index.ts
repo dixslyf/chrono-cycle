@@ -49,21 +49,21 @@ async function prodDb(): Promise<NodePgDatabase> {
 }
 
 async function initDb(): Promise<NodePgDatabase | PgliteDatabase> {
-    let deploy_env = process.env.DEPLOY_ENV;
-    if (!deploy_env || !["dev", "prod"].includes(deploy_env)) {
+    let node_env = process.env.NODE_ENV;
+    if (!node_env || !["development", "production"].includes(node_env)) {
         console.warn(
             "Failed to determine deployment environment — assuming `dev`",
         );
-        deploy_env = "dev";
+        node_env = "development";
     }
 
-    if (deploy_env === "dev") {
+    if (node_env === "development") {
         return await devDb();
     }
 
     console.assert(
-        deploy_env === "prod",
-        `Assertion failed: Unknown deployment environment "${deploy_env}"`,
+        node_env === "production",
+        `Assertion failed: Unknown deployment environment "${node_env}"`,
     );
 
     return await prodDb();
