@@ -1,9 +1,5 @@
 import * as E from "fp-ts/Either";
-import { AuthenticationError } from "@/server/common/errors";
-
-export type DoesNotExistError = {
-    _errorKind: "DoesNotExistError";
-};
+import { AuthenticationError, DoesNotExistError } from "@/server/common/errors";
 
 export type DeleteError = AuthenticationError | DoesNotExistError;
 
