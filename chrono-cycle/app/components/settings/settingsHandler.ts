@@ -127,34 +127,20 @@ export const fetchSettings = async (): Promise<UpdateSettingsFormState> => {
 
     try {
         // Fetch user settings from the database
-        const userSetting = await db
+        let userSetting = await db
             .select()
             .from(userSettings)
             .where(eq(userSettings.userId, userId))
             .limit(1);
 
         if (userSetting.length === 0) {
-            await db.insert(userSettings).values({
+            userSetting = await db.insert(userSettings).values({
                 userId: userId,
                 startDayOfWeek: "Monday",
                 dateFormat: "MM/DD/YYYY",
                 enableEmailNotifications: false,
                 enableDesktopNotifications: false,
-            });
-
-            // Immediately fetch the newly created settings
-            const newUserSetting = await db
-                .select()
-                .from(userSettings)
-                .where(eq(userSettings.userId, userId))
-                .limit(1);
-
-            if (newUserSetting.length === 0) {
-                return {
-                    submitSuccess: false,
-                    errorMessage: "Failed to create default settings.",
-                };
-            }
+            }).returning();
         }
         const settingsData = userSetting[0];
 
