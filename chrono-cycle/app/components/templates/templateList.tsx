@@ -20,10 +20,6 @@ import { ProjectTemplateOverview } from "@/server/project-templates/common/data"
 function getCreateErrorMessage(createState: CreateResult) {
     return match(createState)
         .with(
-            { left: { _errorKind: "AuthenticationError" } },
-            () => "Authentication failed",
-        )
-        .with(
             { left: { _errorKind: "ValidationError" } },
             () => "Invalid or missing fields",
         )
@@ -37,10 +33,6 @@ function getCreateErrorMessage(createState: CreateResult) {
 
 function getDeleteErrorMessage(deleteState: DeleteResult) {
     return match(deleteState)
-        .with(
-            { left: { _errorKind: "AuthenticationError" } },
-            () => "Authentication failed",
-        )
         .with(
             { left: { _errorKind: "DoesNotExistError" } },
             () => "Project template does not exist",

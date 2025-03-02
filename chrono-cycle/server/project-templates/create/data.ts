@@ -3,7 +3,7 @@ import * as E from "fp-ts/Either";
 import { z } from "zod";
 
 import { ProjectTemplateOverview } from "../common/data";
-import { AuthenticationError, ValidationError } from "@/server/common/errors";
+import { ValidationError } from "@/server/common/errors";
 import { projectTemplateInsertSchema } from "@/server/db/schema/projectTemplates";
 
 export const createFormSchema = z.object({
@@ -25,7 +25,6 @@ export type CreateReturnData = ProjectTemplateOverview;
 
 export type CreateError =
     | ValidationError<"name" | "description">
-    | AuthenticationError
     | DuplicateNameError;
 
 export type CreateResult = E.Either<CreateError, CreateReturnData>;

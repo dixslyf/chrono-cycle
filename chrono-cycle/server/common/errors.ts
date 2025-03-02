@@ -1,11 +1,3 @@
-export type AuthenticationError = {
-    _errorKind: "AuthenticationError";
-};
-
-export function AuthenticationError(): AuthenticationError {
-    return { _errorKind: "AuthenticationError" };
-}
-
 export type DoesNotExistError = {
     _errorKind: "DoesNotExistError";
 };

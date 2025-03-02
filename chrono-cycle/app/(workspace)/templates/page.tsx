@@ -20,9 +20,6 @@ export default async function Templates() {
             {/* create template section */}
             <section className="w-full flex justify-center">
                 <div className="w-5/6">
-                    {/* Error message when fetching the entries fail */}
-                    {/* There is only one possible error (authentication error), so we don't need to differentiate. */}
-                    <div>{E.isLeft(result) ? "AuthenticationError" : ""}</div>
                     <TemplateList
                         entries={pipe(
                             result,

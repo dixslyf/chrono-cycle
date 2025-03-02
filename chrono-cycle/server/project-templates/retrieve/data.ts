@@ -1,4 +1,4 @@
-import { AuthenticationError, DoesNotExistError } from "@/server/common/errors";
+import { DoesNotExistError } from "@/server/common/errors";
 import * as E from "fp-ts/Either";
 
 export type ProjectTemplateData = {
@@ -9,6 +9,6 @@ export type ProjectTemplateData = {
     // TODO: Add more in the future (e.g., event data).
 };
 
-export type RetrieveError = AuthenticationError | DoesNotExistError;
+export type RetrieveError = DoesNotExistError;
 
 export type RetrieveResult = E.Either<RetrieveError, ProjectTemplateData>;
