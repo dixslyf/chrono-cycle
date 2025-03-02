@@ -3,23 +3,19 @@
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 
-import { getCurrentSession } from "@/server/auth/sessions";
+import { UserSession } from "@/server/auth/sessions";
 import { deleteProjectTemplate } from "./lib";
 import { DeleteResult } from "./data";
 import { revalidatePath } from "next/cache";
-import { AuthenticationError, DoesNotExistError } from "@/server/common/errors";
+import { DoesNotExistError } from "@/server/common/errors";
+import { checkAuth } from "@/server/auth/decorators";
 
-export async function deleteProjectTemplateAction(
+export const deleteProjectTemplateAction = checkAuth(async function(
+    userSession: UserSession,
     _previousState: DeleteResult | null,
     name: string,
 ): Promise<DeleteResult> {
-    // Verify user identity.
-    const sessionResults = await getCurrentSession();
-    if (!sessionResults) {
-        return E.left(AuthenticationError());
-    }
-
-    const userId = sessionResults.user.id;
+    const userId = userSession.user.id;
 
     // Project template names are unique, so we don't need the project template ID.
     const deleted = await deleteProjectTemplate(name, userId);
@@ -29,4 +25,4 @@ export async function deleteProjectTemplateAction(
 
     revalidatePath("/templates");
     return E.right({});
-}
+});

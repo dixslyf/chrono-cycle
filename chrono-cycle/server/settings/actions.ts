@@ -1,12 +1,13 @@
 "use server";
 
-import { getCurrentSession } from "@/server/auth/sessions";
+import { UserSession } from "@/server/auth/sessions";
 import { z } from "zod";
 import getDb from "@/server/db";
 import { userSettings } from "@/server/db/schema/userSettings";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getUserSettings } from "../auth/users";
+import { checkAuth } from "@/server/auth/decorators";
 
 const db = await getDb();
 
@@ -35,10 +36,11 @@ interface UpdateSettingsFormState {
 }
 
 // Define the server-side action for updating settings
-export const updateSettings = async (
+export const updateSettings = checkAuth(async function(
+    userSession: UserSession,
     _previousState: UpdateSettingsFormState,
     formData: FormData,
-): Promise<UpdateSettingsFormState> => {
+): Promise<UpdateSettingsFormState> {
     // Validate form schema
     const parseResult = updateSettingsFormSchema.safeParse({
         startDayOfWeek: formData.get("startDayOfWeek") as "Monday" | "Sunday",
@@ -70,22 +72,13 @@ export const updateSettings = async (
         };
     }
 
-    // Verify user identity
-    const sessionResults = await getCurrentSession();
-    if (!sessionResults) {
-        return {
-            submitSuccess: false,
-            errorMessage: "Authentication failed",
-        };
-    }
-
     const {
         startDayOfWeek,
         dateFormat,
         enableEmailNotifications,
         enableDesktopNotifications,
     } = parseResult.data;
-    const userId = sessionResults.user.id;
+    const userId = userSession.user.id;
 
     try {
         // Update settings in the database
@@ -112,20 +105,12 @@ export const updateSettings = async (
             errorMessage: "Failed to update settings",
         };
     }
-};
+});
 
-// Define the server-side action for fetching settings
-export const fetchSettings = async (): Promise<UpdateSettingsFormState> => {
-    // Verify user identity
-    const sessionResults = await getCurrentSession();
-    if (!sessionResults) {
-        return {
-            submitSuccess: false,
-            errorMessage: "Authentication failed",
-        };
-    }
-
-    const userId = sessionResults.user.id;
+export const fetchSettings = checkAuth(async function(
+    userSession: UserSession,
+): Promise<UpdateSettingsFormState> {
+    const userId = userSession.user.id;
     try {
         // Fetch user settings from the database
         const settingsData = await getUserSettings(userId);
@@ -152,4 +137,4 @@ export const fetchSettings = async (): Promise<UpdateSettingsFormState> => {
             errorMessage: "Failed to fetch settings",
         };
     }
-};
+});

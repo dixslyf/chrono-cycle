@@ -2,19 +2,15 @@
 
 import * as E from "fp-ts/Either";
 
-import { getCurrentSession } from "@/server/auth/sessions";
+import { UserSession } from "@/server/auth/sessions";
 import { getProjectTemplatesForUser } from "./lib";
 import { ListResult } from "./data";
-import { AuthenticationError } from "@/server/common/errors";
+import { checkAuth } from "@/server/auth/decorators";
 
-export async function listProjectTemplatesAction(): Promise<ListResult> {
-    // Verify user identity.
-    const sessionResults = await getCurrentSession();
-    if (!sessionResults) {
-        return E.left(AuthenticationError());
-    }
-
+export const listProjectTemplatesAction = checkAuth(async function(
+    userSession: UserSession,
+): Promise<ListResult> {
     // Fetch project templates for the user.
-    const userId = sessionResults.user.id;
+    const userId = userSession.user.id;
     return E.right(await getProjectTemplatesForUser(userId));
-}
+});
