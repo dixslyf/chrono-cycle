@@ -11,8 +11,10 @@ interface FormStatus {
 const SettingsForm = () => {
     const [startDayOfWeek, setStartDayOfWeek] = useState<string>("Monday");
     const [dateFormat, setDateFormat] = useState<string>("DD/MM/YYYY");
-    const [enableEmailNotifications, setEmailNotifications] = useState<boolean>(false);
-    const [enableDesktopNotifications, setDesktopNotifications] = useState<boolean>(false);
+    const [enableEmailNotifications, setEmailNotifications] =
+        useState<boolean>(false);
+    const [enableDesktopNotifications, setDesktopNotifications] =
+        useState<boolean>(false);
 
     // Define the action state using useActionState
     const [formStatus, submitAction, isSubmitting] = useActionState(
@@ -26,10 +28,13 @@ const SettingsForm = () => {
                         : response.errorMessage || "An error occurred.",
                 };
             } catch (error) {
-                return { success: false, message: "An error occurred while updating settings." };
+                return {
+                    success: false,
+                    message: "An error occurred while updating settings.",
+                };
             }
         },
-        { success: false, message: "" }
+        { success: false, message: "" },
     );
 
     // Fetch settings on component mount
@@ -39,8 +44,12 @@ const SettingsForm = () => {
             if (settingsResponse.submitSuccess) {
                 setStartDayOfWeek(settingsResponse.startDayOfWeek || "Monday");
                 setDateFormat(settingsResponse.dateFormat || "DD/MM/YYYY");
-                setEmailNotifications(settingsResponse.enableEmailNotifications || false);
-                setDesktopNotifications(settingsResponse.enableDesktopNotifications || false);
+                setEmailNotifications(
+                    settingsResponse.enableEmailNotifications || false,
+                );
+                setDesktopNotifications(
+                    settingsResponse.enableDesktopNotifications || false,
+                );
             }
         };
 
@@ -54,8 +63,14 @@ const SettingsForm = () => {
         const formData = new FormData();
         formData.append("startDayOfWeek", startDayOfWeek);
         formData.append("dateFormat", dateFormat);
-        formData.append("enableEmailNotifications", enableEmailNotifications.toString());
-        formData.append("enableDesktopNotifications", enableDesktopNotifications.toString());
+        formData.append(
+            "enableEmailNotifications",
+            enableEmailNotifications.toString(),
+        );
+        formData.append(
+            "enableDesktopNotifications",
+            enableDesktopNotifications.toString(),
+        );
 
         startTransition(() => {
             submitAction(formData);
@@ -92,11 +107,13 @@ const SettingsForm = () => {
                         value={dateFormat}
                         onChange={(e) => setDateFormat(e.target.value)}
                     >
-                        {["MM/DD/YYYY", "DD/MM/YYYY", "YYYY/MM/DD"].map((format) => (
-                            <option value={format} key={format}>
-                                {format}
-                            </option>
-                        ))}
+                        {["MM/DD/YYYY", "DD/MM/YYYY", "YYYY/MM/DD"].map(
+                            (format) => (
+                                <option value={format} key={format}>
+                                    {format}
+                                </option>
+                            ),
+                        )}
                     </select>
                 </div>
                 <hr />
@@ -113,7 +130,9 @@ const SettingsForm = () => {
                         name="emailToggle"
                         id="emailToggle"
                         checked={enableEmailNotifications}
-                        onChange={(e) => setEmailNotifications(e.target.checked)}
+                        onChange={(e) =>
+                            setEmailNotifications(e.target.checked)
+                        }
                     />
                 </div>
 
@@ -124,7 +143,9 @@ const SettingsForm = () => {
                         name="desktopToggle"
                         id="desktopToggle"
                         checked={enableDesktopNotifications}
-                        onChange={(e) => setDesktopNotifications(e.target.checked)}
+                        onChange={(e) =>
+                            setDesktopNotifications(e.target.checked)
+                        }
                     />
                 </div>
                 <hr />
