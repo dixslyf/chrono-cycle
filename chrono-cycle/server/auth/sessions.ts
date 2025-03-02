@@ -127,13 +127,12 @@ export async function getSessionTokenFromCookie(): Promise<string | null> {
     return token;
 }
 
-export const getCurrentUserSession = cache(
-    async (): Promise<UserSession | null> => {
-        const token = await getSessionTokenFromCookie();
-        if (token === null) {
-            return null;
-        }
-        const result = await validateSessionToken(token);
-        return result;
-    },
-);
+export async function getCurrentUserSession(): Promise<UserSession | null> {
+    const token = await getSessionTokenFromCookie();
+    if (token === null) {
+        return null;
+    }
+    const result = await validateSessionToken(token);
+    return result;
+}
+

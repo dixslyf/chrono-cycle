@@ -1,6 +1,7 @@
 import Navbar from "@/app/components/nav/navbar";
+import { wrapAuthRedirectLogin } from "@/app/components/auth/redirectWrapper";
 
-export default function WorkspaceLayout({
+async function WorkspaceLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
@@ -14,3 +15,5 @@ export default function WorkspaceLayout({
         </>
     );
 }
+
+export default wrapAuthRedirectLogin(WorkspaceLayout);
