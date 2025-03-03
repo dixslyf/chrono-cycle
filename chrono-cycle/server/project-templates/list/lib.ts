@@ -2,11 +2,12 @@ import { eq } from "drizzle-orm";
 
 import getDb from "@/server/db";
 import { projectTemplates as projectTemplatesTable } from "@/server/db/schema/projectTemplates";
-import { ProjectTemplateBasicInfo } from "./data";
+import { ProjectTemplateOverview } from "../common/data";
+import { encodeProjectTemplateId } from "@/server/common/identifiers";
 
 export async function getProjectTemplatesForUser(
     userId: number,
-): Promise<ProjectTemplateBasicInfo[]> {
+): Promise<ProjectTemplateOverview[]> {
     const db = await getDb();
     const selected = await db
         .select()
@@ -14,6 +15,7 @@ export async function getProjectTemplatesForUser(
         .where(eq(projectTemplatesTable.userId, userId));
 
     return selected.map((row) => ({
+        id: encodeProjectTemplateId(row.id),
         name: row.name,
         description: row.description,
         createdAt: row.createdAt,

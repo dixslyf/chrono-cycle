@@ -3,12 +3,13 @@ import * as O from "fp-ts/Option";
 
 import getDb from "@/server/db";
 import { projectTemplates as projectTemplatesTable } from "@/server/db/schema/projectTemplates";
-import { ProjectTemplateBasicInfo } from "@/server/project-templates/list/data";
+import { ProjectTemplateOverview } from "../common/data";
+import { encodeProjectTemplateId } from "@/server/common/identifiers";
 
 export async function deleteProjectTemplate(
     projectTemplateName: string,
     userId: number,
-): Promise<O.Option<ProjectTemplateBasicInfo>> {
+): Promise<O.Option<ProjectTemplateOverview>> {
     const db = await getDb();
     const deleted = await db
         .delete(projectTemplatesTable)
@@ -25,6 +26,7 @@ export async function deleteProjectTemplate(
     }
 
     return O.some({
+        id: encodeProjectTemplateId(deleted[0].id),
         name: deleted[0].name,
         description: deleted[0].description,
         createdAt: deleted[0].createdAt,

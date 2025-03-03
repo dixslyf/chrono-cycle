@@ -11,11 +11,11 @@ import { Trash, X } from "lucide-react";
 import { match, P } from "ts-pattern";
 import * as E from "fp-ts/Either";
 import { createProjectTemplateAction } from "@/server/project-templates/create/action";
-import { ProjectTemplateBasicInfo } from "@/server/project-templates/list/data";
 import { deleteProjectTemplateAction } from "@/server/project-templates/delete/action";
 import { CreateResult } from "@/server/project-templates/create/data";
 import { ValidationIssues } from "@/server/common/errors";
 import { DeleteResult } from "@/server/project-templates/delete/data";
+import { ProjectTemplateOverview } from "@/server/project-templates/common/data";
 
 function getCreateErrorMessage(createState: CreateResult) {
     return match(createState)
@@ -68,7 +68,7 @@ function extractValidationIssues(
         .otherwise(() => noIssue);
 }
 
-function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
+function TemplateList({ entries }: { entries: ProjectTemplateOverview[] }) {
     // Action state for creating a project template.
     const [createState, createAction, _createPending] = useActionState(
         createProjectTemplateAction,
@@ -81,7 +81,7 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
     const [modalMode, setModalMode] = useState<"create" | "view">("create");
     // selected template for view mode
     const [selectedTemplate, setSelectedTemplate] =
-        useState<ProjectTemplateBasicInfo | null>(null);
+        useState<ProjectTemplateOverview | null>(null);
 
     const toggleModal = () => {
         setIsModalOpen((prev) => !prev);
@@ -113,7 +113,7 @@ function TemplateList({ entries }: { entries: ProjectTemplateBasicInfo[] }) {
     }, [deleteState, modalMode]);
 
     // handles clickable rows to view template
-    const handleRowClick = (template: ProjectTemplateBasicInfo) => {
+    const handleRowClick = (template: ProjectTemplateOverview) => {
         setModalMode("view");
         setSelectedTemplate(template);
         setIsModalOpen(true);
