@@ -12,6 +12,7 @@ import { createProjectTemplateAction } from "@/server/project-templates/create/a
 import { deleteProjectTemplateAction } from "@/server/project-templates/delete/action";
 import { ProjectTemplateOverview } from "@/server/project-templates/common/data";
 import TemplateModel from "./templateModal";
+import { Table } from "@chakra-ui/react";
 
 function TemplateList({ entries }: { entries: ProjectTemplateOverview[] }) {
     // Action state for creating a project template.
@@ -74,32 +75,49 @@ function TemplateList({ entries }: { entries: ProjectTemplateOverview[] }) {
     return (
         <>
             {/* List of project templates. */}
-            <div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Created At</th>
-                            <th>Updated At</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            {entries.length > 0 && (
+                <Table.Root striped>
+                    <Table.Header>
+                        <Table.Row className="bg-palette3">
+                            <Table.ColumnHeader className="text-palette5">
+                                Name
+                            </Table.ColumnHeader>
+                            <Table.ColumnHeader className="text-palette5">
+                                Description
+                            </Table.ColumnHeader>
+                            <Table.ColumnHeader className="text-palette5">
+                                Created At
+                            </Table.ColumnHeader>
+                            <Table.ColumnHeader className="text-palette5">
+                                Updated At
+                            </Table.ColumnHeader>
+                        </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
                         {entries.map((info) => (
-                            <tr
+                            <Table.Row
                                 key={info.name}
-                                className="cursor-pointer"
+                                cursor="pointer"
                                 onClick={() => handleRowClick(info)}
+                                className="border-2 hover:bg-gray-500"
                             >
-                                <td>{info.name}</td>
-                                <td>{info.description}</td>
-                                <td>{info.createdAt.toString()}</td>
-                                <td>{info.updatedAt.toString()}</td>
-                            </tr>
+                                <Table.Cell className="bg-palette3">
+                                    {info.name}
+                                </Table.Cell>
+                                <Table.Cell className="bg-palette3">
+                                    {info.description}
+                                </Table.Cell>
+                                <Table.Cell className="bg-palette3">
+                                    {info.createdAt.toString()}
+                                </Table.Cell>
+                                <Table.Cell className="bg-palette3">
+                                    {info.updatedAt.toString()}
+                                </Table.Cell>
+                            </Table.Row>
                         ))}
-                    </tbody>
-                </table>
-            </div>
+                    </Table.Body>
+                </Table.Root>
+            )}
 
             {/* add template button */}
             <AddTemplateButton toggleModal={handleNewTemplate} />

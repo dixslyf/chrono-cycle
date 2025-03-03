@@ -10,7 +10,7 @@ export default function WorkspaceLayout({
             <header>
                 <Navbar />
             </header>
-            <main className="m-0 w-full h-full">{children}</main>
+            <main className="m-0">{children}</main>
         </>
     );
 }
