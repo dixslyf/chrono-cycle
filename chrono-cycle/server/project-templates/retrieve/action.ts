@@ -4,22 +4,18 @@ import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
 
-import { getCurrentSession } from "@/server/auth/sessions";
 import { retrieveProjectTemplate } from "./lib";
 import { RetrieveResult } from "./data";
-import { AuthenticationError, DoesNotExistError } from "@/server/common/errors";
+import { DoesNotExistError } from "@/server/common/errors";
+import { checkAuth } from "@/server/auth/decorators";
+import { UserSession } from "@/server/auth/sessions";
 
-export async function retrieveProjectTemplateAction(
+export const retrieveProjectTemplateAction = checkAuth(async function(
+    userSession: UserSession,
     projectTemplateName: string,
 ): Promise<RetrieveResult> {
-    // Verify user identity.
-    const sessionResults = await getCurrentSession();
-    if (!sessionResults) {
-        return E.left(AuthenticationError());
-    }
-
     // Check that the user owns the project template.
-    const userId = sessionResults.user.id;
+    const userId = userSession.user.id;
 
     // Retrieve the project template.
     const projectTemplate = await retrieveProjectTemplate(
@@ -32,4 +28,4 @@ export async function retrieveProjectTemplateAction(
         O.map((pt) => E.right(pt)),
         O.getOrElse(() => E.left(DoesNotExistError())),
     );
-}
+});

@@ -2,14 +2,16 @@
 
 import * as E from "fp-ts/Either";
 
-import { getCurrentSession } from "@/server/auth/sessions";
+import { UserSession } from "@/server/auth/sessions";
 import { createFormSchema, CreateResult, DuplicateNameError } from "./data";
 import { insertProjectTemplateDb, isDuplicateProjectTemplateName } from "./lib";
 import { revalidatePath } from "next/cache";
-import { AuthenticationError, ValidationError } from "@/server/common/errors";
+import { ValidationError } from "@/server/common/errors";
 import { encodeProjectTemplateId } from "@/server/common/identifiers";
+import { checkAuth } from "@/server/auth/decorators";
 
-export async function createProjectTemplateAction(
+export const createProjectTemplateAction = checkAuth(async function(
+    userSession: UserSession,
     _prevState: CreateResult | null,
     formData: FormData,
 ): Promise<CreateResult> {
@@ -29,14 +31,8 @@ export async function createProjectTemplateAction(
         );
     }
 
-    // Verify user identity.
-    const sessionResults = await getCurrentSession();
-    if (!sessionResults) {
-        return E.left(AuthenticationError());
-    }
-
     const { name, description } = parseResult.data;
-    const userId = sessionResults.user.id;
+    const userId = userSession.user.id;
 
     // Check if name is taken.
     if (await isDuplicateProjectTemplateName(name, userId)) {
@@ -53,4 +49,4 @@ export async function createProjectTemplateAction(
         createdAt: inserted.createdAt,
         updatedAt: inserted.updatedAt,
     });
-}
+});

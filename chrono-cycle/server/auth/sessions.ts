@@ -47,14 +47,14 @@ export async function createSession(
     return session;
 }
 
-export type SessionValidationResult = {
+export type UserSession = {
     session: DbSession;
     user: DbUser;
-} | null;
+};
 
 export async function validateSessionToken(
     token: string,
-): Promise<SessionValidationResult> {
+): Promise<UserSession | null> {
     const db = await getDb();
 
     const sessionId = sessionIdFromToken(token);
@@ -121,8 +121,8 @@ export async function deleteSessionTokenCookie(): Promise<void> {
     });
 }
 
-export const getCurrentSession = cache(
-    async (): Promise<SessionValidationResult> => {
+export const getCurrentUserSession = cache(
+    async (): Promise<UserSession | null> => {
         const cookieStore = await cookies();
         const token = cookieStore.get("session")?.value ?? null;
         if (token === null) {
