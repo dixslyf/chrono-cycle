@@ -6,7 +6,17 @@ import { match, P } from "ts-pattern";
 import EventTable from "./eventTable";
 import { CreateResult } from "@/server/project-templates/create/data";
 import { DeleteResult } from "@/server/project-templates/delete/data";
-import { Input, Textarea } from "@chakra-ui/react";
+import {
+    Input,
+    Textarea,
+    DialogRoot,
+    DialogContent,
+    DialogHeader,
+    DialogBody,
+    DialogFooter,
+    DialogCloseTrigger,
+    Button,
+} from "@chakra-ui/react";
 import { ValidationIssues } from "@/server/common/errors";
 import { ProjectTemplateOverview } from "@/server/project-templates/common/data";
 import ModalWrapper from "./modalWrapper";
@@ -78,88 +88,97 @@ function TemplateModel({
     if (!isOpen) return null;
 
     return (
-        <ModalWrapper
-            isOpen={isOpen}
-            toggleModal={toggleModal}
-            title={
-                modalMode === "create" ? "Create Template" : "Template Details"
-            }
-        >
-            {modalMode === "create" ? (
-                <form action={createAction}>
-                    <div>
-                        <Input
-                            variant="subtle"
-                            placeholder="Project template name"
-                            id="name"
-                            name="name"
-                            className="bg-palette3"
-                        />
-                    </div>
-                    <div>
-                        <Textarea
-                            variant="subtle"
-                            placeholder="Add description"
-                            id="description"
-                            name="description"
-                            className="bg-palette3"
-                        />
-                    </div>
-                    <div className="relative mb-4">
-                        <ul className="text-red-500">
-                            {/* Error Display */}
-                            {createState && getCreateErrorMessage(createState)}
-                            {Object.entries(
-                                extractValidationIssues(createState),
-                            ).flatMap(([fieldName, errors]) =>
-                                errors.map((err, idx) => (
-                                    <li
-                                        key={`${fieldName}-${idx}`}
-                                        className="px-4 py-3"
-                                    >
-                                        {err || ""}
-                                    </li>
-                                )),
-                            )}
-                        </ul>
-                    </div>
-                    <button type="submit">Create Template</button>
-                </form>
-            ) : (
-                <div>
-                    <div>
-                        <label>Name:</label>
-                        <div>{selectedTemplate?.name}</div>
-                    </div>
-                    <div>
-                        <label>Description:</label>
-                        <div>{selectedTemplate?.description}</div>
-                    </div>
-                    <div>
-                        <label>Created At:</label>
-                        <div>{selectedTemplate?.createdAt.toString()}</div>
-                    </div>
-                    <div>
-                        <label>Updated At:</label>
-                        <div>{selectedTemplate?.updatedAt.toString()}</div>
-                    </div>
-                    <div>
-                        <EventTable />
-                    </div>
-                    <div>
-                        {deleteState &&
-                            "Your delete error message handling here"}
-                    </div>
-                    <button
-                        onClick={handleDelete}
-                        className="hover:text-red-500 flex"
-                    >
-                        <Trash />
-                        Delete
-                    </button>
-                </div>
-            )}
-        </ModalWrapper>
+        <DialogRoot lazyMount open={isOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    {modalMode === "create"
+                        ? "Create Template"
+                        : "Template Details"}
+                </DialogHeader>
+            </DialogContent>
+        </DialogRoot>
+        // <ModalWrapper
+        //     isOpen={isOpen}
+        //     toggleModal={toggleModal}
+        //     title={
+        //         modalMode === "create" ? "Create Template" : "Template Details"
+        //     }
+        // >
+        //     {modalMode === "create" ? (
+        //         <form action={createAction}>
+        //             <div>
+        //                 <Input
+        //                     variant="subtle"
+        //                     placeholder="Project template name"
+        //                     id="name"
+        //                     name="name"
+        //                     className="bg-palette3"
+        //                 />
+        //             </div>
+        //             <div>
+        //                 <Textarea
+        //                     variant="subtle"
+        //                     placeholder="Add description"
+        //                     id="description"
+        //                     name="description"
+        //                     className="bg-palette3"
+        //                 />
+        //             </div>
+        //             <div className="relative mb-4">
+        //                 <ul className="text-red-500">
+        //                     {/* Error Display */}
+        //                     {createState && getCreateErrorMessage(createState)}
+        //                     {Object.entries(
+        //                         extractValidationIssues(createState),
+        //                     ).flatMap(([fieldName, errors]) =>
+        //                         errors.map((err, idx) => (
+        //                             <li
+        //                                 key={`${fieldName}-${idx}`}
+        //                                 className="px-4 py-3"
+        //                             >
+        //                                 {err || ""}
+        //                             </li>
+        //                         )),
+        //                     )}
+        //                 </ul>
+        //             </div>
+        //             <button type="submit">Create Template</button>
+        //         </form>
+        //     ) : (
+        //         <div>
+        //             <div>
+        //                 <label>Name:</label>
+        //                 <div>{selectedTemplate?.name}</div>
+        //             </div>
+        //             <div>
+        //                 <label>Description:</label>
+        //                 <div>{selectedTemplate?.description}</div>
+        //             </div>
+        //             <div>
+        //                 <label>Created At:</label>
+        //                 <div>{selectedTemplate?.createdAt.toString()}</div>
+        //             </div>
+        //             <div>
+        //                 <label>Updated At:</label>
+        //                 <div>{selectedTemplate?.updatedAt.toString()}</div>
+        //             </div>
+        //             <div>
+        //                 <EventTable />
+        //             </div>
+        //             <div>
+        //                 {deleteState &&
+        //                     "Your delete error message handling here"}
+        //             </div>
+        //             <button
+        //                 onClick={handleDelete}
+        //                 className="hover:text-red-500 flex"
+        //             >
+        //                 <Trash />
+        //                 Delete
+        //             </button>
+        //         </div>
+        //     )}
+        // </ModalWrapper>
     );
 }
 
