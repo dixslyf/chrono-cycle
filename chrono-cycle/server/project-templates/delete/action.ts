@@ -8,9 +8,9 @@ import { deleteProjectTemplate } from "./lib";
 import { DeleteResult } from "./data";
 import { revalidatePath } from "next/cache";
 import { DoesNotExistError } from "@/server/common/errors";
-import { checkAuth } from "@/server/auth/decorators";
+import { wrapServerAction } from "@/server/decorators";
 
-export const deleteProjectTemplateAction = checkAuth(async function(
+async function deleteProjectTemplateImpl(
     userSession: UserSession,
     _previousState: DeleteResult | null,
     name: string,
@@ -25,4 +25,9 @@ export const deleteProjectTemplateAction = checkAuth(async function(
 
     revalidatePath("/templates");
     return E.right({});
-});
+}
+
+export const deleteProjectTemplateAction = wrapServerAction(
+    "deleteProjectTemplate",
+    deleteProjectTemplateImpl,
+);

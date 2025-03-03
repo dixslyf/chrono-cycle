@@ -8,9 +8,9 @@ import { insertProjectTemplateDb, isDuplicateProjectTemplateName } from "./lib";
 import { revalidatePath } from "next/cache";
 import { ValidationError } from "@/server/common/errors";
 import { encodeProjectTemplateId } from "@/server/common/identifiers";
-import { checkAuth } from "@/server/auth/decorators";
+import { wrapServerAction } from "@/server/decorators";
 
-export const createProjectTemplateAction = checkAuth(async function(
+async function createProjectTemplateActionImpl(
     userSession: UserSession,
     _prevState: CreateResult | null,
     formData: FormData,
@@ -49,4 +49,9 @@ export const createProjectTemplateAction = checkAuth(async function(
         createdAt: inserted.createdAt,
         updatedAt: inserted.updatedAt,
     });
-});
+}
+
+export const createProjectTemplateAction = wrapServerAction(
+    "createProjectTemplate",
+    createProjectTemplateActionImpl,
+);

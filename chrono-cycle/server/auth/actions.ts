@@ -25,9 +25,9 @@ import {
 } from "@/server/auth/sessions";
 import { redirect } from "next/navigation";
 import { SignoutFormState } from "@/server/auth/forms/signout";
-import { checkAuth } from "./decorators";
+import { wrapServerAction, wrapServerActionWith } from "@/server/decorators";
 
-export async function signup(
+async function signupImpl(
     _prevState: SignupFormState,
     formData: FormData,
 ): Promise<SignupFormState> {
@@ -93,7 +93,7 @@ export async function signup(
     return { submitSuccess: true };
 }
 
-export async function signin(
+async function signinImpl(
     _prevState: SigninFormState,
     formData: FormData,
 ): Promise<SigninFormState> {
@@ -148,11 +148,25 @@ export async function signin(
     return redirect("/dashboard");
 }
 
-export const signout = checkAuth(async function(
+async function signoutImpl(
     userSession: UserSession,
 ): Promise<SignoutFormState> {
     invalidateSession(userSession.session.id);
     deleteSessionTokenCookie();
 
     return redirect("/");
-});
+}
+
+export const signup = wrapServerActionWith(
+    "signup",
+    { auth: false },
+    signupImpl,
+);
+
+export const signin = wrapServerActionWith(
+    "signin",
+    { auth: false },
+    signinImpl,
+);
+
+export const signout = wrapServerAction("signout", signoutImpl);

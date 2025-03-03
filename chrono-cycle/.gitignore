@@ -47,3 +47,6 @@ drizzle/migrations
 
 # Local dev database
 dev-db
+
+# Ignore logs
+*.log
