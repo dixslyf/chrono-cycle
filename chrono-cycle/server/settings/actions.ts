@@ -6,8 +6,8 @@ import getDb from "@/server/db";
 import { userSettings } from "@/server/db/schema/userSettings";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { getUserSettings } from "../auth/users";
-import { checkAuth } from "@/server/auth/decorators";
+import { getUserSettings } from "@/server/auth/users";
+import { wrapServerAction } from "@/server/decorators";
 
 const db = await getDb();
 
@@ -35,8 +35,7 @@ interface UpdateSettingsFormState {
     enableDesktopNotifications?: boolean;
 }
 
-// Define the server-side action for updating settings
-export const updateSettings = checkAuth(async function(
+async function updateSettingsImpl(
     userSession: UserSession,
     _previousState: UpdateSettingsFormState,
     formData: FormData,
@@ -105,9 +104,9 @@ export const updateSettings = checkAuth(async function(
             errorMessage: "Failed to update settings",
         };
     }
-});
+}
 
-export const fetchSettings = checkAuth(async function(
+async function fetchSettingsImpl(
     userSession: UserSession,
 ): Promise<UpdateSettingsFormState> {
     const userId = userSession.user.id;
@@ -137,4 +136,14 @@ export const fetchSettings = checkAuth(async function(
             errorMessage: "Failed to fetch settings",
         };
     }
-});
+}
+
+export const fetchSettings = wrapServerAction(
+    "fetchSettings",
+    fetchSettingsImpl,
+);
+
+export const updateSettings = wrapServerAction(
+    "updateSettings",
+    updateSettingsImpl,
+);

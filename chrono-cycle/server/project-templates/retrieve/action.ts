@@ -7,10 +7,10 @@ import { pipe } from "fp-ts/function";
 import { retrieveProjectTemplate } from "./lib";
 import { RetrieveResult } from "./data";
 import { DoesNotExistError } from "@/server/common/errors";
-import { checkAuth } from "@/server/auth/decorators";
 import { UserSession } from "@/server/auth/sessions";
+import { wrapServerAction } from "@/server/decorators";
 
-export const retrieveProjectTemplateAction = checkAuth(async function(
+async function retrieveProjectTemplateImpl(
     userSession: UserSession,
     projectTemplateName: string,
 ): Promise<RetrieveResult> {
@@ -28,4 +28,9 @@ export const retrieveProjectTemplateAction = checkAuth(async function(
         O.map((pt) => E.right(pt)),
         O.getOrElse(() => E.left(DoesNotExistError())),
     );
-});
+}
+
+export const retrieveProjectTemplateAction = wrapServerAction(
+    "retrieveProjectTemplate",
+    retrieveProjectTemplateImpl,
+);
