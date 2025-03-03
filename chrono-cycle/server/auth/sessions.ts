@@ -121,10 +121,15 @@ export async function deleteSessionTokenCookie(): Promise<void> {
     });
 }
 
+export async function getSessionTokenFromCookie(): Promise<string | null> {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("session")?.value ?? null;
+    return token;
+}
+
 export const getCurrentUserSession = cache(
     async (): Promise<UserSession | null> => {
-        const cookieStore = await cookies();
-        const token = cookieStore.get("session")?.value ?? null;
+        const token = await getSessionTokenFromCookie();
         if (token === null) {
             return null;
         }
