@@ -36,9 +36,6 @@ function DashNav({ months, initialMonth }: DashNavProps) {
         initialMonth || (months && months.length > 0 ? months[0].value : "");
     const [selectedMonth, setSelectedMonth] = useState<string>(initial);
 
-    // determine the current index for navigation
-    const currentIndex = months?.findIndex((m) => m.value === selectedMonth);
-
     // handle back and forth arrow
     const handleMonthChange = (delta: number) => {
         if (!months || months.length === 0) return;
@@ -109,15 +106,6 @@ function DashNav({ months, initialMonth }: DashNavProps) {
                         <Calendar />
                         Calendar
                     </Button>
-
-                    {/* <button className="flex items-center">
-                        <Calendar />
-                        Calendar
-                    </button>
-                    <button className="flex items-center">
-                        <ChartNoAxesGantt />
-                        Timeline
-                    </button> */}
                 </div>
 
                 {/* Choose template button */}
