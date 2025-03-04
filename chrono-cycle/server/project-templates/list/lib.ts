@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 
 import getDb from "@/server/db";
 import { projectTemplates as projectTemplatesTable } from "@/server/db/schema/projectTemplates";
-import { ProjectTemplateOverview } from "../common/data";
+import { ProjectTemplateOverview } from "@/server/common/data";
 import { encodeProjectTemplateId } from "@/server/common/identifiers";
 
 export async function getProjectTemplatesForUser(

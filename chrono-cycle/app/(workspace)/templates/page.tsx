@@ -5,7 +5,7 @@ import { pipe } from "fp-ts/function";
 
 import TemplateList from "@/app/components/templates/templateList";
 import { listProjectTemplatesAction } from "@/server/project-templates/list/action";
-import { ProjectTemplateOverview } from "@/server/project-templates/common/data";
+import { ProjectTemplateOverview } from "@/server/common/data";
 
 export default async function Templates() {
     const result = await listProjectTemplatesAction();

@@ -15,7 +15,7 @@ import { deleteProjectTemplateAction } from "@/server/project-templates/delete/a
 import { CreateResult } from "@/server/project-templates/create/data";
 import { ValidationIssues } from "@/server/common/errors";
 import { DeleteResult } from "@/server/project-templates/delete/data";
-import { ProjectTemplateOverview } from "@/server/project-templates/common/data";
+import { ProjectTemplateOverview } from "@/server/common/data";
 
 function getCreateErrorMessage(createState: CreateResult) {
     return match(createState)
