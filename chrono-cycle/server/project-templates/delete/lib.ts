@@ -4,18 +4,23 @@ import * as O from "fp-ts/Option";
 import getDb from "@/server/db";
 import { projectTemplates as projectTemplatesTable } from "@/server/db/schema/projectTemplates";
 import { ProjectTemplateOverview } from "@/server/common/data";
-import { encodeProjectTemplateId } from "@/server/common/identifiers";
+import {
+    decodeProjectTemplateId,
+    encodeProjectTemplateId,
+} from "@/server/common/identifiers";
 
 export async function deleteProjectTemplate(
-    projectTemplateName: string,
+    projectTemplateEncodedId: string,
     userId: number,
 ): Promise<O.Option<ProjectTemplateOverview>> {
+    const projectTemplateId = decodeProjectTemplateId(projectTemplateEncodedId);
+
     const db = await getDb();
     const deleted = await db
         .delete(projectTemplatesTable)
         .where(
             and(
-                eq(projectTemplatesTable.name, projectTemplateName),
+                eq(projectTemplatesTable.id, projectTemplateId),
                 eq(projectTemplatesTable.userId, userId),
             ),
         )

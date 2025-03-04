@@ -4,18 +4,21 @@ import * as O from "fp-ts/Option";
 import getDb from "@/server/db";
 import { projectTemplates as projectTemplatesTable } from "@/server/db/schema/projectTemplates";
 import { ProjectTemplateData } from "./data";
+import { decodeProjectTemplateId } from "@/server/common/identifiers";
 
 export async function retrieveProjectTemplate(
-    projectTemplateName: string,
+    projectTemplateEncodedId: string,
     userId: number,
 ): Promise<O.Option<ProjectTemplateData>> {
+    const projectTemplateId = decodeProjectTemplateId(projectTemplateEncodedId);
+
     const db = await getDb();
     const selected = await db
         .select()
         .from(projectTemplatesTable)
         .where(
             and(
-                eq(projectTemplatesTable.name, projectTemplateName),
+                eq(projectTemplatesTable.id, projectTemplateId),
                 eq(projectTemplatesTable.userId, userId),
             ),
         );

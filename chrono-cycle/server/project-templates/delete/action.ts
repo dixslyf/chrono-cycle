@@ -13,12 +13,12 @@ import { wrapServerAction } from "@/server/decorators";
 async function deleteProjectTemplateImpl(
     userSession: UserSession,
     _previousState: DeleteResult | null,
-    name: string,
+    projectTemplateId: string,
 ): Promise<DeleteResult> {
     const userId = userSession.user.id;
 
     // Project template names are unique, so we don't need the project template ID.
-    const deleted = await deleteProjectTemplate(name, userId);
+    const deleted = await deleteProjectTemplate(projectTemplateId, userId);
     if (O.isNone(deleted)) {
         return E.left(DoesNotExistError());
     }
