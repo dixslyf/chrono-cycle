@@ -12,14 +12,14 @@ import { wrapServerAction } from "@/server/decorators";
 
 async function retrieveProjectTemplateImpl(
     userSession: UserSession,
-    projectTemplateName: string,
+    projectTemplateId: string,
 ): Promise<RetrieveResult> {
     // Check that the user owns the project template.
     const userId = userSession.user.id;
 
     // Retrieve the project template.
     const projectTemplate = await retrieveProjectTemplate(
-        projectTemplateName,
+        projectTemplateId,
         userId,
     );
 
