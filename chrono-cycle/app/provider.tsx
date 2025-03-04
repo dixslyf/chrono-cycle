@@ -2,14 +2,19 @@
 
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import { ThemeProvider } from "next-themes";
+import { MantineProvider } from "@mantine/core";
 import React from "react";
 
-export default function RootLayout(props: { children: React.ReactNode }) {
+export default function RootProvider({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
     return (
-        <ChakraProvider value={defaultSystem}>
-            <ThemeProvider attribute="class" disableTransitionOnChange>
-                {props.children}
-            </ThemeProvider>
-        </ChakraProvider>
+        <MantineProvider>
+            <ChakraProvider value={defaultSystem}>
+                <ThemeProvider>{children}</ThemeProvider>
+            </ChakraProvider>
+        </MantineProvider>
     );
 }

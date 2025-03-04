@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-// import { Provider } from "@/components/";
-import Provider from "./provider";
+import RootProvider from "./provider";
+
+import "@mantine/core/styles.css";
+import { ColorSchemeScript } from "@mantine/core";
 
 import "./globals.css";
 
@@ -27,10 +29,13 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" className="w-full h-full" suppressHydrationWarning>
+            <head>
+                <ColorSchemeScript />
+            </head>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased w-full h-full`}
             >
-                <Provider>{children}</Provider>
+                <RootProvider>{children}</RootProvider>
             </body>
         </html>
     );
