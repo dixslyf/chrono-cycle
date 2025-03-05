@@ -20,9 +20,18 @@ interface DashNavProps {
     selectedMonth: string;
     onSelectMonth: (month: string) => void;
     year: number;
+    activeView: "timeline" | "calendar";
+    onViewChange: (view: "timeline" | "calendar") => void;
 }
 
-function DashNav({ months, selectedMonth, onSelectMonth, year }: DashNavProps) {
+function DashNav({
+    months,
+    selectedMonth,
+    onSelectMonth,
+    year,
+    activeView,
+    onViewChange,
+}: DashNavProps) {
     // handle back and forth arrow changes
     const handleMonthChange = (delta: number) => {
         if (!months || months.length === 0) return;
@@ -85,14 +94,26 @@ function DashNav({ months, selectedMonth, onSelectMonth, year }: DashNavProps) {
                 <div className="flex gap-2 w-1/3 justify-center items-center">
                     <Button
                         variant="transparent"
-                        className="text-palette1 text-lg font-semibold hover:text-palette2"
+                        onClick={() => onViewChange("timeline")}
+                        // className="text-palette1 text-lg font-semibold hover:text-palette2"
+                        className={`text-lg font-semibold h-full hover:text-palette2 ${
+                            activeView === "timeline"
+                                ? "text-palette2 border-b-2 border-b-palette2 p-0 rounded-none"
+                                : "text-palette1"
+                        }`}
                     >
                         <ChartNoAxesGantt />
                         Timeline
                     </Button>
                     <Button
                         variant="transparent"
-                        className="text-palette1 text-lg font-semibold hover:text-palette2"
+                        onClick={() => onViewChange("calendar")}
+                        // className="text-palette1 text-lg font-semibold hover:text-palette2"
+                        className={`text-lg font-semibold h-full  hover:text-palette2 ${
+                            activeView === "calendar"
+                                ? "text-palette2 border-b-2 border-b-palette2 p-0 rounded-none"
+                                : "text-palette1"
+                        }`}
                     >
                         <Calendar />
                         Calendar

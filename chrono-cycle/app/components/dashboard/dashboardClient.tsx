@@ -13,6 +13,9 @@ interface DashboardProps {
 function DashboardClient({ months, initialMonth, days, year }: DashboardProps) {
     const [selectedMonth, setSelectedMonth] = useState(initialMonth);
     const [scrollToMonth, setScrollToMonth] = useState<string | null>(null);
+    const [activeView, setActiveView] = useState<"timeline" | "calendar">(
+        "timeline",
+    );
 
     // update the month from the nav from scrolling
     const handleSelectMonth = (month: string, scroll: boolean = false) => {
@@ -30,16 +33,24 @@ function DashboardClient({ months, initialMonth, days, year }: DashboardProps) {
                     selectedMonth={selectedMonth}
                     onSelectMonth={(month) => handleSelectMonth(month, true)}
                     year={year}
+                    activeView={activeView}
+                    onViewChange={setActiveView}
                 />
-                <Timeline
-                    days={days}
-                    selectedMonth={selectedMonth}
-                    scrollToMonth={scrollToMonth}
-                    onMonthChange={(month) => {
-                        setSelectedMonth(month.toLowerCase());
-                    }}
-                    onScolled={() => setScrollToMonth(null)}
-                />
+                {activeView === "timeline" ? (
+                    <Timeline
+                        days={days}
+                        selectedMonth={selectedMonth}
+                        scrollToMonth={scrollToMonth}
+                        onMonthChange={(month) => {
+                            setSelectedMonth(month.toLowerCase());
+                        }}
+                        onScolled={() => setScrollToMonth(null)}
+                    />
+                ) : (
+                    <div className="flex flex-1 items-center justify-center">
+                        <h2>Calendar view</h2>
+                    </div>
+                )}
             </div>
         </>
     );
