@@ -8,10 +8,12 @@ async function WorkspaceLayout({
 }>) {
     return (
         <>
-            <header>
-                <Navbar />
-            </header>
-            <main className="m-0 w-full h-full">{children}</main>
+            <div className="min-h-screen flex flex-col">
+                <header className="flex-none">
+                    <Navbar />
+                </header>
+                <main className="flex-1 w-full flex flex-col">{children}</main>
+            </div>
         </>
     );
 }

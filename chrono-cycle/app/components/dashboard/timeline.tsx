@@ -56,15 +56,18 @@ function Timeline({ days, onMonthChange }: TimelineProps) {
 
     // each day is one column wide, so number of columns should be days.length
     return (
-        <div ref={containerRef} className="overflow-x-auto">
-            <div className="flex">
+        <div
+            ref={containerRef}
+            className="overflow-x-auto w-full flex-1 h-full flex flex-col"
+        >
+            <div className="flex h-full flex-1">
                 {days.map((day) => {
                     const isToday =
                         new Date().toDateString() === day.date.toDateString();
                     return (
                         <div
                             key={day.date.toISOString()}
-                            className="flex-none border p-2 text-center"
+                            className="flex-none border p-2 text-center flex flex-col gap-2"
                             style={{ width: `${cellWidth}px` }}
                         >
                             <Text
@@ -74,6 +77,8 @@ function Timeline({ days, onMonthChange }: TimelineProps) {
                             >
                                 {day.label}
                             </Text>
+                            {/* vertical line below label */}
+                            <div className="w-px h-[90%] bg-gray-400 mx-auto mt-2" />
                         </div>
                     );
                 })}

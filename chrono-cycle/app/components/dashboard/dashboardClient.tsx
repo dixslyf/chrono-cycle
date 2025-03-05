@@ -15,16 +15,20 @@ function DashboardClient({ months, initialMonth, days, year }: DashboardProps) {
 
     return (
         <>
-            <DashNav
-                months={months}
-                selectedMonth={selectedMonth}
-                onSelectMonth={setSelectedMonth}
-                year={year}
-            />
-            <Timeline
-                days={days}
-                onMonthChange={(month) => setSelectedMonth(month.toLowerCase())}
-            />
+            <div className="flex flex-col flex-1 h-full">
+                <DashNav
+                    months={months}
+                    selectedMonth={selectedMonth}
+                    onSelectMonth={setSelectedMonth}
+                    year={year}
+                />
+                <Timeline
+                    days={days}
+                    onMonthChange={(month) =>
+                        setSelectedMonth(month.toLowerCase())
+                    }
+                />
+            </div>
         </>
     );
 }
