@@ -7,18 +7,8 @@ import {
     ClipboardList,
     ChevronDown,
 } from "lucide-react";
-import {
-    SelectRoot,
-    SelectLabel,
-    SelectTrigger,
-    SelectContent,
-    SelectItem,
-    createListCollection,
-    SelectValueText,
-} from "@chakra-ui/react";
 
 import { Button, Menu, Text, ActionIcon, Select } from "@mantine/core";
-import { useState } from "react";
 
 interface Month {
     value: string;
@@ -27,29 +17,26 @@ interface Month {
 
 interface DashNavProps {
     months?: Month[];
-    initialMonth?: string;
+    selectedMonth: string;
+    onSelectMonth: (month: string) => void;
+    year: number;
 }
 
-function DashNav({ months, initialMonth }: DashNavProps) {
-    // initialise month
-    const initial =
-        initialMonth || (months && months.length > 0 ? months[0].value : "");
-    const [selectedMonth, setSelectedMonth] = useState<string>(initial);
-
-    // handle back and forth arrow
+function DashNav({ months, selectedMonth, onSelectMonth, year }: DashNavProps) {
+    // handle back and forth arrow changes
     const handleMonthChange = (delta: number) => {
         if (!months || months.length === 0) return;
         const currentIndex = months.findIndex((m) => m.value === selectedMonth);
         if (currentIndex === -1) {
-            setSelectedMonth(months[0].value);
+            onSelectMonth(months[0].value);
             return;
         }
         const newIndex = (currentIndex + delta + months.length) % months.length;
-        setSelectedMonth(months[newIndex].value);
+        onSelectMonth(months[newIndex].value);
     };
 
     const handleSelectChange = (value: string | null) => {
-        if (value) setSelectedMonth(value);
+        if (value) onSelectMonth(value);
     };
 
     return (
@@ -88,6 +75,8 @@ function DashNav({ months, initialMonth }: DashNavProps) {
                         })}
                         comboboxProps={{ shadow: "md" }}
                     />
+                    {/* display the dynamic year */}
+                    <Text className="font-semibold text-lg ml-2">{year}</Text>
                 </div>
 
                 {/* calendar / timeline button */}

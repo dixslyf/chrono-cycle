@@ -19,6 +19,7 @@ function Timeline({ days, onMonthChange }: TimelineProps) {
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
+        // scroll to the current day
         const todayIndex = days.findIndex(
             (d) => new Date().toDateString() === d.date.toDateString(),
         );
