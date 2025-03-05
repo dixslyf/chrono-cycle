@@ -165,6 +165,7 @@ export async function createEventTemplate(
             return {
                 id: encodeEventTemplateId(id),
                 projectTemplateId: encodeProjectTemplateId(projectTemplateId),
+                reminders: [],
                 tags,
                 ...partial,
             } satisfies CreateReturnData;

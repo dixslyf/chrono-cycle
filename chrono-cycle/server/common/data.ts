@@ -18,6 +18,7 @@ export type EventTemplate = {
     autoReschedule: boolean;
     projectTemplateId: string;
     updatedAt: Date;
+    reminders: ReminderTemplate[];
     tags: Tag[];
 };
 
