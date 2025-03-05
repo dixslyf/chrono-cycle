@@ -21,6 +21,14 @@ export type EventTemplate = {
     tags: Tag[];
 };
 
+export type ReminderTemplate = {
+    id: string; // Encoded ID.
+    daysBeforeEvent: number;
+    time: string;
+    emailNotifications: boolean;
+    desktopNotifications: boolean;
+};
+
 export type Tag = {
     id: string; // Encoded ID.
     name: string;
