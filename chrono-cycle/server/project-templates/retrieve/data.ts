@@ -2,6 +2,7 @@ import { DoesNotExistError } from "@/server/common/errors";
 import * as E from "fp-ts/Either";
 
 export type ProjectTemplateData = {
+    id: string; // Encoded ID.
     name: string;
     description: string;
     createdAt: Date;

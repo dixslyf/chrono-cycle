@@ -28,6 +28,7 @@ export async function retrieveProjectTemplate(
     }
 
     return O.some({
+        id: projectTemplateEncodedId,
         name: selected[0].name,
         description: selected[0].description,
         createdAt: selected[0].createdAt,
