@@ -14,6 +14,9 @@ import {
     CreateResult,
 } from "@/server/project-templates/create/data";
 import { Textarea, TextInput } from "@mantine/core";
+import { pipe } from "fp-ts/lib/function";
+
+import { notifyError, notifySuccess } from "@/app/utils/notifications";
 
 function getCreateErrorMessage(createState: CreateResult) {
     return match(createState)
@@ -61,9 +64,25 @@ export function CreateProjectTemplateForm({
 
     // Call `onSuccess` whenever creation is successful.
     useEffect(() => {
-        if (createResult && E.isRight(createResult)) {
-            onSuccess();
+        if (!createResult) {
+            return;
         }
+
+        pipe(
+            createResult,
+            E.match(
+                (_err) =>
+                    notifyError({
+                        message: "Failed to create project template.",
+                    }),
+                () => {
+                    notifySuccess({
+                        message: "Successfully created project template.",
+                    });
+                    onSuccess();
+                },
+            ),
+        );
     }, [createResult, onSuccess]);
 
     const form = useForm({

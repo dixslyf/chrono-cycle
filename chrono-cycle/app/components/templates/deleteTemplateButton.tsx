@@ -4,6 +4,8 @@ import { startTransition, useActionState, useEffect } from "react";
 import { Button } from "@mantine/core";
 import { Trash } from "lucide-react";
 
+import { notifyError, notifySuccess } from "@/app/utils/notifications";
+
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 
@@ -30,10 +32,16 @@ export function DeleteTemplateButton({
         pipe(
             deleteResult,
             E.match(
-                (_err) => {
-                    /* TODO: display error */
+                (_err) =>
+                    notifyError({
+                        message: "Failed to delete project template.",
+                    }),
+                () => {
+                    notifySuccess({
+                        message: "Successfully deleted project template.",
+                    });
+                    onSuccess();
                 },
-                () => onSuccess(),
             ),
         );
     }, [deleteResult, onSuccess]);
