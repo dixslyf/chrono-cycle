@@ -66,17 +66,19 @@ function DashNav({ months, selectedMonth, onSelectMonth, year }: DashNavProps) {
                         onChange={handleSelectChange}
                         placeholder="Select Month"
                         variant="unstyled"
-                        className="font-semibold w-32"
-                        rightSection={<></>}
+                        className="font-semibold w-28"
+                        rightSection={null}
+                        rightSectionWidth={0}
                         styles={(theme) => ({
                             input: {
                                 fontSize: theme.fontSizes.xl,
+                                textAlign: "center",
                             },
                         })}
                         comboboxProps={{ shadow: "md" }}
                     />
                     {/* display the dynamic year */}
-                    <Text className="font-semibold text-lg ml-2">{year}</Text>
+                    <Text className="font-semibold text-xl">{year}</Text>
                 </div>
 
                 {/* calendar / timeline button */}
