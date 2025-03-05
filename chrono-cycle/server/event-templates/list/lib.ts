@@ -1,7 +1,7 @@
 import { eq, and, getTableColumns } from "drizzle-orm";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
-import { ListResult } from "./data";
+import { ListError, ListResult } from "./data";
 import { eventTemplates } from "@/server/db/schema/eventTemplates";
 import { EventTemplate } from "@/server/common/data";
 import {
@@ -10,18 +10,21 @@ import {
     encodeProjectTemplateId,
     encodeTagId,
 } from "@/server/common/identifiers";
-import { eventTemplateTags, projectTemplates, tags } from "@/server/db/schema";
-import getFuncDb from "@/server/db/functional";
+import {
+    DbProjectTemplate,
+    eventTemplateTags,
+    projectTemplates,
+    tags,
+} from "@/server/db/schema";
+import getFuncDb, { FunctionalDatabase } from "@/server/db/functional";
 
-export async function listEventTemplates(
+// Check if the project template exists.
+function checkProjectTemplateTask(
+    fDb: FunctionalDatabase,
     userId: number,
-    projectTemplateEncodedId: string,
-): Promise<ListResult> {
-    const fDb = await getFuncDb();
-
-    // Check if the project template exists.
-    const projectTemplateId = decodeProjectTemplateId(projectTemplateEncodedId);
-    const checkProjectTemplateTask = fDb.do((db) =>
+    projectTemplateId: number,
+): TE.TaskEither<ListError, DbProjectTemplate[]> {
+    return fDb.do((db) =>
         db
             .select()
             .from(projectTemplates)
@@ -32,9 +35,14 @@ export async function listEventTemplates(
                 ),
             ),
     );
+}
 
-    // Retrieve the event templates for the project template.
-    const selectEventTemplatesTask = pipe(
+// Retrieve the event templates for the project template.
+function selectEventTemplatesTask(
+    fDb: FunctionalDatabase,
+    projectTemplateId: number,
+): TE.TaskEither<ListError, EventTemplate[]> {
+    return pipe(
         fDb.do((db) =>
             db
                 .select({
@@ -87,10 +95,19 @@ export async function listEventTemplates(
             return Array.from(map.values());
         }),
     );
+}
+
+export async function listEventTemplates(
+    userId: number,
+    projectTemplateSqid: string,
+): Promise<ListResult> {
+    const fDb = await getFuncDb();
+
+    const projectTemplateId = decodeProjectTemplateId(projectTemplateSqid);
 
     const task = pipe(
-        checkProjectTemplateTask,
-        TE.chain(() => selectEventTemplatesTask),
+        checkProjectTemplateTask(fDb, userId, projectTemplateId),
+        TE.chain(() => selectEventTemplatesTask(fDb, projectTemplateId)),
     );
     return await task();
 }
