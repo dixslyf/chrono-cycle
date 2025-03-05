@@ -32,17 +32,19 @@ export const events = pgTable("events", {
     name: text("name").notNull(),
     offsetDays: integer("offset_days").notNull(),
     duration: integer("duration").notNull(),
-    note: text("note"),
+    note: text("note").notNull().default(""),
     eventType: eventTypeEnum("event_type").notNull(),
-    autoReschedule: boolean("auto_reschedule").notNull(),
+    autoReschedule: boolean("auto_reschedule").notNull().default(true),
     updatedAt: timestamp("created_at", {
         withTimezone: true,
         mode: "date",
     })
         .notNull()
         .defaultNow(),
-    status: statusEnum("status").notNull(),
-    notificationsEnabled: boolean("notifications_enabled").notNull(),
+    status: statusEnum("status").notNull().default("none"),
+    notificationsEnabled: boolean("notifications_enabled")
+        .notNull()
+        .default(true),
     eventTemplateId: integer("event_template_id").references(
         () => eventTemplates.id,
     ),
