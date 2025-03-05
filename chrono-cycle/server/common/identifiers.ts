@@ -21,6 +21,21 @@ const sqidses = {
             "wbA9KrOU1EgIoT6sicLlCpP7RxXMHF2e0uGaDN3hVWSd8tzZkjQqBvmf54ynYJ",
         ...COMMON_SQIDS_CONFIG,
     }),
+    project: new Sqids({
+        alphabet:
+            "t68m5x4qEDyFQVIMvR2pceXn13u0HjoShlaBrLYbdzgsOKZw7CGNPk9WiUJTAf",
+        ...COMMON_SQIDS_CONFIG,
+    }),
+    event: new Sqids({
+        alphabet:
+            "73SdLl8XHKnirPW1U4k6pyZADFxVsTuf2wOvzBaQYRCe9tN5EqhmobMgGI0cjJ",
+        ...COMMON_SQIDS_CONFIG,
+    }),
+    reminder: new Sqids({
+        alphabet:
+            "3F7eqvxs05fj9oMwazBtShRCI6KZNQ2OLWnmJ4i8lGAYVTUHcErb1XpyDPdguk",
+        ...COMMON_SQIDS_CONFIG,
+    }),
     tag: new Sqids({
         alphabet:
             "Co5GjZLnANYE6ImUuF7k2x48r3OQiHy0VcSTbfRDlWavsPhgKXdzpt9JqMeBw1",
@@ -59,6 +74,15 @@ export const decodeEventTemplateId = genDecodeId("eventTemplate");
 
 export const encodeReminderTemplateId = genEncodeId("reminderTemplate");
 export const decodeReminderTemplateId = genDecodeId("reminderTemplate");
+
+export const encodeProjectId = genEncodeId("project");
+export const decodeProjectId = genDecodeId("project");
+
+export const encodeEventId = genEncodeId("event");
+export const decodeEventId = genDecodeId("event");
+
+export const encodeReminderId = genEncodeId("reminder");
+export const decodeReminderId = genDecodeId("reminder");
 
 export const encodeTagId = genEncodeId("tag");
 export const decodeTagId = genDecodeId("tag");
