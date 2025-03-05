@@ -16,6 +16,11 @@ const sqidses = {
             "2na6ICdpxG73S8myYUJ40ckNL5htTosvgWuR1AqfzwZX9OKFDMBHPVbQjrieEl",
         ...COMMON_SQIDS_CONFIG,
     }),
+    reminderTemplate: new Sqids({
+        alphabet:
+            "wbA9KrOU1EgIoT6sicLlCpP7RxXMHF2e0uGaDN3hVWSd8tzZkjQqBvmf54ynYJ",
+        ...COMMON_SQIDS_CONFIG,
+    }),
     tag: new Sqids({
         alphabet:
             "Co5GjZLnANYE6ImUuF7k2x48r3OQiHy0VcSTbfRDlWavsPhgKXdzpt9JqMeBw1",
@@ -51,6 +56,9 @@ export const decodeProjectTemplateId = genDecodeId("projectTemplate");
 
 export const encodeEventTemplateId = genEncodeId("eventTemplate");
 export const decodeEventTemplateId = genDecodeId("eventTemplate");
+
+export const encodeReminderTemplateId = genEncodeId("reminderTemplate");
+export const decodeReminderTemplateId = genDecodeId("reminderTemplate");
 
 export const encodeTagId = genEncodeId("tag");
 export const decodeTagId = genDecodeId("tag");
