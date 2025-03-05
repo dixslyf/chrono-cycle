@@ -1,5 +1,5 @@
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import { pgTable, serial, integer, time } from "drizzle-orm/pg-core";
+import { pgTable, serial, integer, time, boolean } from "drizzle-orm/pg-core";
 import events from "./events";
 import reminderTemplates from "./reminderTemplates";
 import {
@@ -15,6 +15,10 @@ export const reminders = pgTable("reminders", {
         .references(() => events.id),
     daysBeforeEvent: integer("days_before_event").notNull(),
     time: time("time").notNull(),
+    emailNotifications: boolean("email_notifications").default(true).notNull(),
+    desktopNotifications: boolean("desktop_notifications")
+        .default(true)
+        .notNull(),
     reminderTemplateId: integer("reminder_template_id").references(
         () => reminderTemplates.id,
     ),
