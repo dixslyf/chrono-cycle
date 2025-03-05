@@ -3,7 +3,7 @@ import * as E from "fp-ts/Either";
 import { z } from "zod";
 
 import { ProjectTemplateOverview } from "@/server/common/data";
-import { ValidationError } from "@/server/common/errors";
+import { DuplicateNameError, ValidationError } from "@/server/common/errors";
 import { projectTemplateInsertSchema } from "@/server/db/schema/projectTemplates";
 
 export const createFormSchema = z.object({
@@ -12,14 +12,6 @@ export const createFormSchema = z.object({
 });
 
 export type CreateFormData = z.output<typeof createFormSchema>;
-
-export type DuplicateNameError = {
-    _errorKind: "DuplicateNameError";
-};
-
-export function DuplicateNameError(): DuplicateNameError {
-    return { _errorKind: "DuplicateNameError" };
-}
 
 export type CreateReturnData = ProjectTemplateOverview;
 
