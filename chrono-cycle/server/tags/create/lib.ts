@@ -6,7 +6,7 @@ import { pipe } from "fp-ts/function";
 
 import getDb from "@/server/db";
 import { CreateError, CreateResult, TagExistsError } from "./data";
-import { InternalError } from "@/server/common/errors";
+import { InternalError, ValidationError } from "@/server/common/errors";
 import { encodeTagId } from "@/server/common/identifiers";
 import { tags, users, DbTagInsert, DbTag } from "@/server/db/schema";
 import { Tag, tagNameSchema } from "@/server/common/data";
@@ -25,21 +25,18 @@ export async function getTagIfExists(
                     .from(tags)
                     .where(and(eq(users.id, userId), eq(tags.name, tagName))),
             (_err) =>
-                ({
-                    _errorKind: "InternalError",
-                    context: "An error occurred while querying the database",
-                }) satisfies InternalError,
+                InternalError("An error occurred while querying the database"),
         ),
         TE.chain((selected): TE.TaskEither<InternalError, O.Option<Tag>> => {
             if (selected.length < 1) {
                 // Tag not found.
                 return TE.right(O.none);
             } else if (selected.length > 1) {
-                return TE.left({
-                    _errorKind: "InternalError",
-                    context:
+                return TE.left(
+                    InternalError(
                         "Unexpected multiple matching tags while querying the database",
-                });
+                    ),
+                );
             } else {
                 // selected.length === 1; i.e., tag has been found.
                 // Convert to the output type.
@@ -65,10 +62,7 @@ export async function createTag(
     const parseResult = tagNameSchema.safeParse(tagName);
     if (!parseResult.success) {
         const formattedErrors = parseResult.error.format();
-        return E.left({
-            _errorKind: "ValidationError",
-            issues: { name: formattedErrors._errors },
-        });
+        return E.left(ValidationError({ name: formattedErrors._errors }));
     }
 
     // Try insert the tag.
@@ -94,11 +88,9 @@ export async function createTag(
                         } satisfies DbTagInsert)
                         .returning(),
                 (_err) =>
-                    ({
-                        _errorKind: "InternalError",
-                        context:
-                            "An error occurred while inserting into the database.",
-                    }) satisfies InternalError,
+                    InternalError(
+                        "An error occurred while inserting into the database.",
+                    ),
             );
         }),
         TE.map((insertResult) => insertResult[0]), // We've only inserted one value.
@@ -124,10 +116,7 @@ export async function ensureTagExists(
     const parseResult = tagNameSchema.safeParse(tagName);
     if (!parseResult.success) {
         const formattedErrors = parseResult.error.format();
-        return E.left({
-            _errorKind: "ValidationError",
-            issues: { name: formattedErrors._errors },
-        });
+        return E.left(ValidationError({ name: formattedErrors._errors }));
     }
 
     // Try inserting the tag.
@@ -154,11 +143,9 @@ export async function ensureTagExists(
                                     } satisfies DbTagInsert)
                                     .returning(),
                             (_err) =>
-                                ({
-                                    _errorKind: "InternalError",
-                                    context:
-                                        "An error occurred while inserting into the database.",
-                                }) satisfies InternalError,
+                                InternalError(
+                                    "An error occurred while inserting into the database.",
+                                ),
                         ),
                         TE.map((insertResult) => insertResult[0]), // We've only inserted one value.
                         TE.map((dbTag) => {
