@@ -1,5 +1,5 @@
 import DashNav from "@/app/components/dashboard/dashNav";
-import Timeline from "@/app/components/dashboard/timeline";
+import Timeline, { Day } from "@/app/components/dashboard/timeline";
 
 const monthsData = [
     { value: "january", label: "January" },
@@ -16,23 +16,47 @@ const monthsData = [
     { value: "december", label: "December" },
 ];
 
-// get currrent month index
-const currentMonthIndex = new Date().getMonth();
+// Get the current month index and value
+const currentDate = new Date();
+const currentMonthIndex = currentDate.getMonth();
 const currentMonth = monthsData[currentMonthIndex].value;
 
-// generate the days for the current month
-const year = new Date().getFullYear();
-const daysInMonth = new Date(year, currentMonthIndex + 1, 0).getDate();
+// Generate a range of days spanning from one month before to one month after
+function generateDaysRange(): Day[] {
+    const days: Day[] = [];
+    const year = currentDate.getFullYear();
 
-const days = Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
-    const date = new Date(year, currentMonthIndex, day);
-    // for label we use first char of weekday
-    const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "short" });
-    const label = `${dayOfWeek[0]}${day}`;
-    return { day, label, date };
-});
+    // Start from previous month
+    const startDate = new Date(year, currentMonthIndex - 1, 1);
+    // End at next month’s last day
+    const endDate = new Date(year, currentMonthIndex + 2, 0);
+
+    const current = new Date(startDate);
+    while (current <= endDate) {
+        const dayOfWeek = current.toLocaleDateString("en-US", {
+            weekday: "short",
+        });
+        // Label: first letter of weekday + day of month (e.g., "T5" for Tuesday the 5th)
+        const label = `${dayOfWeek[0]}${current.getDate()}`;
+        days.push({
+            date: new Date(current),
+            label,
+        });
+        current.setDate(current.getDate() + 1);
+    }
+    return days;
+}
+
+const days = generateDaysRange();
 
 export default function Dashboard() {
+    // this part will only work with csr so will have to create a main component
+    // const handleMonthChange = (month: string) => {
+    // TODO
+    // when month change will have to parse to nav to change the month as well
+    // for now will just do nothing
+    // };
+
     return (
         <>
             <DashNav months={monthsData} initialMonth={currentMonth} />
