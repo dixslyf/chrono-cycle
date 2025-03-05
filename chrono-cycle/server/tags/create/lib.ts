@@ -4,28 +4,25 @@ import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 
-import getDb from "@/server/db";
 import { CreateError, CreateResult, TagExistsError } from "./data";
 import { InternalError, ValidationError } from "@/server/common/errors";
 import { encodeTagId } from "@/server/common/identifiers";
 import { tags, users, DbTagInsert, DbTag } from "@/server/db/schema";
 import { Tag, tagNameSchema } from "@/server/common/data";
+import getFuncDb from "@/server/db/functional";
 
 export async function getTagIfExists(
     userId: number,
     tagName: string,
 ): Promise<E.Either<CreateError, O.Option<Tag>>> {
-    const db = await getDb();
+    const fDb = await getFuncDb();
 
     const task = pipe(
-        TE.tryCatch(
-            () =>
-                db
-                    .select()
-                    .from(tags)
-                    .where(and(eq(users.id, userId), eq(tags.name, tagName))),
-            (_err) =>
-                InternalError("An error occurred while querying the database"),
+        fDb.do((db) =>
+            db
+                .select()
+                .from(tags)
+                .where(and(eq(users.id, userId), eq(tags.name, tagName))),
         ),
         TE.chain((selected): TE.TaskEither<InternalError, O.Option<Tag>> => {
             if (selected.length < 1) {
@@ -56,7 +53,7 @@ export async function createTag(
     userId: number,
     tagName: string,
 ): Promise<CreateResult> {
-    const db = await getDb();
+    const fDb = await getFuncDb();
 
     // Validate tag name schema.
     const parseResult = tagNameSchema.safeParse(tagName);
@@ -78,19 +75,14 @@ export async function createTag(
             }
 
             // Otherwise, we try inserting the tag.
-            return TE.tryCatch(
-                () =>
-                    db
-                        .insert(tags)
-                        .values({
-                            userId,
-                            name: tagName,
-                        } satisfies DbTagInsert)
-                        .returning(),
-                (_err) =>
-                    InternalError(
-                        "An error occurred while inserting into the database.",
-                    ),
+            return fDb.do((db) =>
+                db
+                    .insert(tags)
+                    .values({
+                        userId,
+                        name: tagName,
+                    } satisfies DbTagInsert)
+                    .returning(),
             );
         }),
         TE.map((insertResult) => insertResult[0]), // We've only inserted one value.
@@ -110,7 +102,7 @@ export async function ensureTagExists(
     userId: number,
     tagName: string,
 ): Promise<CreateResult> {
-    const db = await getDb();
+    const fDb = await getFuncDb();
 
     // Validate tag name schema.
     const parseResult = tagNameSchema.safeParse(tagName);
@@ -133,19 +125,14 @@ export async function ensureTagExists(
                 // Otherwise, we have to try inserting.
                 O.getOrElse(() =>
                     pipe(
-                        TE.tryCatch(
-                            () =>
-                                db
-                                    .insert(tags)
-                                    .values({
-                                        userId,
-                                        name: tagName,
-                                    } satisfies DbTagInsert)
-                                    .returning(),
-                            (_err) =>
-                                InternalError(
-                                    "An error occurred while inserting into the database.",
-                                ),
+                        fDb.do((db) =>
+                            db
+                                .insert(tags)
+                                .values({
+                                    userId,
+                                    name: tagName,
+                                } satisfies DbTagInsert)
+                                .returning(),
                         ),
                         TE.map((insertResult) => insertResult[0]), // We've only inserted one value.
                         TE.map((dbTag) => {
