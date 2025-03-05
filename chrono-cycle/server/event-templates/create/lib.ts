@@ -17,7 +17,6 @@ import eventTemplates, {
 import projectTemplates from "@/server/db/schema/projectTemplates";
 import { DoesNotExistError, InternalError } from "@/server/common/errors";
 import {
-    decodeEventTemplateId,
     decodeProjectTemplateId,
     decodeTagId,
     encodeEventTemplateId,
@@ -103,29 +102,17 @@ export async function createEventTemplate(
             ),
             TE.mapError((err) => err satisfies CreateError as CreateError),
             TE.map((insertResult) => insertResult[0]), // We've only inserted one value.
-            TE.map((et) => {
-                // Map to return type.
-                const { id, projectTemplateId, ...partial } = et;
-                return {
-                    id: encodeEventTemplateId(id),
-                    projectTemplateId:
-                        encodeProjectTemplateId(projectTemplateId),
-                    ...partial,
-                } satisfies CreateReturnData;
-            }),
         );
 
     // Task to insert into the junction table linking tags and event templates.
-    const linkTagsTask = (eventTemplate: EventTemplate, tags: Tag[]) =>
+    const linkTagsTask = (eventTemplateId: number, tags: Tag[]) =>
         pipe(
             fDb.do<void>((db) =>
                 db
                     .insert(eventTemplateTags)
                     .values(
                         tags.map((tag) => ({
-                            eventTemplateId: decodeEventTemplateId(
-                                eventTemplate.id,
-                            ),
+                            eventTemplateId, // Real database ID, not encoded ID.
                             tagId: decodeTagId(tag.id),
                         })),
                     )
@@ -140,19 +127,30 @@ export async function createEventTemplate(
         // Try inserting the event template.
         insertEventTemplateTask(),
         // Ensure that all tags exist.
-        TE.chain((eventTemplate) =>
+        TE.chain((dbEt) =>
             pipe(
                 ensureTagsExistTask(),
-                TE.map((tags) => ({ eventTemplate: eventTemplate, tags })),
+                TE.map((tags) => ({ dbEt, tags })),
             ),
         ),
         // Link the tags with the event template.
-        TE.chain(({ eventTemplate, tags }) =>
+        TE.chain(({ dbEt, tags }) =>
             pipe(
-                linkTagsTask(eventTemplate, tags),
-                TE.map(() => eventTemplate), // Ignore the return of `linkTagsTask`, just return the `EventTemplate`.
+                linkTagsTask(dbEt.id, tags),
+                // Ignore the return of `linkTagsTask`, just return the event template and tags.
+                TE.map(() => ({ dbEt, tags })),
             ),
         ),
+        TE.map(({ dbEt, tags }) => {
+            // Map to return type.
+            const { id, projectTemplateId, ...partial } = dbEt;
+            return {
+                id: encodeEventTemplateId(id),
+                projectTemplateId: encodeProjectTemplateId(projectTemplateId),
+                tags,
+                ...partial,
+            } satisfies CreateReturnData;
+        }),
     );
 
     const task = pipe(
