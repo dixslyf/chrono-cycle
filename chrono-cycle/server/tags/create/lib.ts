@@ -80,9 +80,7 @@ export async function createTag(
         ): TE.TaskEither<CreateError, DbTag[]> {
             // If the tag already exists, then error out.
             if (O.isSome(maybeTag)) {
-                return TE.left({
-                    _errorKind: "TagExistsError",
-                } satisfies TagExistsError);
+                return TE.left(TagExistsError());
             }
 
             // Otherwise, we try inserting the tag.

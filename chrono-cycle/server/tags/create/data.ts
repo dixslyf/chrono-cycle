@@ -7,6 +7,10 @@ export type TagExistsError = {
     _errorKind: "TagExistsError";
 };
 
+export function TagExistsError(): TagExistsError {
+    return { _errorKind: "TagExistsError" };
+}
+
 export type CreateError =
     | ValidationError<"name">
     | TagExistsError
