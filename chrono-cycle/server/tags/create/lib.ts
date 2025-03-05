@@ -7,7 +7,7 @@ import { pipe } from "fp-ts/function";
 import { CreateError, CreateResult, TagExistsError } from "./data";
 import { InternalError, ValidationError } from "@/server/common/errors";
 import { encodeTagId } from "@/server/common/identifiers";
-import { tags, users, DbTagInsert, DbTag } from "@/server/db/schema";
+import { tags, DbTagInsert, DbTag } from "@/server/db/schema";
 import { Tag, tagNameSchema } from "@/server/common/data";
 import getFuncDb from "@/server/db/functional";
 
@@ -22,7 +22,7 @@ export async function getTagIfExists(
             db
                 .select()
                 .from(tags)
-                .where(and(eq(users.id, userId), eq(tags.name, tagName))),
+                .where(and(eq(tags.userId, userId), eq(tags.name, tagName))),
         ),
         TE.chain((selected): TE.TaskEither<InternalError, O.Option<Tag>> => {
             if (selected.length < 1) {
