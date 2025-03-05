@@ -30,6 +30,46 @@ export type ReminderTemplate = {
     desktopNotifications: boolean;
 };
 
+export type ProjectOverview = {
+    id: string; // Encoded ID.
+    name: string;
+    description: string;
+    createdAt: Date;
+    updatedAt: Date;
+    startsAt: Date;
+    projectTemplateId: string; // Encoded ID.
+};
+
+export type Project = {
+    events: Event[];
+} & ProjectOverview;
+
+export type Event = {
+    id: string; // Encoded ID.
+    projectId: string; // Encoded ID.
+    name: string;
+    offsetDays: number;
+    duration: number;
+    note: string;
+    eventType: "task" | "activity";
+    autoReschedule: boolean;
+    updatedAt: Date;
+    status: "none" | "not started" | "in progress" | "completed";
+    notificationsEnabled: boolean;
+    eventTemplateId: string | null; // Encoded ID.
+    reminders: Reminder[];
+    tags: Tag[];
+};
+
+export type Reminder = {
+    id: string; // Encoded ID.
+    daysBeforeEvent: number;
+    time: string;
+    emailNotifications: boolean;
+    desktopNotifications: boolean;
+    reminderTemplateId: string | null; // Encoded ID.
+};
+
 export type Tag = {
     id: string; // Encoded ID.
     name: string;
