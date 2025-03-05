@@ -4,7 +4,10 @@ import RootProvider from "./provider";
 
 import "@mantine/core/styles.css";
 import "mantine-datatable/styles.layer.css";
+import "@mantine/notifications/styles.css";
+
 import { ColorSchemeScript } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 
 import "./globals.css";
 
@@ -36,7 +39,11 @@ export default function RootLayout({
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased w-full h-full`}
             >
-                <RootProvider>{children}</RootProvider>
+                <RootProvider>
+                    {/* Mantine notifications */}
+                    <Notifications />
+                    {children}
+                </RootProvider>
             </body>
         </html>
     );
