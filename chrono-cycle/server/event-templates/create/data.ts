@@ -7,7 +7,8 @@ import {
     ValidationError,
 } from "@/server/common/errors";
 import { eventTemplateInsertSchema } from "@/server/db/schema/eventTemplates";
-import { EventTemplate } from "@/server/common/data";
+import { EventTemplate, tagNameSchema } from "@/server/common/data";
+import { CreateError as CreateTagError } from "@/server/tags/create/data";
 import { encodedIdSchema } from "@/server/common/identifiers";
 
 export const createFormDataSchema = z.object({
@@ -18,6 +19,7 @@ export const createFormDataSchema = z.object({
     eventType: eventTemplateInsertSchema.shape.eventType,
     autoReschedule: eventTemplateInsertSchema.shape.autoReschedule,
     projectTemplateId: encodedIdSchema, // Sqid, not the actual ID.
+    tags: z.array(tagNameSchema),
 });
 
 export type CreateFormData = z.output<typeof createFormDataSchema>;
@@ -35,6 +37,7 @@ export type CreateError =
         | "projectTemplateId"
     >
     | DoesNotExistError
-    | InternalError;
+    | InternalError
+    | CreateTagError;
 
 export type CreateResult = E.Either<CreateError, CreateReturnData>;

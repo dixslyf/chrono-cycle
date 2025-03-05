@@ -47,4 +47,3 @@ export const createEventTemplateAction = wrapServerAction(
     "createEventTemplate",
     createEventTemplateActionImpl,
 );
-

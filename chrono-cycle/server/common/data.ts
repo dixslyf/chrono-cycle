@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export type ProjectTemplateOverview = {
     id: string; // Encoded ID.
     name: string;
@@ -16,4 +18,18 @@ export type EventTemplate = {
     autoReschedule: boolean;
     projectTemplateId: string;
     updatedAt: Date;
+    tags: Tag[];
 };
+
+export type Tag = {
+    id: string; // Encoded ID.
+    name: string;
+};
+
+export const tagNameSchema = z
+    .string()
+    .nonempty("Tag cannot be empty")
+    .regex(
+        /^[a-zA-Z0-9_-]+$/,
+        "Tag can only contain alphanumeric characters, dashes and underscores",
+    );
