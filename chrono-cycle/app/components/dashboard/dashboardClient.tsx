@@ -12,6 +12,15 @@ interface DashboardProps {
 
 function DashboardClient({ months, initialMonth, days, year }: DashboardProps) {
     const [selectedMonth, setSelectedMonth] = useState(initialMonth);
+    const [scrollToMonth, setScrollToMonth] = useState<string | null>(null);
+
+    // update the month from the nav from scrolling
+    const handleSelectMonth = (month: string, scroll: boolean = false) => {
+        setScrollToMonth(month);
+        if (scroll) {
+            setScrollToMonth(month);
+        }
+    };
 
     return (
         <>
@@ -19,14 +28,17 @@ function DashboardClient({ months, initialMonth, days, year }: DashboardProps) {
                 <DashNav
                     months={months}
                     selectedMonth={selectedMonth}
-                    onSelectMonth={setSelectedMonth}
+                    onSelectMonth={(month) => handleSelectMonth(month, true)}
                     year={year}
                 />
                 <Timeline
                     days={days}
-                    onMonthChange={(month) =>
-                        setSelectedMonth(month.toLowerCase())
-                    }
+                    selectedMonth={selectedMonth}
+                    scrollToMonth={scrollToMonth}
+                    onMonthChange={(month) => {
+                        setSelectedMonth(month.toLowerCase());
+                    }}
+                    onScolled={() => setScrollToMonth(null)}
                 />
             </div>
         </>
