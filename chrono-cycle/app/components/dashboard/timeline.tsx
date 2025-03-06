@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { Text } from "@mantine/core";
-import { ReceiptRussianRuble } from "lucide-react";
 
 export interface Day {
     date: Date;
@@ -16,12 +15,7 @@ interface TimelineProps {
     onScolled?: () => void;
 }
 
-function Timeline({
-    days,
-    selectedMonth,
-    scrollToMonth,
-    onMonthChange,
-}: TimelineProps) {
+function Timeline({ days, scrollToMonth, onMonthChange }: TimelineProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const cellWidth = 96; // fixed width for each day
 
@@ -115,13 +109,24 @@ function Timeline({
                         >
                             <Text
                                 className={
-                                    isToday ? "font-bold text-yellow-500" : ""
+                                    isToday
+                                        ? "font-bold text-palette3 bg-palette2"
+                                        : ""
                                 }
                             >
                                 {day.label}
                             </Text>
                             {/* vertical line below label */}
-                            <div className="w-px h-[90%] bg-gray-400 mx-auto mt-2" />
+                            <div
+                                className={`w-[0.1rem] h-[90%] mx-auto mt-2 ${
+                                    // isToday ? "bg-palette2" : "bg-gray-700"
+                                    isToday
+                                        ? "bg-palette2"
+                                        : day.date < new Date()
+                                          ? "bg-gray-300"
+                                          : "bg-gray-700"
+                                }`}
+                            />
                         </div>
                     );
                 })}

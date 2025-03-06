@@ -95,7 +95,6 @@ function DashNav({
                     <Button
                         variant="transparent"
                         onClick={() => onViewChange("timeline")}
-                        // className="text-palette1 text-lg font-semibold hover:text-palette2"
                         className={`text-lg font-semibold h-full hover:text-palette2 ${
                             activeView === "timeline"
                                 ? "text-palette2 border-b-2 border-b-palette2 p-0 rounded-none"
@@ -108,7 +107,6 @@ function DashNav({
                     <Button
                         variant="transparent"
                         onClick={() => onViewChange("calendar")}
-                        // className="text-palette1 text-lg font-semibold hover:text-palette2"
                         className={`text-lg font-semibold h-full  hover:text-palette2 ${
                             activeView === "calendar"
                                 ? "text-palette2 border-b-2 border-b-palette2 p-0 rounded-none"
