@@ -1,23 +1,41 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { Text } from "@mantine/core";
+import EventBar from "./eventBar";
 
 export interface Day {
     date: Date;
     label: string;
 }
 
+export type Event = {
+    name: string;
+    offsetDays: number;
+    duration: number;
+    eventType: "task" | "activity";
+};
+
 interface TimelineProps {
     days: Day[];
+    events: Event[];
+    projectStartDate: Date;
     selectedMonth: string;
     scrollToMonth?: string | null;
     onMonthChange?: (month: string) => void;
     onScolled?: () => void;
 }
 
-function Timeline({ days, scrollToMonth, onMonthChange }: TimelineProps) {
+function Timeline({
+    days,
+    events,
+    projectStartDate,
+    scrollToMonth,
+    onMonthChange,
+}: TimelineProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const cellWidth = 96; // fixed width for each day
+    const eventHeight = 32; // might be able to change this later on
+    const rowSpacing = 4; // space between row
 
     useEffect(() => {
         const container = containerRef.current;
@@ -95,9 +113,9 @@ function Timeline({ days, scrollToMonth, onMonthChange }: TimelineProps) {
     return (
         <div
             ref={containerRef}
-            className="overflow-x-auto w-full flex-1 h-full flex flex-col"
+            className="overflow-x-auto w-full flex-1 h-full flex flex-col relative"
         >
-            <div className="flex h-full flex-1">
+            <div className="flex h-full flex-1 relative">
                 {days.map((day) => {
                     const isToday =
                         new Date().toDateString() === day.date.toDateString();
@@ -130,6 +148,112 @@ function Timeline({ days, scrollToMonth, onMonthChange }: TimelineProps) {
                         </div>
                     );
                 })}
+
+                {/* Render Events */}
+                <div className="absolute top-16 w-full">
+                    {(() => {
+                        const occupiedRows: number[][] = [];
+                        return events?.map((event, eventIndex) => {
+                            // get event start and end dates based on project start date
+                            const startDate = new Date(projectStartDate);
+                            startDate.setDate(
+                                startDate.getDate() + event.offsetDays,
+                            );
+
+                            const endDate = new Date(startDate);
+                            endDate.setDate(
+                                startDate.getDate() + event.duration - 1,
+                            );
+
+                            // find index based on days
+                            const startIndex = days.findIndex(
+                                (d) =>
+                                    d.date.toDateString() ===
+                                    startDate.toDateString(),
+                            );
+                            const endIndex = days.findIndex(
+                                (d) =>
+                                    d.date.toDateString() ===
+                                    endDate.toDateString(),
+                            );
+
+                            if (startIndex !== -1 && endIndex !== -1) {
+                                // find the lowest avaliable row slot
+                                let row = 0;
+                                while (
+                                    occupiedRows[row] &&
+                                    occupiedRows[row].some(
+                                        (index) =>
+                                            index >= startIndex &&
+                                            index <= endIndex,
+                                    )
+                                ) {
+                                    row++;
+                                }
+
+                                // mark these days as occupied for this row
+                                if (!occupiedRows[row]) occupiedRows[row] = [];
+                                for (let i = startIndex; i <= endIndex; i++) {
+                                    occupiedRows[row].push(i);
+                                }
+
+                                return (
+                                    <EventBar
+                                        key={eventIndex}
+                                        name={event.name}
+                                        startIndex={startIndex}
+                                        endIndex={endIndex}
+                                        color="bg-blue-500"
+                                        cellWidth={cellWidth}
+                                        topOffset={
+                                            row * (eventHeight + rowSpacing)
+                                        }
+                                    />
+                                );
+                            }
+
+                            return null;
+                        });
+                    })()}
+                    {/* {events.map((event, evnetIndex) => {
+                        const startDate = new Date(projectStartDate);
+                        startDate.setDate(
+                            startDate.getDate() + event.offsetDays,
+                        );
+
+                        const endDate = new Date(startDate);
+                        endDate.setDate(
+                            startDate.getDate() + event.duration - 1,
+                        );
+
+                        // find index in days
+                        const startIndex = days.findIndex(
+                            (d) =>
+                                d.date.toDateString() ===
+                                startDate.toDateString(),
+                        );
+                        const endIndex = days.findIndex(
+                            (d) =>
+                                d.date.toDateString() ===
+                                endDate.toDateString(),
+                        );
+
+                        if (startIndex !== -1 && endIndex !== -1) {
+                            return (
+                                <EventBar
+                                    key={evnetIndex}
+                                    name={event.name}
+                                    startIndex={startIndex}
+                                    endIndex={endIndex}
+                                    color={"blue"} // not sure about this
+                                    cellWidth={cellWidth}
+                                />
+                            );
+                        }
+
+                        return null;
+                    })} */}
+                </div>
             </div>
         </div>
     );
