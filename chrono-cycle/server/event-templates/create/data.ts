@@ -10,6 +10,7 @@ import { eventTemplateInsertSchema } from "@/server/db/schema/eventTemplates";
 import { EventTemplate, tagNameSchema } from "@/server/common/data";
 import { CreateError as CreateTagError } from "@/server/tags/create/data";
 import { encodedIdSchema } from "@/server/common/identifiers";
+import { createFormDataSchema as createReminderTemplateFormDataSchema } from "@/server/reminder-templates/create/data";
 
 export const createFormDataSchema = z.object({
     name: eventTemplateInsertSchema.shape.name,
@@ -19,6 +20,9 @@ export const createFormDataSchema = z.object({
     eventType: eventTemplateInsertSchema.shape.eventType,
     autoReschedule: eventTemplateInsertSchema.shape.autoReschedule,
     projectTemplateId: encodedIdSchema, // Sqid, not the actual ID.
+    reminders: z.array(
+        createReminderTemplateFormDataSchema.omit({ eventTemplateId: true }),
+    ),
     tags: z.array(tagNameSchema),
 });
 
