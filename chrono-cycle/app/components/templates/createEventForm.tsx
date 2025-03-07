@@ -203,7 +203,6 @@ export function CreateEventTemplateForm({
                                     description="Whether to send an email notification for this reminder"
                                     defaultChecked
                                     disabled={createPending}
-                                    required
                                     {...form.getInputProps(
                                         `reminders.${index}.emailNotifications`,
                                     )}
@@ -216,7 +215,6 @@ export function CreateEventTemplateForm({
                                     description="Whether to send an desktop notification for this reminder"
                                     defaultChecked
                                     disabled={createPending}
-                                    required
                                     {...form.getInputProps(
                                         `reminders.${index}.desktopNotifications`,
                                     )}
