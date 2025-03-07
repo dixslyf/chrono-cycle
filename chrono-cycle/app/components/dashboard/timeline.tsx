@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useRef } from "react";
-import { Text } from "@mantine/core";
+import { useEffect, useRef, useState } from "react";
+import { Text, Button, Accordion, Paper } from "@mantine/core";
+import { ChevronUp, ChevronDown } from "lucide-react";
 import EventBar from "./eventBar";
 
 export interface Day {
@@ -8,26 +9,37 @@ export interface Day {
     label: string;
 }
 
-export type Event = {
+export interface Event {
+    id: string;
+    projectId: string;
     name: string;
     offsetDays: number;
     duration: number;
     eventType: "task" | "activity";
-};
+    eventTemplateId: string | null;
+    status: "none" | "not started" | "in progress" | "completed";
+}
+
+export interface EventTemplate {
+    id: string;
+    name: string;
+}
 
 interface TimelineProps {
     days: Day[];
     events: Event[];
+    eventTemplates: EventTemplate[];
     projectStartDate: Date;
     selectedMonth: string;
     scrollToMonth?: string | null;
     onMonthChange?: (month: string) => void;
-    onScolled?: () => void;
+    onScrolled?: () => void;
 }
 
 function Timeline({
     days,
     events,
+    eventTemplates,
     projectStartDate,
     scrollToMonth,
     onMonthChange,
@@ -36,6 +48,28 @@ function Timeline({
     const cellWidth = 96; // fixed width for each day
     const eventHeight = 32; // might be able to change this later on
     const rowSpacing = 4; // space between row
+
+    // Group event based on templateid
+    const eventMap = new Map<string, Event[]>();
+    events.forEach((event) => {
+        if (!event.eventTemplateId) return; // skip event without template
+        if (!eventMap.has(event.eventTemplateId)) {
+            eventMap.set(event.eventTemplateId, []);
+        }
+        eventMap.get(event.eventTemplateId)!.push(event);
+    });
+
+    // toggle state for each template
+    const [expandedTemplates, setExpandedTemplates] = useState<
+        Record<string, boolean>
+    >({});
+
+    const toggleTemplate = (templateID: string) => {
+        setExpandedTemplates((prev) => ({
+            ...prev,
+            [templateID]: !prev[templateID],
+        }));
+    };
 
     useEffect(() => {
         const container = containerRef.current;
@@ -87,6 +121,7 @@ function Timeline({
             });
             return monthName.toLowerCase() === scrollToMonth;
         });
+
         if (targetIndex !== -1) {
             const containerWidth = container.offsetWidth;
             const scrollLeft = Math.max(
@@ -153,106 +188,196 @@ function Timeline({
                 <div className="absolute top-16 w-full">
                     {(() => {
                         const occupiedRows: number[][] = [];
-                        return events?.map((event, eventIndex) => {
-                            // get event start and end dates based on project start date
-                            const startDate = new Date(projectStartDate);
-                            startDate.setDate(
-                                startDate.getDate() + event.offsetDays,
-                            );
+                        return eventTemplates.map((template) => {
+                            const templateEvents =
+                                eventMap.get(template.id) || [];
 
-                            const endDate = new Date(startDate);
-                            endDate.setDate(
-                                startDate.getDate() + event.duration - 1,
-                            );
+                            if (templateEvents.length === 0) return null; // Skip empty templates
 
-                            // find index based on days
+                            // set template start index to project start date
                             const startIndex = days.findIndex(
                                 (d) =>
                                     d.date.toDateString() ===
-                                    startDate.toDateString(),
-                            );
-                            const endIndex = days.findIndex(
-                                (d) =>
-                                    d.date.toDateString() ===
-                                    endDate.toDateString(),
+                                    projectStartDate.toDateString(),
                             );
 
-                            if (startIndex !== -1 && endIndex !== -1) {
-                                // find the lowest avaliable row slot
-                                let row = 0;
-                                while (
-                                    occupiedRows[row] &&
-                                    occupiedRows[row].some(
-                                        (index) =>
-                                            index >= startIndex &&
-                                            index <= endIndex,
-                                    )
-                                ) {
-                                    row++;
-                                }
+                            // set template end index to last event's end date
+                            const endIndex = Math.max(
+                                ...templateEvents.map((event) =>
+                                    days.findIndex(
+                                        (d) =>
+                                            d.date.toDateString() ===
+                                            new Date(
+                                                projectStartDate.getTime() +
+                                                    (event.offsetDays +
+                                                        event.duration -
+                                                        1) *
+                                                        86400000,
+                                            ).toDateString(),
+                                    ),
+                                ),
+                            );
 
-                                // mark these days as occupied for this row
-                                if (!occupiedRows[row]) occupiedRows[row] = [];
-                                for (let i = startIndex; i <= endIndex; i++) {
-                                    occupiedRows[row].push(i);
-                                }
+                            if (startIndex === -1 || endIndex === -1)
+                                return null; // Skip if no valid events
 
-                                return (
-                                    <EventBar
-                                        key={eventIndex}
-                                        name={event.name}
-                                        startIndex={startIndex}
-                                        endIndex={endIndex}
-                                        color="bg-blue-500"
-                                        cellWidth={cellWidth}
-                                        topOffset={
-                                            row * (eventHeight + rowSpacing)
-                                        }
-                                    />
-                                );
+                            /** Calculate leftOffset and width like EventBar */
+                            const leftOffset = startIndex * cellWidth;
+                            const width =
+                                (endIndex - startIndex + 1) * cellWidth;
+
+                            /** Find the lowest available row for this template */
+                            let row = 0;
+                            while (occupiedRows[row]) {
+                                row++;
                             }
 
-                            return null;
+                            // Mark row as occupied for this template
+                            occupiedRows[row] = [];
+
+                            return (
+                                <div
+                                    key={template.id}
+                                    className="relative w-full"
+                                >
+                                    {/* Template Header (Aligned to its row) */}
+                                    <Paper
+                                        withBorder
+                                        p="sm"
+                                        className="absolute bg-gray-100 shadow-md rounded-md flex items-center justify-center text-sm font-bold text-gray-800"
+                                        style={{
+                                            left: `${leftOffset}px`,
+                                            width: `${width}px`,
+                                            height: "24px",
+                                            top: `${row * (eventHeight + rowSpacing)}px`,
+                                        }}
+                                        onClick={() =>
+                                            toggleTemplate(template.id)
+                                        }
+                                    >
+                                        {template.name}
+                                        {expandedTemplates[template.id] ? (
+                                            <ChevronUp size={16} />
+                                        ) : (
+                                            <ChevronDown size={16} />
+                                        )}
+                                    </Paper>
+
+                                    {/* Render Events under the template */}
+                                    {expandedTemplates[template.id] && (
+                                        <div className="relative w-full">
+                                            {(() => {
+                                                return templateEvents.map(
+                                                    (event, eventIndex) => {
+                                                        const startDate =
+                                                            new Date(
+                                                                projectStartDate,
+                                                            );
+                                                        startDate.setDate(
+                                                            startDate.getDate() +
+                                                                event.offsetDays,
+                                                        );
+
+                                                        const endDate =
+                                                            new Date(startDate);
+                                                        endDate.setDate(
+                                                            startDate.getDate() +
+                                                                event.duration -
+                                                                1,
+                                                        );
+
+                                                        const startIndex =
+                                                            days.findIndex(
+                                                                (d) =>
+                                                                    d.date.toDateString() ===
+                                                                    startDate.toDateString(),
+                                                            );
+
+                                                        const endIndex =
+                                                            days.findIndex(
+                                                                (d) =>
+                                                                    d.date.toDateString() ===
+                                                                    endDate.toDateString(),
+                                                            );
+
+                                                        if (
+                                                            startIndex !== -1 &&
+                                                            endIndex !== -1
+                                                        ) {
+                                                            let eventRow =
+                                                                row + 1; // Place events **below** template
+                                                            while (
+                                                                occupiedRows[
+                                                                    eventRow
+                                                                ] &&
+                                                                occupiedRows[
+                                                                    eventRow
+                                                                ].some(
+                                                                    (index) =>
+                                                                        index >=
+                                                                            startIndex &&
+                                                                        index <=
+                                                                            endIndex,
+                                                                )
+                                                            ) {
+                                                                eventRow++;
+                                                            }
+
+                                                            if (
+                                                                !occupiedRows[
+                                                                    eventRow
+                                                                ]
+                                                            )
+                                                                occupiedRows[
+                                                                    eventRow
+                                                                ] = [];
+                                                            for (
+                                                                let i =
+                                                                    startIndex;
+                                                                i <= endIndex;
+                                                                i++
+                                                            ) {
+                                                                occupiedRows[
+                                                                    eventRow
+                                                                ].push(i);
+                                                            }
+
+                                                            return (
+                                                                <EventBar
+                                                                    key={
+                                                                        eventIndex
+                                                                    }
+                                                                    name={
+                                                                        event.name
+                                                                    }
+                                                                    startIndex={
+                                                                        startIndex
+                                                                    }
+                                                                    endIndex={
+                                                                        endIndex
+                                                                    }
+                                                                    color="bg-blue-500"
+                                                                    cellWidth={
+                                                                        cellWidth
+                                                                    }
+                                                                    topOffset={
+                                                                        eventRow *
+                                                                        (eventHeight +
+                                                                            rowSpacing)
+                                                                    }
+                                                                />
+                                                            );
+                                                        }
+                                                        return null;
+                                                    },
+                                                );
+                                            })()}
+                                        </div>
+                                    )}
+                                </div>
+                            );
                         });
                     })()}
-                    {/* {events.map((event, evnetIndex) => {
-                        const startDate = new Date(projectStartDate);
-                        startDate.setDate(
-                            startDate.getDate() + event.offsetDays,
-                        );
-
-                        const endDate = new Date(startDate);
-                        endDate.setDate(
-                            startDate.getDate() + event.duration - 1,
-                        );
-
-                        // find index in days
-                        const startIndex = days.findIndex(
-                            (d) =>
-                                d.date.toDateString() ===
-                                startDate.toDateString(),
-                        );
-                        const endIndex = days.findIndex(
-                            (d) =>
-                                d.date.toDateString() ===
-                                endDate.toDateString(),
-                        );
-
-                        if (startIndex !== -1 && endIndex !== -1) {
-                            return (
-                                <EventBar
-                                    key={evnetIndex}
-                                    name={event.name}
-                                    startIndex={startIndex}
-                                    endIndex={endIndex}
-                                    color={"blue"} // not sure about this
-                                    cellWidth={cellWidth}
-                                />
-                            );
-                        }
-
-                        return null;
-                    })} */}
                 </div>
             </div>
         </div>

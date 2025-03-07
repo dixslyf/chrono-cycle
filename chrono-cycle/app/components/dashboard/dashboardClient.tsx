@@ -2,6 +2,7 @@
 import { useState } from "react";
 import DashNav from "./dashNav";
 import Timeline, { Day, Event } from "./timeline";
+import { EventTemplate } from "./timeline"; // should change this
 
 interface DashboardProps {
     months: { value: string; label: string }[];
@@ -17,21 +18,42 @@ function DashboardClient({ months, initialMonth, days, year }: DashboardProps) {
         "timeline",
     );
 
-    const projectStartDate = new Date(2025, 2, 1); // March 1 2025
+    const projectStartDate = new Date(2025, 2, 7); // March 7 2025
+
+    // TODO
+    // should change this in the backend
+    // define event templates
+    const [eventTemplates, setEventTemplates] = useState<EventTemplate[]>([
+        { id: "template-1", name: "Gardening Tasks" },
+        { id: "template-2", name: "Harvesting Schedule" },
+    ]);
 
     const [events, setEvents] = useState<Event[]>([
-        { name: "Plant Seeds", offsetDays: 5, duration: 6, eventType: "task" },
         {
+            id: "event-1",
+            projectId: "project-1",
+            name: "Plant Seeds",
+            offsetDays: 5,
+            duration: 6,
+            eventType: "task",
+            eventTemplateId: "template-1",
+            status: "not started",
+        },
+        {
+            id: "event-2",
+            projectId: "project-2",
             name: "Harvest Apple",
             offsetDays: 8,
             duration: 7,
             eventType: "activity",
+            eventTemplateId: "template-2",
+            status: "in progress",
         },
     ]);
 
     // update the month from the nav from scrolling
     const handleSelectMonth = (month: string, scroll: boolean = false) => {
-        setScrollToMonth(month);
+        // setScrollToMonth(month);
         if (scroll) {
             setScrollToMonth(month);
         }
@@ -52,13 +74,14 @@ function DashboardClient({ months, initialMonth, days, year }: DashboardProps) {
                     <Timeline
                         days={days}
                         events={events}
+                        eventTemplates={eventTemplates}
                         projectStartDate={projectStartDate}
                         selectedMonth={selectedMonth}
                         scrollToMonth={scrollToMonth}
                         onMonthChange={(month) => {
                             setSelectedMonth(month.toLowerCase());
                         }}
-                        onScolled={() => setScrollToMonth(null)}
+                        onScrolled={() => setScrollToMonth(null)}
                     />
                 ) : (
                     <div className="flex flex-1 items-center justify-center">
