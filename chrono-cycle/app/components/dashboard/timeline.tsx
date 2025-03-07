@@ -1,8 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Text, Button, Accordion, Paper } from "@mantine/core";
-import { ChevronUp, ChevronDown } from "lucide-react";
-import EventBar from "./eventBar";
+import { Text } from "@mantine/core";
+import TemplateRow from "./templateRow";
 
 export interface Day {
     date: Date;
@@ -46,6 +45,7 @@ function Timeline({
 }: TimelineProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const cellWidth = 96; // fixed width for each day
+    const headerHeight = 24; // height for template header
     const eventHeight = 32; // might be able to change this later on
     const rowSpacing = 4; // space between row
 
@@ -71,6 +71,7 @@ function Timeline({
         }));
     };
 
+    // scroll to current day on initial load
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
@@ -109,12 +110,13 @@ function Timeline({
         return () => container.removeEventListener("scroll", handleScroll);
     }, [days, cellWidth, onMonthChange]);
 
+    // scroll to a specific month when the scrollToMonth prop changes
     useEffect(() => {
         if (!scrollToMonth) return;
         const container = containerRef.current;
         if (!container) return;
 
-        // find the infdex of the frist day with matching month
+        // find the index of the first day with matching month
         const targetIndex = days.findIndex((day) => {
             const monthName = day.date.toLocaleDateString("en-US", {
                 month: "long",
@@ -143,6 +145,10 @@ function Timeline({
         // since this should only run when `scrollToMonth` changes
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scrollToMonth, days, cellWidth]);
+
+    // calculate a cumulative vertical offset for each template row.
+    // each row's height is the header height plus additionnal height for expanded events.
+    let cumulativeOffset = 0;
 
     // each day is one column wide, so number of columns should be days.length
     return (
@@ -183,201 +189,42 @@ function Timeline({
                         </div>
                     );
                 })}
-
-                {/* Render Events */}
+                {/* render template row with events */}
                 <div className="absolute top-16 w-full">
-                    {(() => {
-                        const occupiedRows: number[][] = [];
-                        return eventTemplates.map((template) => {
-                            const templateEvents =
-                                eventMap.get(template.id) || [];
+                    {eventTemplates.map((template) => {
+                        const templateEvents = eventMap.get(template.id) || [];
+                        if (templateEvents.length === 0) return null;
 
-                            if (templateEvents.length === 0) return null; // Skip empty templates
+                        // determine the current template's top offset
+                        const topOffset = cumulativeOffset;
 
-                            // set template start index to project start date
-                            const startIndex = days.findIndex(
-                                (d) =>
-                                    d.date.toDateString() ===
-                                    projectStartDate.toDateString(),
-                            );
+                        // determine additional height if expanded:
+                        const isExpanded = !!expandedTemplates[template.id];
+                        const extraHeight = isExpanded
+                            ? templateEvents.length * (eventHeight + rowSpacing)
+                            : 0;
 
-                            // set template end index to last event's end date
-                            const endIndex = Math.max(
-                                ...templateEvents.map((event) =>
-                                    days.findIndex(
-                                        (d) =>
-                                            d.date.toDateString() ===
-                                            new Date(
-                                                projectStartDate.getTime() +
-                                                    (event.offsetDays +
-                                                        event.duration -
-                                                        1) *
-                                                        86400000,
-                                            ).toDateString(),
-                                    ),
-                                ),
-                            );
+                        // updated cumulative offset: header height + extra height + rowspacing for gap
+                        cumulativeOffset +=
+                            headerHeight + extraHeight + rowSpacing;
 
-                            if (startIndex === -1 || endIndex === -1)
-                                return null; // Skip if no valid events
-
-                            /** Calculate leftOffset and width like EventBar */
-                            const leftOffset = startIndex * cellWidth;
-                            const width =
-                                (endIndex - startIndex + 1) * cellWidth;
-
-                            /** Find the lowest available row for this template */
-                            let row = 0;
-                            while (occupiedRows[row]) {
-                                row++;
-                            }
-
-                            // Mark row as occupied for this template
-                            occupiedRows[row] = [];
-
-                            return (
-                                <div
-                                    key={template.id}
-                                    className="relative w-full"
-                                >
-                                    {/* Template Header (Aligned to its row) */}
-                                    <Paper
-                                        withBorder
-                                        p="sm"
-                                        className="absolute bg-gray-100 shadow-md rounded-md flex items-center justify-center text-sm font-bold text-gray-800"
-                                        style={{
-                                            left: `${leftOffset}px`,
-                                            width: `${width}px`,
-                                            height: "24px",
-                                            top: `${row * (eventHeight + rowSpacing)}px`,
-                                        }}
-                                        onClick={() =>
-                                            toggleTemplate(template.id)
-                                        }
-                                    >
-                                        {template.name}
-                                        {expandedTemplates[template.id] ? (
-                                            <ChevronUp size={16} />
-                                        ) : (
-                                            <ChevronDown size={16} />
-                                        )}
-                                    </Paper>
-
-                                    {/* Render Events under the template */}
-                                    {expandedTemplates[template.id] && (
-                                        <div className="relative w-full">
-                                            {(() => {
-                                                return templateEvents.map(
-                                                    (event, eventIndex) => {
-                                                        const startDate =
-                                                            new Date(
-                                                                projectStartDate,
-                                                            );
-                                                        startDate.setDate(
-                                                            startDate.getDate() +
-                                                                event.offsetDays,
-                                                        );
-
-                                                        const endDate =
-                                                            new Date(startDate);
-                                                        endDate.setDate(
-                                                            startDate.getDate() +
-                                                                event.duration -
-                                                                1,
-                                                        );
-
-                                                        const startIndex =
-                                                            days.findIndex(
-                                                                (d) =>
-                                                                    d.date.toDateString() ===
-                                                                    startDate.toDateString(),
-                                                            );
-
-                                                        const endIndex =
-                                                            days.findIndex(
-                                                                (d) =>
-                                                                    d.date.toDateString() ===
-                                                                    endDate.toDateString(),
-                                                            );
-
-                                                        if (
-                                                            startIndex !== -1 &&
-                                                            endIndex !== -1
-                                                        ) {
-                                                            let eventRow =
-                                                                row + 1; // Place events **below** template
-                                                            while (
-                                                                occupiedRows[
-                                                                    eventRow
-                                                                ] &&
-                                                                occupiedRows[
-                                                                    eventRow
-                                                                ].some(
-                                                                    (index) =>
-                                                                        index >=
-                                                                            startIndex &&
-                                                                        index <=
-                                                                            endIndex,
-                                                                )
-                                                            ) {
-                                                                eventRow++;
-                                                            }
-
-                                                            if (
-                                                                !occupiedRows[
-                                                                    eventRow
-                                                                ]
-                                                            )
-                                                                occupiedRows[
-                                                                    eventRow
-                                                                ] = [];
-                                                            for (
-                                                                let i =
-                                                                    startIndex;
-                                                                i <= endIndex;
-                                                                i++
-                                                            ) {
-                                                                occupiedRows[
-                                                                    eventRow
-                                                                ].push(i);
-                                                            }
-
-                                                            return (
-                                                                <EventBar
-                                                                    key={
-                                                                        eventIndex
-                                                                    }
-                                                                    name={
-                                                                        event.name
-                                                                    }
-                                                                    startIndex={
-                                                                        startIndex
-                                                                    }
-                                                                    endIndex={
-                                                                        endIndex
-                                                                    }
-                                                                    color="bg-blue-500"
-                                                                    cellWidth={
-                                                                        cellWidth
-                                                                    }
-                                                                    topOffset={
-                                                                        eventRow *
-                                                                        (eventHeight +
-                                                                            rowSpacing)
-                                                                    }
-                                                                />
-                                                            );
-                                                        }
-                                                        return null;
-                                                    },
-                                                );
-                                            })()}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        });
-                    })()}
+                        return (
+                            <TemplateRow
+                                key={template.id}
+                                template={template}
+                                events={templateEvents}
+                                days={days}
+                                projectStartDate={projectStartDate}
+                                cellWidth={cellWidth}
+                                eventHeight={eventHeight}
+                                rowSpacing={rowSpacing}
+                                expanded={!!expandedTemplates[template.id]}
+                                toggleTemplate={toggleTemplate}
+                                topOffset={topOffset}
+                                headerHeight={headerHeight}
+                            />
+                        );
+                    })}
                 </div>
             </div>
         </div>

@@ -22,7 +22,7 @@ function EventBar({
 
     return (
         <div
-            className={`absolute rounded-lg text-palette3 font-bold flex items-center justify-center text-sm ${color}`}
+            className={`absolute rounded-lg text-palette3 font-bold flex items-center justify-center text-sm ${color} mt-2`}
             style={{
                 left: `${leftOffset}px`,
                 width: `${width}px`,
