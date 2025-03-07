@@ -14,7 +14,7 @@ export const reminders = pgTable("reminders", {
         .notNull()
         .references(() => events.id),
     daysBeforeEvent: integer("days_before_event").notNull(),
-    time: time("time").notNull(),
+    time: time("time", { withTimezone: true }).notNull(),
     emailNotifications: boolean("email_notifications").default(true).notNull(),
     desktopNotifications: boolean("desktop_notifications")
         .default(true)

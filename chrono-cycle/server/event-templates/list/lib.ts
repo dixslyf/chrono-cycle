@@ -1,27 +1,37 @@
 import { eq, and, getTableColumns } from "drizzle-orm";
 import * as TE from "fp-ts/TaskEither";
+import * as R from "fp-ts/Record";
+import * as NEA from "fp-ts/NonEmptyArray";
 import { pipe } from "fp-ts/function";
-import { ListResult } from "./data";
-import { eventTemplates } from "@/server/db/schema/eventTemplates";
-import { EventTemplate } from "@/server/common/data";
+import { ListError, ListResult } from "./data";
+import {
+    DbEventTemplate,
+    eventTemplates,
+} from "@/server/db/schema/eventTemplates";
+import { EventTemplate, ReminderTemplate, Tag } from "@/server/common/data";
 import {
     decodeProjectTemplateId,
     encodeEventTemplateId,
     encodeProjectTemplateId,
+    encodeReminderTemplateId,
     encodeTagId,
 } from "@/server/common/identifiers";
-import { eventTemplateTags, projectTemplates, tags } from "@/server/db/schema";
-import getFuncDb from "@/server/db/functional";
+import {
+    DbProjectTemplate,
+    eventTemplateTags,
+    projectTemplates,
+    reminderTemplates,
+    tags,
+} from "@/server/db/schema";
+import getFuncDb, { FunctionalDatabase } from "@/server/db/functional";
 
-export async function listEventTemplates(
+// Check if the project template exists.
+function checkProjectTemplateTask(
+    fDb: FunctionalDatabase,
     userId: number,
-    projectTemplateEncodedId: string,
-): Promise<ListResult> {
-    const fDb = await getFuncDb();
-
-    // Check if the project template exists.
-    const projectTemplateId = decodeProjectTemplateId(projectTemplateEncodedId);
-    const checkProjectTemplateTask = fDb.do((db) =>
+    projectTemplateId: number,
+): TE.TaskEither<ListError, DbProjectTemplate[]> {
+    return fDb.do((db) =>
         db
             .select()
             .from(projectTemplates)
@@ -32,65 +42,144 @@ export async function listEventTemplates(
                 ),
             ),
     );
+}
 
-    // Retrieve the event templates for the project template.
-    const selectEventTemplatesTask = pipe(
+type SelectRow = {
+    tagId: number | null;
+    tagName: string | null;
+    rtId: number | null;
+    rtDaysBeforeEvent: number | null;
+    rtTime: string | null;
+    rtEmailNotifications: boolean | null;
+    rtDesktopNotifications: boolean | null;
+} & DbEventTemplate;
+
+// Retrieve the event templates for the project template.
+function selectEventTemplatesTask(
+    fDb: FunctionalDatabase,
+    projectTemplateId: number,
+): TE.TaskEither<ListError, SelectRow[]> {
+    return pipe(
         fDb.do((db) =>
             db
                 .select({
                     ...getTableColumns(eventTemplates),
+
+                    // Tag attributes
                     tagId: tags.id,
                     tagName: tags.name,
+
+                    // Reminder template attributes
+                    rtId: reminderTemplates.id,
+                    rtDaysBeforeEvent: reminderTemplates.daysBeforeEvent,
+                    rtTime: reminderTemplates.time,
+                    rtEmailNotifications: reminderTemplates.emailNotifications,
+                    rtDesktopNotifications:
+                        reminderTemplates.desktopNotifications,
                 })
                 .from(eventTemplates)
+
+                // Join with tag tables.
                 // Must be a left join since we want to get the event template even if it doesn't have any tags.
                 .leftJoin(
                     eventTemplateTags,
                     eq(eventTemplates.id, eventTemplateTags.eventTemplateId),
                 )
                 .leftJoin(tags, eq(eventTemplateTags.tagId, tags.id))
+
+                // Join with reminder template table.
+                .leftJoin(
+                    reminderTemplates,
+                    eq(reminderTemplates.eventTemplateId, eventTemplates.id),
+                )
                 .where(eq(eventTemplates.projectTemplateId, projectTemplateId)),
         ),
-        // Group the rows by event template ID.
-        TE.map((rows) => {
-            // Store the final EventTemplates to return.
-            // Maps database ID to EventTemplate.
-            const map = new Map<number, EventTemplate>();
-            for (const row of rows) {
-                // If we haven't added the event template to the map,
-                // create an entry for it.
-                if (!map.has(row.id)) {
-                    const { id, projectTemplateId, ...partial } = row;
-                    map.set(row.id, {
-                        id: encodeEventTemplateId(id),
-                        projectTemplateId:
-                            encodeProjectTemplateId(projectTemplateId),
-                        tags: [],
-                        ...partial,
-                    } satisfies EventTemplate);
+        TE.mapError((err) => err satisfies ListError as ListError),
+    );
+}
+
+// Process the rows returned by the select query.
+function processRows(rows: SelectRow[]): EventTemplate[] {
+    if (rows.length === 0) {
+        return [];
+    }
+
+    // Group the rows by event template (encoded) ID.
+    // encodedId: rows
+    const groups = pipe(
+        rows,
+        NEA.groupBy((row) => encodeEventTemplateId(row.id)),
+    );
+
+    const etMap = pipe(
+        groups,
+        R.mapWithIndex((sqid, group) => {
+            // Use maps to keep track of whether we've seen a tag or reminder template.
+            const rtMap = new Map<number, ReminderTemplate>();
+            const tagMap = new Map<number, Tag>();
+
+            for (const row of group) {
+                if (row.rtId && !rtMap.has(row.rtId)) {
+                    // Encountered new reminder template.
+
+                    // Safety: rt attributes are guaranteed to be non-null since rtId is non-null.
+                    rtMap.set(row.rtId, {
+                        id: encodeReminderTemplateId(row.rtId),
+                        daysBeforeEvent: row.rtDaysBeforeEvent as number,
+                        time: row.rtTime as string,
+                        emailNotifications: row.rtEmailNotifications as boolean,
+                        desktopNotifications:
+                            row.rtDesktopNotifications as boolean,
+                    });
                 }
 
-                // If there is a tag in the current row, add it to the map entry.
-                if (row.tagId) {
-                    // Safety: The map entry should have been created earlier,
-                    // so this should not be undefined.
-                    const et = map.get(row.id) as EventTemplate;
+                if (row.tagId && !tagMap.has(row.tagId)) {
+                    // Encountered new tag.
 
-                    et.tags.push({
+                    // Safety: tagName is guaranteed to be non-null since tagId is non-null.
+                    tagMap.set(row.tagId, {
                         id: encodeTagId(row.tagId),
-                        // Safety: Since row.tagId is not null, row.tagName should also not be null.
                         name: row.tagName as string,
                     });
                 }
             }
 
-            return Array.from(map.values());
+            // For grabbing the actual event template properties.
+            // `group[0]`
+            const dbEt = group[0];
+            return {
+                id: sqid,
+                name: dbEt.name,
+                offsetDays: dbEt.offsetDays,
+                duration: dbEt.duration,
+                note: dbEt.note,
+                eventType: dbEt.eventType,
+                autoReschedule: dbEt.autoReschedule,
+                projectTemplateId: encodeProjectTemplateId(
+                    dbEt.projectTemplateId,
+                ),
+                updatedAt: dbEt.updatedAt,
+                reminders: Array.from(rtMap.values()),
+                tags: Array.from(tagMap.values()),
+            } satisfies EventTemplate;
         }),
     );
 
+    return Object.values(etMap);
+}
+
+export async function listEventTemplates(
+    userId: number,
+    projectTemplateSqid: string,
+): Promise<ListResult> {
+    const fDb = await getFuncDb();
+
+    const projectTemplateId = decodeProjectTemplateId(projectTemplateSqid);
+
     const task = pipe(
-        checkProjectTemplateTask,
-        TE.chain(() => selectEventTemplatesTask),
+        checkProjectTemplateTask(fDb, userId, projectTemplateId),
+        TE.chain(() => selectEventTemplatesTask(fDb, projectTemplateId)),
+        TE.map((rows) => processRows(rows)),
     );
     return await task();
 }

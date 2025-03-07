@@ -11,7 +11,7 @@ type Database = NodePgDatabase | PgliteDatabase;
 type LowerBound<T, Lower> = Lower extends T ? T : never;
 type ContainsInternalError<E> = InternalError | LowerBound<E, InternalError>;
 
-class FunctionalDatabase {
+export class FunctionalDatabase {
     readonly db: Database;
 
     constructor(db: Database) {
