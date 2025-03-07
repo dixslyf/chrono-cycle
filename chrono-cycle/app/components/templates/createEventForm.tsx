@@ -3,6 +3,7 @@
 import * as E from "fp-ts/Either";
 import { useActionState, useEffect, useState } from "react";
 import { match, P } from "ts-pattern";
+import { startTransition, useActionState, useEffect, useState } from "react";
 import { useForm } from "@mantine/form";
 import { zodResolver } from "mantine-form-zod-resolver";
 import {
@@ -26,6 +27,7 @@ import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { createEventTemplateAction } from "@/server/event-templates/create/action";
 import {
     CreateFormData as CreateEventTemplateFormData,
+    CreateFormData,
     createFormDataSchema,
     CreateResult,
 } from "@/server/event-templates/create/data";
@@ -124,7 +126,7 @@ export function CreateEventTemplateForm({
         );
     }, [createResult, onSuccess]);
 
-    const form = useForm({
+    const form = useForm<CreateFormData>({
         mode: "uncontrolled",
         initialValues: {
             name: "",
@@ -154,7 +156,11 @@ export function CreateEventTemplateForm({
     }, [form]);
 
     return (
-        <form action={createAction}>
+        <form
+            onSubmit={form.onSubmit((values) =>
+                startTransition(() => createAction(values)),
+            )}
+        >
             <Fieldset legend="Basic Information">
                 <TextInput
                     label="Name"
