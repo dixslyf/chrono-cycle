@@ -1,17 +1,18 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, or } from "drizzle-orm";
 import * as TE from "fp-ts/TaskEither";
+import * as E from "fp-ts/Either";
+import { NonEmptyArray } from "fp-ts/NonEmptyArray";
 import { pipe } from "fp-ts/function";
 
-import { CreateError, CreateFormData, CreateResult } from "./data";
+import { CreateError, ReminderTemplateCreate, CreateResult } from "./data";
 
-import getFuncDb, { FunctionalDatabase } from "@/server/db/functional";
 import {
-    DbReminderTemplate,
     eventTemplates,
     projectTemplates,
     reminderTemplates,
     users,
 } from "@/server/db/schema";
+import getDb, { DbLike } from "@/server/db";
 import {
     decodeEventTemplateId,
     encodeReminderTemplateId,
@@ -19,95 +20,103 @@ import {
 import { DoesNotExistError, InternalError } from "@/server/common/errors";
 import { ReminderTemplate } from "@/server/common/data";
 
-function checkOwnershipTask(
-    fDb: FunctionalDatabase,
+// Checks that the user owns the event templates.
+export async function checkUserOwnsEventTemplates(
+    db: DbLike,
     userId: number,
-    eventTemplateSqid: string,
-): TE.TaskEither<CreateError, void> {
-    return pipe(
-        fDb.do((db) =>
-            db
-                .select()
-                .from(users)
-                .innerJoin(
-                    projectTemplates,
-                    eq(users.id, projectTemplates.userId),
-                )
-                .innerJoin(
-                    eventTemplates,
-                    eq(projectTemplates.id, eventTemplates.id),
-                )
-                .where(
-                    and(
-                        eq(users.id, userId),
-                        eq(
-                            eventTemplates.id,
-                            decodeEventTemplateId(eventTemplateSqid),
-                        ),
-                    ),
-                ),
+    etIds: NonEmptyArray<string>,
+): Promise<E.Either<CreateError, void>> {
+    const uniqueEtIds = Array.from(new Set(etIds));
+
+    const conditions = uniqueEtIds.map((etId) =>
+        and(
+            eq(users.id, userId),
+            eq(eventTemplates.id, decodeEventTemplateId(etId)),
         ),
-        TE.chain((selected) => {
-            if (selected.length < 1) {
-                return TE.left(
-                    DoesNotExistError() satisfies CreateError as CreateError,
-                );
-            }
-
-            if (selected.length > 1) {
-                return TE.left(
-                    InternalError(
-                        "Unexpected multiple matching event templates",
-                    ) satisfies CreateError as CreateError,
-                );
-            }
-
-            return TE.right(undefined);
-        }),
     );
+
+    const rows = await db
+        .select()
+        .from(users)
+        .innerJoin(projectTemplates, eq(users.id, projectTemplates.userId))
+        .innerJoin(eventTemplates, eq(projectTemplates.id, eventTemplates.id))
+        .where(or(...conditions));
+
+    if (rows.length < uniqueEtIds.length) {
+        return E.left(DoesNotExistError() satisfies CreateError as CreateError);
+    }
+
+    if (rows.length > uniqueEtIds.length) {
+        return E.left(
+            InternalError(
+                "Unexpected multiple matching event templates",
+            ) satisfies CreateError as CreateError,
+        );
+    }
+
+    return E.right(undefined);
 }
 
-function insertReminderTemplateTask(
-    fDb: FunctionalDatabase,
-    data: CreateFormData,
-): TE.TaskEither<CreateError, DbReminderTemplate> {
-    return pipe(
-        fDb.do(async (db) => {
-            const { eventTemplateId: eventTemplateSqid, ...partial } = data;
-            const inserted = await db
-                .insert(reminderTemplates)
-                .values({
+export async function insertReminderTemplates(
+    db: DbLike,
+    rts: ReminderTemplateCreate[],
+): Promise<ReminderTemplate[]> {
+    if (rts.length === 0) {
+        return [];
+    }
+
+    const inserted = await db
+        .insert(reminderTemplates)
+        .values(
+            rts.map((rt) => {
+                const { eventTemplateId: eventTemplateSqid, ...partial } = rt;
+                return {
                     eventTemplateId: decodeEventTemplateId(eventTemplateSqid),
                     ...partial,
-                })
-                .returning();
-            return inserted[0];
-        }),
-    );
+                };
+            }),
+        )
+        .returning();
+
+    return inserted.map((dbRt) => {
+        const { id, eventTemplateId, ...partial } = dbRt;
+        return {
+            id: encodeReminderTemplateId(id),
+            ...partial,
+        } satisfies ReminderTemplate;
+    });
 }
 
-export async function createReminderTemplate(
+export async function createReminderTemplates(
     userId: number,
-    data: CreateFormData,
+    rts: ReminderTemplateCreate[],
 ): Promise<CreateResult> {
-    const fDb = await getFuncDb();
+    if (rts.length === 0) {
+        return E.right([]);
+    }
 
+    // Safety: Guaranteed to have at least one value since we did the check above.
+    rts = rts as NonEmptyArray<ReminderTemplateCreate>;
+
+    const db = await getDb();
     const task = pipe(
-        // Check if the user owns the event template.
-        checkOwnershipTask(fDb, userId, data.eventTemplateId),
+        // Check if the user owns the event templates.
+        () =>
+            checkUserOwnsEventTemplates(
+                db,
+                userId,
+                rts.map((rt) => rt.eventTemplateId) as NonEmptyArray<string>, // Safety: `rts` is non-empty.
+            ),
 
-        // Insert the reminder template.
-        TE.chain(() => insertReminderTemplateTask(fDb, data)),
-
-        // Map to domain object.
-        TE.map((dbRt) => {
-            const { id, eventTemplateId, ...partial } = dbRt;
-            return {
-                id: encodeReminderTemplateId(id),
-                ...partial,
-            } satisfies ReminderTemplate;
-        }),
+        // Insert the reminder templates.
+        TE.chain(() => TE.fromTask(() => insertReminderTemplates(db, rts))),
     );
 
-    return task();
+    return await pipe(
+        TE.tryCatch(
+            task,
+            (_err) => InternalError() satisfies CreateError as CreateError,
+        ),
+        TE.chain((value) => TE.fromEither(value)), // Flatten
+    )();
 }

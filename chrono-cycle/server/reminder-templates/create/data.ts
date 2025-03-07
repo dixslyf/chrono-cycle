@@ -10,7 +10,7 @@ import { reminderTemplateInsertSchema } from "@/server/db/schema";
 import { encodedIdSchema } from "@/server/common/identifiers";
 import { z } from "zod";
 
-export const createFormDataSchema = z.object({
+export const reminderTemplateCreateSchema = z.object({
     eventTemplateId: encodedIdSchema,
     daysBeforeEvent: reminderTemplateInsertSchema.shape.daysBeforeEvent,
     time: reminderTemplateInsertSchema.shape.time,
@@ -19,7 +19,9 @@ export const createFormDataSchema = z.object({
         reminderTemplateInsertSchema.shape.desktopNotifications,
 });
 
-export type CreateFormData = z.output<typeof createFormDataSchema>;
+export type ReminderTemplateCreate = z.output<
+    typeof reminderTemplateCreateSchema
+>;
 
 export type DuplicateReminderError = {
     _errorKind: "DuplicateReminderError";
@@ -40,4 +42,4 @@ export type CreateError =
     | DoesNotExistError
     | InternalError;
 
-export type CreateResult = E.Either<CreateError, ReminderTemplate>;
+export type CreateResult = E.Either<CreateError, ReminderTemplate[]>;
