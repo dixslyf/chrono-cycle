@@ -2,7 +2,7 @@
 
 import { Modal, Group, Stack, useModalsStack } from "@mantine/core";
 import { DataTable } from "mantine-datatable";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
@@ -33,6 +33,11 @@ export function TemplateTable({
         "project-template-details",
         "add-event",
     ]);
+
+    const closeModal = useCallback(
+        () => modalStack.close("project-template-details"),
+        [],
+    );
 
     // State for storing the clicked project template.
     const [clickedProjectTemplateData, setClickedProjectTemplateData] =
@@ -92,11 +97,7 @@ export function TemplateTable({
                                         projectTemplateId={
                                             clickedProjectTemplateData.id
                                         }
-                                        onSuccess={() =>
-                                            modalStack.close(
-                                                "project-template-details",
-                                            )
-                                        }
+                                        onSuccess={closeModal}
                                     />
                                     <CreateEventTemplateButton
                                         projectTemplateId={

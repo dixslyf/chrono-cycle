@@ -3,6 +3,7 @@
 import { Button, Modal, useModalsStack } from "@mantine/core";
 import { CreateEventTemplateForm } from "./createEventForm";
 import { CalendarPlus } from "lucide-react";
+import { useCallback } from "react";
 
 export function CreateEventTemplateButton<T extends string>({
     projectTemplateId,
@@ -11,6 +12,9 @@ export function CreateEventTemplateButton<T extends string>({
     projectTemplateId: string;
     modalStack: ReturnType<typeof useModalsStack<"add-event" | T>>;
 }) {
+    const openModal = useCallback(() => modalStack.open("add-event"), []);
+    const closeModal = useCallback(() => modalStack.close("add-event"), []);
+
     return (
         <>
             <Modal
@@ -21,12 +25,12 @@ export function CreateEventTemplateButton<T extends string>({
             >
                 <CreateEventTemplateForm
                     projectTemplateId={projectTemplateId}
-                    onSuccess={() => modalStack.close("add-event")}
+                    onSuccess={closeModal}
                 />
             </Modal>
             <Button
                 variant="filled"
-                onClick={() => modalStack.open("add-event")}
+                onClick={openModal}
             >
                 <CalendarPlus className="mr-2" /> Add Event
             </Button>
