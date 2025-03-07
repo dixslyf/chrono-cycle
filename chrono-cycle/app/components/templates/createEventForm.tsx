@@ -1,8 +1,6 @@
 "use client";
 
 import * as E from "fp-ts/Either";
-import { useActionState, useEffect, useState } from "react";
-import { match, P } from "ts-pattern";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { useForm } from "@mantine/form";
 import { zodResolver } from "mantine-form-zod-resolver";
@@ -19,7 +17,6 @@ import {
 } from "@mantine/core";
 import { TimeInput } from "@mantine/dates";
 
-import { ValidationIssues } from "@/server/common/errors";
 import { Textarea, TextInput } from "@mantine/core";
 import { pipe } from "fp-ts/lib/function";
 
@@ -29,66 +26,10 @@ import {
     CreateFormData as CreateEventTemplateFormData,
     CreateFormData,
     createFormDataSchema,
-    CreateResult,
 } from "@/server/event-templates/create/data";
 import { Clock, Plus, Trash } from "lucide-react";
 
 type ReminderData = Required<CreateEventTemplateFormData["reminders"][number]>;
-
-function getCreateErrorMessage(createState: CreateResult) {
-    return match(createState)
-        .with(
-            { left: { _errorKind: "ValidationError" } },
-            () => "Invalid or missing fields",
-        )
-        .with(
-            { left: { _errorKind: "DoesNotExistError" } },
-            () => "Project template does not exist",
-        )
-        .with(
-            { left: { _errorKind: "InternalError" } },
-            () => "An internal error occurred",
-        )
-        .with({ left: { _errorKind: "TagExistsError" } }, () => "Tag exists")
-        .with({ right: P.any }, () => "")
-        .exhaustive();
-}
-
-function extractValidationIssues(
-    createState: CreateResult | null,
-): ValidationIssues<
-    | "name"
-    | "offsetDays"
-    | "duration"
-    | "note"
-    | "eventType"
-    | "autoReschedule"
-    | "projectTemplateId"
-> {
-    const noIssue = {
-        name: [],
-        offsetDays: [],
-        duration: [],
-        note: [],
-        eventType: [],
-        autoReschedule: [],
-        projectTemplateId: [],
-    };
-
-    if (!createState) {
-        return noIssue;
-    }
-
-    return match(createState)
-        .with(
-            {
-                _tag: "Left",
-                left: { _errorKind: "ValidationError", issues: P.select() },
-            },
-            (issues) => ({ ...noIssue, ...issues }),
-        )
-        .otherwise(() => noIssue);
-}
 
 export function CreateEventTemplateForm({
     projectTemplateId,
