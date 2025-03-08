@@ -13,10 +13,10 @@ export const eventDependencies = pgTable(
     {
         parentId: integer("parent_id")
             .notNull()
-            .references(() => events.id),
+            .references(() => events.id, { onDelete: "cascade" }),
         childId: integer("child_id")
             .notNull()
-            .references(() => events.id),
+            .references(() => events.id, { onDelete: "cascade" }),
         dependencyType: dependencyTypeEnum("dependency_type").notNull(),
         lagDays: integer("lag_days").notNull(),
     },

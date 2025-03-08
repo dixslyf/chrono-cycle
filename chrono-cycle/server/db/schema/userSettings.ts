@@ -20,7 +20,7 @@ export const dateFormatEnum = pgEnum("date_format", [
 
 export const userSettings = pgTable("user_settings", {
     userId: integer("user_id")
-        .references(() => users.id)
+        .references(() => users.id, { onDelete: "cascade" })
         .primaryKey()
         .notNull(),
     startDayOfWeek: startDayOfWeekEnum("start_day_of_week").notNull(),

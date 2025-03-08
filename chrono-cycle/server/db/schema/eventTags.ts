@@ -13,7 +13,7 @@ export const eventTags = pgTable(
     {
         eventId: integer("event_id")
             .notNull()
-            .references(() => events.id),
+            .references(() => events.id, { onDelete: "cascade" }),
         tagId: integer("tag_id")
             .notNull()
             .references(() => tags.id),

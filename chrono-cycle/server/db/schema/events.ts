@@ -28,7 +28,7 @@ export const events = pgTable("events", {
     id: serial("id").primaryKey().unique(),
     projectId: integer("project_id")
         .notNull()
-        .references(() => projects.id),
+        .references(() => projects.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     offsetDays: integer("offset_days").notNull(),
     duration: integer("duration").notNull(),
@@ -47,6 +47,7 @@ export const events = pgTable("events", {
         .default(true),
     eventTemplateId: integer("event_template_id").references(
         () => eventTemplates.id,
+        { onDelete: "set null" },
     ),
 });
 

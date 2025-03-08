@@ -39,6 +39,7 @@ export const projects = pgTable(
         }).notNull(),
         projectTemplateId: integer("project_template_id").references(
             () => projectTemplates.id,
+            { onDelete: "set null" },
         ),
     },
     (t) => [unique("projects_unique_user_id_name").on(t.userId, t.name)],

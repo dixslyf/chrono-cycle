@@ -12,7 +12,7 @@ export const reminders = pgTable("reminders", {
     id: serial("id").primaryKey().unique(),
     eventId: integer("event_id")
         .notNull()
-        .references(() => events.id),
+        .references(() => events.id, { onDelete: "cascade" }),
     daysBeforeEvent: integer("days_before_event").notNull(),
     time: time("time", { withTimezone: true }).notNull(),
     emailNotifications: boolean("email_notifications").default(true).notNull(),
@@ -21,6 +21,7 @@ export const reminders = pgTable("reminders", {
         .notNull(),
     reminderTemplateId: integer("reminder_template_id").references(
         () => reminderTemplates.id,
+        { onDelete: "set null" },
     ),
 });
 
