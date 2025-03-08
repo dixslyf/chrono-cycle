@@ -182,9 +182,9 @@ function Timeline({
                                     isToday
                                         ? "bg-palette2"
                                         : day.date < new Date()
-                                            ? "bg-gray-300"
-                                            : "bg-gray-700"
-                                    }`}
+                                          ? "bg-gray-300"
+                                          : "bg-gray-700"
+                                }`}
                             />
                         </div>
                     );
