@@ -40,7 +40,10 @@ export function checkUserOwnsEventTemplates(
                     )
                     .innerJoin(
                         eventTemplatesTable,
-                        eq(projectTemplatesTable.id, eventTemplatesTable.id),
+                        eq(
+                            projectTemplatesTable.id,
+                            eventTemplatesTable.projectTemplateId,
+                        ),
                     )
                     .where(or(...conditions)),
             (err) => {
