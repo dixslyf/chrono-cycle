@@ -15,11 +15,9 @@ export const listFormDataSchema = z.object({
 
 export type ListFormData = z.output<typeof listFormDataSchema>;
 
-export type ListReturnData = EventTemplate[];
-
 export type ListError =
     | ValidationError<"projectTemplateId">
     | DoesNotExistError
     | InternalError;
 
-export type ListResult = E.Either<ListError, ListReturnData>;
+export type ListResult = E.Either<ListError, EventTemplate[]>;

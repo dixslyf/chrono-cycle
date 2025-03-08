@@ -20,7 +20,7 @@ export const eventTemplates = pgTable("event_templates", {
     name: text("name").notNull(),
     offsetDays: integer("offset_days").notNull(),
     duration: integer("duration").notNull(),
-    note: text("note").notNull(),
+    note: text("note").notNull().default(""),
     eventType: eventTypeEnum("event_type").notNull(),
     autoReschedule: boolean("auto_reschedule").notNull(),
     updatedAt: timestamp("created_at", {

@@ -1,7 +1,25 @@
 import "dotenv/config";
-import { sql } from "drizzle-orm";
-import { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { PgliteDatabase } from "drizzle-orm/pglite";
+import { ExtractTablesWithRelations, sql } from "drizzle-orm";
+import {
+    NodePgDatabase,
+    NodePgQueryResultHKT,
+} from "drizzle-orm/node-postgres";
+import { PgTransaction } from "drizzle-orm/pg-core";
+import { PgliteDatabase, PgliteQueryResultHKT } from "drizzle-orm/pglite";
+
+export type Db = NodePgDatabase | PgliteDatabase;
+export type DbTransaction =
+    | PgTransaction<
+        NodePgQueryResultHKT,
+        Record<string, never>,
+        ExtractTablesWithRelations<Record<string, never>>
+    >
+    | PgTransaction<
+        PgliteQueryResultHKT,
+        Record<string, never>,
+        ExtractTablesWithRelations<Record<string, never>>
+    >;
+export type DbLike = Db | DbTransaction;
 
 async function devDb(): Promise<PgliteDatabase> {
     console.log("Using development database");
@@ -69,7 +87,7 @@ async function initDb(): Promise<NodePgDatabase | PgliteDatabase> {
     return await prodDb();
 }
 
-let db: NodePgDatabase | PgliteDatabase | null = null;
+let db: Db | null = null;
 async function getDb(): Promise<NodePgDatabase | PgliteDatabase> {
     if (!db) {
         db = await initDb();

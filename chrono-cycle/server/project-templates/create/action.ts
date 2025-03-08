@@ -3,10 +3,10 @@
 import * as E from "fp-ts/Either";
 
 import { UserSession } from "@/server/auth/sessions";
-import { createFormSchema, CreateResult, DuplicateNameError } from "./data";
+import { createFormSchema, CreateResult } from "./data";
 import { insertProjectTemplateDb, isDuplicateProjectTemplateName } from "./lib";
 import { revalidatePath } from "next/cache";
-import { ValidationError } from "@/server/common/errors";
+import { DuplicateNameError, ValidationError } from "@/server/common/errors";
 import { encodeProjectTemplateId } from "@/server/common/identifiers";
 import { wrapServerAction } from "@/server/decorators";
 

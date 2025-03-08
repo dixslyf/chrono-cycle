@@ -6,6 +6,14 @@ export function DoesNotExistError(): DoesNotExistError {
     return { _errorKind: "DoesNotExistError" };
 }
 
+export type DuplicateNameError = {
+    _errorKind: "DuplicateNameError";
+};
+
+export function DuplicateNameError(): DuplicateNameError {
+    return { _errorKind: "DuplicateNameError" };
+}
+
 export type InternalError = {
     _errorKind: "InternalError";
     context: string;
