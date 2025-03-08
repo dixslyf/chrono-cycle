@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { Text } from "@mantine/core";
-import TemplateRow from "./templateRow";
+import ProjectRow from "./projectRow";
 
 export interface Day {
     date: Date;
@@ -19,7 +19,7 @@ export interface Event {
     status: "none" | "not started" | "in progress" | "completed";
 }
 
-export interface EventTemplate {
+export interface Project {
     id: string;
     name: string;
 }
@@ -27,7 +27,7 @@ export interface EventTemplate {
 interface TimelineProps {
     days: Day[];
     events: Event[];
-    eventTemplates: EventTemplate[];
+    projects: Project[];
     projectStartDate: Date;
     selectedMonth: string;
     scrollToMonth?: string | null;
@@ -38,36 +38,36 @@ interface TimelineProps {
 function Timeline({
     days,
     events,
-    eventTemplates,
+    projects,
     projectStartDate,
     scrollToMonth,
     onMonthChange,
 }: TimelineProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const cellWidth = 96; // fixed width for each day
-    const headerHeight = 24; // height for template header
+    const headerHeight = 24; // height for project header
     const eventHeight = 32; // might be able to change this later on
     const rowSpacing = 4; // space between row
 
-    // Group event based on templateid
+    // Group event based on project ID
     const eventMap = new Map<string, Event[]>();
     events.forEach((event) => {
-        if (!event.eventTemplateId) return; // skip event without template
-        if (!eventMap.has(event.eventTemplateId)) {
-            eventMap.set(event.eventTemplateId, []);
+        if (!event.projectId) return; // skip event without project
+        if (!eventMap.has(event.projectId)) {
+            eventMap.set(event.projectId, []);
         }
-        eventMap.get(event.eventTemplateId)!.push(event);
+        eventMap.get(event.projectId)!.push(event);
     });
 
-    // toggle state for each template
-    const [expandedTemplates, setExpandedTemplates] = useState<
+    // toggle state for each project
+    const [expandedProjects, setExpandedProjects] = useState<
         Record<string, boolean>
     >({});
 
-    const toggleTemplate = (templateID: string) => {
-        setExpandedTemplates((prev) => ({
+    const toggleProject = (projectId: string) => {
+        setExpandedProjects((prev) => ({
             ...prev,
-            [templateID]: !prev[templateID],
+            [projectId]: !prev[projectId],
         }));
     };
 
@@ -146,7 +146,7 @@ function Timeline({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scrollToMonth, days, cellWidth]);
 
-    // calculate a cumulative vertical offset for each template row.
+    // calculate a cumulative vertical offset for each project row.
     // each row's height is the header height plus additionnal height for expanded events.
     let cumulativeOffset = 0;
 
@@ -182,26 +182,26 @@ function Timeline({
                                     isToday
                                         ? "bg-palette2"
                                         : day.date < new Date()
-                                          ? "bg-gray-300"
-                                          : "bg-gray-700"
-                                }`}
+                                            ? "bg-gray-300"
+                                            : "bg-gray-700"
+                                    }`}
                             />
                         </div>
                     );
                 })}
-                {/* render template row with events */}
+                {/* render project row with events */}
                 <div className="absolute top-16 w-full">
-                    {eventTemplates.map((template) => {
-                        const templateEvents = eventMap.get(template.id) || [];
-                        if (templateEvents.length === 0) return null;
+                    {projects.map((project) => {
+                        const projectEvents = eventMap.get(project.id) || [];
+                        if (projectEvents.length === 0) return null;
 
-                        // determine the current template's top offset
+                        // determine the current project's top offset
                         const topOffset = cumulativeOffset;
 
                         // determine additional height if expanded:
-                        const isExpanded = !!expandedTemplates[template.id];
+                        const isExpanded = !!expandedProjects[project.id];
                         const extraHeight = isExpanded
-                            ? templateEvents.length * (eventHeight + rowSpacing)
+                            ? projectEvents.length * (eventHeight + rowSpacing)
                             : 0;
 
                         // updated cumulative offset: header height + extra height + rowspacing for gap
@@ -209,17 +209,17 @@ function Timeline({
                             headerHeight + extraHeight + rowSpacing;
 
                         return (
-                            <TemplateRow
-                                key={template.id}
-                                template={template}
-                                events={templateEvents}
+                            <ProjectRow
+                                key={project.id}
+                                project={project}
+                                events={projectEvents}
                                 days={days}
                                 projectStartDate={projectStartDate}
                                 cellWidth={cellWidth}
                                 eventHeight={eventHeight}
                                 rowSpacing={rowSpacing}
-                                expanded={!!expandedTemplates[template.id]}
-                                toggleTemplate={toggleTemplate}
+                                expanded={!!expandedProjects[project.id]}
+                                toggleProject={toggleProject}
                                 topOffset={topOffset}
                                 headerHeight={headerHeight}
                             />

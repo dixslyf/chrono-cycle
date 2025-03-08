@@ -2,7 +2,7 @@
 import { useState } from "react";
 import DashNav from "./dashNav";
 import Timeline, { Day, Event } from "./timeline";
-import { EventTemplate } from "./timeline"; // should change this
+import { Project } from "./timeline"; // should change this
 
 interface DashboardProps {
     months: { value: string; label: string }[];
@@ -22,10 +22,9 @@ function DashboardClient({ months, initialMonth, days, year }: DashboardProps) {
 
     // TODO
     // should change this in the backend
-    // define event templates
-    const [project, setProject] = useState<EventTemplate[]>([
-        { id: "template-1", name: "Gardening Tasks" },
-        { id: "template-2", name: "Harvesting Schedule" },
+    const [projects, setProjects] = useState<Project[]>([
+        { id: "project-1", name: "Gardening Tasks" },
+        { id: "project-2", name: "Harvesting Schedule" },
     ]);
 
     const [events, setEvents] = useState<Event[]>([
@@ -74,7 +73,7 @@ function DashboardClient({ months, initialMonth, days, year }: DashboardProps) {
                     <Timeline
                         days={days}
                         events={events}
-                        eventTemplates={project}
+                        projects={projects}
                         projectStartDate={projectStartDate}
                         selectedMonth={selectedMonth}
                         scrollToMonth={scrollToMonth}

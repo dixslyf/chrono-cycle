@@ -3,10 +3,10 @@ import React from "react";
 import { Paper } from "@mantine/core";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import EventBar from "./eventBar";
-import { Day, Event, EventTemplate } from "./timeline";
+import { Day, Event, Project } from "./timeline";
 
-interface TemplateRowProps {
-    template: EventTemplate;
+interface ProjectRowProps {
+    project: Project;
     events: Event[];
     days: Day[];
     projectStartDate: Date;
@@ -14,13 +14,13 @@ interface TemplateRowProps {
     eventHeight: number;
     rowSpacing: number;
     expanded: boolean;
-    toggleTemplate: (templateId: string) => void;
+    toggleProject: (projectId: string) => void;
     topOffset: number; // computed vertical offset for this row
     headerHeight: number; // height for the header (e.g., 24px)
 }
 
-const TemplateRow: React.FC<TemplateRowProps> = ({
-    template,
+const ProjectRow: React.FC<ProjectRowProps> = ({
+    project,
     events,
     days,
     projectStartDate,
@@ -28,7 +28,7 @@ const TemplateRow: React.FC<TemplateRowProps> = ({
     eventHeight,
     rowSpacing,
     expanded,
-    toggleTemplate,
+    toggleProject: toggleProject,
     topOffset,
     headerHeight,
 }) => {
@@ -37,7 +37,7 @@ const TemplateRow: React.FC<TemplateRowProps> = ({
         (d) => d.date.getTime() === projectStartDate.getTime(),
     );
 
-    // For the end index, determine the farthest day among the events in this template.
+    // For the end index, determine the farthest day among the events in this project.
     const eventEndIndexes = events.map((event) => {
         const endDate = new Date(projectStartDate);
         endDate.setDate(
@@ -57,7 +57,7 @@ const TemplateRow: React.FC<TemplateRowProps> = ({
             // style={{ top: `${topOffset}px`, position: "absolute" }}
             style={{ top: `${topOffset}px` }}
         >
-            {/* Template Header */}
+            {/* Project Header */}
             <Paper
                 withBorder
                 p={0}
@@ -68,9 +68,9 @@ const TemplateRow: React.FC<TemplateRowProps> = ({
                     height: `${headerHeight}px`,
                     lineHeight: `${headerHeight}px`,
                 }}
-                onClick={() => toggleTemplate(template.id)}
+                onClick={() => toggleProject(project.id)}
             >
-                {template.name}
+                {project.name}
                 {expanded ? (
                     <ChevronUp size={16} className="ml-1" />
                 ) : (
@@ -125,4 +125,4 @@ const TemplateRow: React.FC<TemplateRowProps> = ({
     );
 };
 
-export default TemplateRow;
+export default ProjectRow;
