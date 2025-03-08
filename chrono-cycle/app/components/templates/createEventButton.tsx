@@ -12,8 +12,16 @@ export function CreateEventTemplateButton<T extends string>({
     projectTemplateId: string;
     modalStack: ReturnType<typeof useModalsStack<"add-event" | T>>;
 }) {
-    const openModal = useCallback(() => modalStack.open("add-event"), []);
-    const closeModal = useCallback(() => modalStack.close("add-event"), []);
+    const { open: modalStackOpen, close: modalStackClose } = modalStack;
+    const openModal = useCallback(
+        () => modalStackOpen("add-event"),
+        [modalStackOpen],
+    );
+
+    const closeModal = useCallback(
+        () => modalStackClose("add-event"),
+        [modalStackClose],
+    );
 
     return (
         <>
@@ -28,10 +36,7 @@ export function CreateEventTemplateButton<T extends string>({
                     onSuccess={closeModal}
                 />
             </Modal>
-            <Button
-                variant="filled"
-                onClick={openModal}
-            >
+            <Button variant="filled" onClick={openModal}>
                 <CalendarPlus className="mr-2" /> Add Event
             </Button>
         </>

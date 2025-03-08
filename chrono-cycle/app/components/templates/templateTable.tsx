@@ -34,9 +34,10 @@ export function TemplateTable({
         "add-event",
     ]);
 
+    const { close: modalStackClose } = modalStack;
     const closeModal = useCallback(
-        () => modalStack.close("project-template-details"),
-        [],
+        () => modalStackClose("project-template-details"),
+        [modalStackClose],
     );
 
     // State for storing the clicked project template.
