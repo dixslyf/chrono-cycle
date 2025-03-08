@@ -73,7 +73,7 @@ export function CreateEventTemplateForm({
             name: "",
             offsetDays: 0,
             eventType: "task",
-            duration: 0,
+            duration: 1,
             note: "",
             autoReschedule: true,
             projectTemplateId, // Sqid, not the actual ID.
@@ -136,6 +136,7 @@ export function CreateEventTemplateForm({
                     <NumberInput
                         key={form.key("duration")}
                         label="Duration (days)"
+                        min={1}
                         description="The duration of the event in days"
                         error="Invalid duration"
                         disabled={durationDisabled}
