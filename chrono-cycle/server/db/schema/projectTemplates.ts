@@ -12,12 +12,15 @@ import {
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+import users from "./users";
 
 export const projectTemplates = pgTable(
     "project_templates",
     {
         id: serial("id").primaryKey().unique(),
-        userId: integer("user_id").notNull(),
+        userId: integer("user_id")
+            .notNull()
+            .references(() => users.id, { onDelete: "cascade" }),
         name: text("name").notNull().unique(),
         description: text("description").notNull(),
         createdAt: timestamp("created_at", {

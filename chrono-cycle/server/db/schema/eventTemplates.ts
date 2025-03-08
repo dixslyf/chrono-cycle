@@ -31,7 +31,7 @@ export const eventTemplates = pgTable("event_templates", {
         .defaultNow(),
     projectTemplateId: integer("project_template_id")
         .notNull()
-        .references(() => projectTemplates.id),
+        .references(() => projectTemplates.id, { onDelete: "cascade" }),
 });
 
 export type DbEventTemplate = InferSelectModel<typeof eventTemplates>;

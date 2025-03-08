@@ -26,6 +26,7 @@ import {
 import { ensureTagExists } from "@/server/tags/create/lib";
 import { EventTemplate, Tag } from "@/server/common/data";
 import { eventTemplateTags } from "@/server/db/schema";
+import { insertReminderTemplates } from "@/server/reminder-templates/create/lib";
 
 // Task to check if the project template exists.
 function checkProjectTemplateExistsTask(
@@ -115,7 +116,11 @@ function linkTagsTask(
     fDb: FunctionalDatabase,
     eventTemplateId: number,
     tags: Tag[],
-) {
+): TE.TaskEither<CreateError, void> {
+    if (tags.length === 0) {
+        return TE.of(undefined);
+    }
+
     return pipe(
         fDb.do<void>((db) =>
             db
@@ -159,13 +164,30 @@ export async function createEventTemplate(
                 TE.map(() => ({ dbEt, tags })),
             ),
         ),
-        TE.map(({ dbEt, tags }) => {
-            // Map to return type.
+        // Insert the reminders.
+        TE.chain(({ dbEt, tags }) =>
+            TE.tryCatch(
+                () =>
+                    insertReminderTemplates(
+                        fDb.db,
+                        data.reminders.map((reminder) => ({
+                            eventTemplateId: encodeEventTemplateId(dbEt.id),
+                            ...reminder,
+                        })),
+                    ).then((reminders) => ({ dbEt, tags, reminders })),
+                (_err) =>
+                    InternalError(
+                        String(_err),
+                    ) satisfies CreateError as CreateError,
+            ),
+        ),
+        // Map to return type.
+        TE.map(({ dbEt, tags, reminders }) => {
             const { id, projectTemplateId, ...partial } = dbEt;
             return {
                 id: encodeEventTemplateId(id),
                 projectTemplateId: encodeProjectTemplateId(projectTemplateId),
-                reminders: [],
+                reminders,
                 tags,
                 ...partial,
             } satisfies CreateReturnData;

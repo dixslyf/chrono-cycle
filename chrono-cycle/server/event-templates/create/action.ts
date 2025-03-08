@@ -2,7 +2,7 @@
 
 import * as E from "fp-ts/Either";
 
-import { CreateResult, createFormDataSchema } from "./data";
+import { CreateFormData, CreateResult, createFormDataSchema } from "./data";
 import { createEventTemplate } from "./lib";
 import { UserSession } from "@/server/auth/sessions";
 import { ValidationError } from "@/server/common/errors";
@@ -11,10 +11,10 @@ import { wrapServerAction } from "@/server/decorators";
 async function createEventTemplateActionImpl(
     userSession: UserSession,
     _prevState: CreateResult | null,
-    formData: FormData,
+    data: CreateFormData,
 ): Promise<CreateResult> {
     // Validate form schema.
-    const parseResult = createFormDataSchema.safeParse(formData);
+    const parseResult = createFormDataSchema.safeParse(data);
     if (!parseResult.success) {
         const formattedZodErrors = parseResult.error.format();
         return E.left(

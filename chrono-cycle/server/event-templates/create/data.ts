@@ -10,17 +10,30 @@ import { eventTemplateInsertSchema } from "@/server/db/schema/eventTemplates";
 import { EventTemplate, tagNameSchema } from "@/server/common/data";
 import { CreateError as CreateTagError } from "@/server/tags/create/data";
 import { encodedIdSchema } from "@/server/common/identifiers";
+import { reminderTemplateCreateSchema } from "@/server/reminder-templates/create/data";
 
-export const createFormDataSchema = z.object({
-    name: eventTemplateInsertSchema.shape.name,
-    offsetDays: eventTemplateInsertSchema.shape.offsetDays,
-    duration: eventTemplateInsertSchema.shape.duration,
-    note: eventTemplateInsertSchema.shape.note,
-    eventType: eventTemplateInsertSchema.shape.eventType,
-    autoReschedule: eventTemplateInsertSchema.shape.autoReschedule,
-    projectTemplateId: encodedIdSchema, // Sqid, not the actual ID.
-    tags: z.array(tagNameSchema),
-});
+export const createFormDataSchema = z
+    .object({
+        name: eventTemplateInsertSchema.shape.name,
+        offsetDays: eventTemplateInsertSchema.shape.offsetDays,
+        duration: eventTemplateInsertSchema.shape.duration,
+        note: eventTemplateInsertSchema.shape.note,
+        eventType: eventTemplateInsertSchema.shape.eventType,
+        autoReschedule: eventTemplateInsertSchema.shape.autoReschedule,
+        projectTemplateId: encodedIdSchema, // Sqid, not the actual ID.
+        reminders: z.array(
+            reminderTemplateCreateSchema.omit({ eventTemplateId: true }),
+        ),
+        tags: z.array(tagNameSchema),
+    })
+    .refine(
+        (val) => (val.eventType === "task" ? val.duration === 1 : true),
+        "Duration for a task must be 1 day",
+    )
+    .refine(
+        (val) => (val.eventType === "activity" ? val.duration >= 1 : true),
+        "Duration for an activity must be at least 1 day",
+    );
 
 export type CreateFormData = z.output<typeof createFormDataSchema>;
 

@@ -19,8 +19,11 @@ export type InternalError = {
     context: string;
 };
 
-export function InternalError(context: string): InternalError {
-    return { _errorKind: "InternalError", context };
+export function InternalError(context?: string): InternalError {
+    return {
+        _errorKind: "InternalError",
+        context: context ? context : "An internal error occurred",
+    };
 }
 
 export type ValidationIssues<K extends string = string> = Record<K, string[]>;

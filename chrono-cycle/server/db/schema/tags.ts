@@ -13,7 +13,7 @@ export const tags = pgTable(
         id: serial("id").primaryKey().unique(),
         userId: integer("user_id")
             .notNull()
-            .references(() => users.id),
+            .references(() => users.id, { onDelete: "cascade" }),
         name: text("name").notNull(),
     },
     (t) => [unique("tags_unique_user_id_name").on(t.userId, t.name)],

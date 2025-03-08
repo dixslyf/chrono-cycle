@@ -1,9 +1,8 @@
 "use client";
 
-import { Button, Modal, Group, Stack } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { Modal, Group, Stack, useModalsStack } from "@mantine/core";
 import { DataTable } from "mantine-datatable";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
@@ -15,6 +14,7 @@ import { DeleteTemplateButton } from "./deleteTemplateButton";
 import { retrieveProjectTemplateAction } from "@/server/project-templates/retrieve/action";
 import { ProjectTemplateOverview } from "@/server/common/data";
 import { ProjectTemplateData } from "@/server/project-templates/retrieve/data";
+import { CreateEventTemplateButton } from "./createEventButton";
 
 const columns = [
     { accessor: "name", title: "Name" },
@@ -28,8 +28,17 @@ export function TemplateTable({
 }: {
     entries: ProjectTemplateOverview[];
 }): React.ReactNode {
-    // For opening / closing the project template details modal window.
-    const [opened, { open: openModal, close: closeModal }] = useDisclosure();
+    // For keeping track of modals.
+    const modalStack = useModalsStack([
+        "project-template-details",
+        "add-event",
+    ]);
+
+    const { close: modalStackClose } = modalStack;
+    const closeModal = useCallback(
+        () => modalStackClose("project-template-details"),
+        [modalStackClose],
+    );
 
     // State for storing the clicked project template.
     const [clickedProjectTemplateData, setClickedProjectTemplateData] =
@@ -53,7 +62,7 @@ export function TemplateTable({
             result,
             E.match(
                 (_err) => {
-                    closeModal();
+                    modalStack.close("project-template-details");
                     notifyError({
                         message: "Failed to retrieve project template data.",
                     });
@@ -65,39 +74,46 @@ export function TemplateTable({
 
     return (
         <>
-            {/* Modal window for showing the details of the clicked project template. */}
-            <Modal
-                title="Project Template Details"
-                opened={opened}
-                onClose={closeModal}
-                size="auto"
-                centered
-            >
-                <Stack>
-                    {/* Template details */}
-                    {clickedProjectTemplateData ? (
-                        <TemplateDetails
-                            projectTemplateData={clickedProjectTemplateData}
-                        />
-                    ) : (
-                        <TemplateDetailsSkeleton />
-                    )}
+            <Modal.Stack>
+                {/* Modal window for showing the details of the clicked project template. */}
+                <Modal
+                    title="Project Template Details"
+                    size="auto"
+                    centered
+                    {...modalStack.register("project-template-details")}
+                >
+                    <Stack>
+                        {/* Template details */}
+                        {clickedProjectTemplateData ? (
+                            <>
+                                <TemplateDetails
+                                    projectTemplateData={
+                                        clickedProjectTemplateData
+                                    }
+                                />
 
-                    {/* Delete and close buttons */}
-                    <Group justify="flex-end">
-                        {/* Safety: `id` is guaranteed to be non-null since we only show the modal after setting it.*/}
-                        <DeleteTemplateButton
-                            projectTemplateId={
-                                clickedProjectTemplateData?.id as string
-                            }
-                            onSuccess={closeModal}
-                        />
-                        <Button variant="default" onClick={closeModal}>
-                            Close
-                        </Button>
-                    </Group>
-                </Stack>
-            </Modal>
+                                {/* Delete and create event buttons */}
+                                <Group justify="flex-end">
+                                    <DeleteTemplateButton
+                                        projectTemplateId={
+                                            clickedProjectTemplateData.id
+                                        }
+                                        onSuccess={closeModal}
+                                    />
+                                    <CreateEventTemplateButton
+                                        projectTemplateId={
+                                            clickedProjectTemplateData.id
+                                        }
+                                        modalStack={modalStack}
+                                    />
+                                </Group>
+                            </>
+                        ) : (
+                            <TemplateDetailsSkeleton />
+                        )}
+                    </Stack>
+                </Modal>
+            </Modal.Stack>
 
             {/* Table to show available project templates. */}
             <DataTable
@@ -108,7 +124,7 @@ export function TemplateTable({
                 minHeight={150}
                 noRecordsText="No project templates"
                 onRowClick={async ({ record: { id } }) => {
-                    openModal();
+                    modalStack.open("project-template-details");
                     await retrieveProjectTemplateData(id);
                 }}
             />

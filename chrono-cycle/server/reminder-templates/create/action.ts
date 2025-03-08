@@ -2,11 +2,11 @@
 
 import * as E from "fp-ts/Either";
 
-import { CreateResult, createFormDataSchema } from "./data";
+import { CreateResult, reminderTemplateCreateSchema } from "./data";
 import { UserSession } from "@/server/auth/sessions";
 import { ValidationError } from "@/server/common/errors";
 import { wrapServerAction } from "@/server/decorators";
-import { createReminderTemplate } from "./lib";
+import { createReminderTemplates } from "./lib";
 
 async function createReminderTemplateActionImpl(
     userSession: UserSession,
@@ -14,7 +14,7 @@ async function createReminderTemplateActionImpl(
     formData: FormData,
 ): Promise<CreateResult> {
     // Validate form schema.
-    const parseResult = createFormDataSchema.safeParse(formData);
+    const parseResult = reminderTemplateCreateSchema.safeParse(formData);
     if (!parseResult.success) {
         const formattedZodErrors = parseResult.error.format();
         return E.left(
@@ -33,7 +33,9 @@ async function createReminderTemplateActionImpl(
     }
 
     const userId = userSession.user.id;
-    const createResult = await createReminderTemplate(userId, parseResult.data);
+    const createResult = await createReminderTemplates(userId, [
+        parseResult.data,
+    ]);
 
     if (E.isRight(createResult)) {
         // TODO: What path to revalidate?

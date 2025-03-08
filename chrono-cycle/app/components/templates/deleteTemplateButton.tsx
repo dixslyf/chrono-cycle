@@ -49,6 +49,7 @@ export function DeleteTemplateButton({
     return (
         <Button
             variant="filled"
+            color="red"
             disabled={deletePending}
             onClick={() =>
                 startTransition(() => deleteAction(projectTemplateId))
