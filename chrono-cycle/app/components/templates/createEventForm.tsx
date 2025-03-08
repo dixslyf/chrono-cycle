@@ -55,11 +55,11 @@ export function CreateEventTemplateForm({
             E.match(
                 (_err) =>
                     notifyError({
-                        message: `Failed to create project template. ${_err}`,
+                        message: `Failed to create event.`,
                     }),
                 () => {
                     notifySuccess({
-                        message: "Successfully created project template.",
+                        message: "Successfully created event.",
                     });
                     onSuccess();
                 },
