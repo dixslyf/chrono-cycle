@@ -23,7 +23,7 @@ function DashboardClient({ months, initialMonth, days, year }: DashboardProps) {
     // TODO
     // should change this in the backend
     // define event templates
-    const [eventTemplates, setEventTemplates] = useState<EventTemplate[]>([
+    const [project, setProject] = useState<EventTemplate[]>([
         { id: "template-1", name: "Gardening Tasks" },
         { id: "template-2", name: "Harvesting Schedule" },
     ]);
@@ -74,7 +74,7 @@ function DashboardClient({ months, initialMonth, days, year }: DashboardProps) {
                     <Timeline
                         days={days}
                         events={events}
-                        eventTemplates={eventTemplates}
+                        eventTemplates={project}
                         projectStartDate={projectStartDate}
                         selectedMonth={selectedMonth}
                         scrollToMonth={scrollToMonth}
