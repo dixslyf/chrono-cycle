@@ -26,15 +26,17 @@ export function InternalError(context?: string): InternalError {
     };
 }
 
-export type ValidationIssues<K extends string = string> = Record<K, string[]>;
+export type ValidationIssues<K extends string = never> = {
+    [Key in K]: string[];
+};
 
-export type ValidationError<K extends string = string> = {
+export type ValidationError<K extends string = never> = {
     _errorKind: "ValidationError";
     issues: ValidationIssues<K>;
 };
 
-export function ValidationError<K extends string = string>(
+export function ValidationError<K extends string = never>(
     issues: ValidationIssues<K>,
-): ValidationError {
+): ValidationError<K> {
     return { _errorKind: "ValidationError", issues };
 }
