@@ -19,7 +19,7 @@ const config: Config = {
         "^@/(.*)$": "<rootDir>/$1",
     },
     testMatch: [
-        "<rootDir>/tests/**/*.[jt]s?(x)",
+        "<rootDir>/src/tests/**/*.[jt]s?(x)",
         "**/__tests__/**/*.[jt]s?(x)",
         "**/?(*.)+(spec|test).[jt]s?(x)",
     ],
