@@ -37,7 +37,7 @@ export type ProjectOverview = {
     createdAt: Date;
     updatedAt: Date;
     startsAt: Date;
-    projectTemplateId: string; // Encoded ID.
+    projectTemplateId: string | null; // Encoded ID.
 };
 
 export type Project = {
