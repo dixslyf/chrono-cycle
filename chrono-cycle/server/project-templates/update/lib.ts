@@ -62,7 +62,7 @@ export function updateProjectTemplateDb(
                 await db.transaction(async (tx) => {
                     const updated = await tx
                         .update(projectTemplatesTable)
-                        .set(setData)
+                        .set({ updatedAt: new Date(), ...setData })
                         .where(
                             eq(
                                 projectTemplatesTable.id,
