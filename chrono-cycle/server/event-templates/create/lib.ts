@@ -166,19 +166,16 @@ export async function createEventTemplate(
         ),
         // Insert the reminders.
         TE.chain(({ dbEt, tags }) =>
-            TE.tryCatch(
-                () =>
-                    insertReminderTemplates(
-                        fDb.db,
-                        data.reminders.map((reminder) => ({
-                            eventTemplateId: encodeEventTemplateId(dbEt.id),
-                            ...reminder,
-                        })),
-                    ).then((reminders) => ({ dbEt, tags, reminders })),
-                (_err) =>
-                    InternalError(
-                        String(_err),
-                    ) satisfies CreateError as CreateError,
+            pipe(
+                insertReminderTemplates(
+                    fDb.db,
+                    data.reminders.map((reminder) => ({
+                        eventTemplateId: encodeEventTemplateId(dbEt.id),
+                        ...reminder,
+                    })),
+                ),
+                TE.map((reminders) => ({ dbEt, tags, reminders })),
+                TE.mapError((err) => err satisfies CreateError as CreateError),
             ),
         ),
         // Map to return type.
