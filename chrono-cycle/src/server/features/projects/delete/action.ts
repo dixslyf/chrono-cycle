@@ -1,16 +1,16 @@
 "use server";
 
+import { UserSession } from "@/server/common/auth/sessions";
+import { ValidationError } from "@/server/common/errors";
+import { wrapServerAction } from "@/server/features/decorators";
 import * as E from "fp-ts/Either";
 
-import { UserSession } from "@/server/common/auth/sessions";
-import { deleteProject } from "./lib";
 import {
     DeleteProjectData,
     deleteProjectDataSchema,
     DeleteProjectResult,
 } from "./data";
-import { ValidationError } from "@/server/common/errors";
-import { wrapServerAction } from "@/server/features/decorators";
+import { deleteProject } from "./lib";
 
 async function deleteProjectImpl(
     userSession: UserSession,

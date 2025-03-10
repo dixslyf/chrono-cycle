@@ -1,6 +1,8 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+
 import { Text } from "@mantine/core";
+import { useEffect, useRef, useState } from "react";
+
 import ProjectRow from "./projectRow";
 
 export interface Day {

@@ -1,8 +1,7 @@
-import type { DbUser } from "@/server/db/schema/users";
+import { hashPassword } from "@/server/common/auth/passwords";
 import getDb from "@/server/db";
 import { DbUserSettings, users, userSettings } from "@/server/db/schema";
-import { hashPassword } from "@/server/common/auth/passwords";
-
+import type { DbUser } from "@/server/db/schema/users";
 import { eq } from "drizzle-orm";
 
 export async function createUser(

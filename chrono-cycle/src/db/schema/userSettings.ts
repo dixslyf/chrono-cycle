@@ -1,11 +1,12 @@
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import { pgEnum, pgTable, integer, boolean } from "drizzle-orm/pg-core";
-import users from "./users";
+import { boolean, integer, pgEnum, pgTable } from "drizzle-orm/pg-core";
 import {
     createInsertSchema,
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+
+import users from "./users";
 
 export const startDayOfWeekEnum = pgEnum("start_day_of_week", [
     "Monday",

@@ -1,10 +1,8 @@
-import * as E from "fp-ts/Either";
-
-import { z } from "zod";
-
 import { ProjectTemplateOverview } from "@/server/common/data";
 import { DuplicateNameError, ValidationError } from "@/server/common/errors";
 import { projectTemplateInsertSchema } from "@/server/db/schema/projectTemplates";
+import * as E from "fp-ts/Either";
+import { z } from "zod";
 
 export const createFormSchema = z.object({
     name: projectTemplateInsertSchema.shape.name,

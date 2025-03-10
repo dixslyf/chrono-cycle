@@ -1,15 +1,16 @@
 "use server";
 
-import { getUserFromUsername } from "@/server/common/auth/users";
-import { signInFormSchema, SignInFormState } from "./data";
 import { verifyPassword } from "@/server/common/auth/passwords";
 import {
     createSession,
     generateSessionToken,
     setSessionTokenCookie,
 } from "@/server/common/auth/sessions";
-import { redirect } from "next/navigation";
+import { getUserFromUsername } from "@/server/common/auth/users";
 import { wrapServerActionWith } from "@/server/features/decorators";
+import { redirect } from "next/navigation";
+
+import { signInFormSchema, SignInFormState } from "./data";
 
 async function signInActionImpl(
     _prevState: SignInFormState,

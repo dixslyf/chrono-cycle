@@ -1,10 +1,11 @@
-import { InferSelectModel, InferInsertModel } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { integer, pgTable, serial, text, unique } from "drizzle-orm/pg-core";
 import {
     createInsertSchema,
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+
 import users from "./users";
 
 export const tags = pgTable(

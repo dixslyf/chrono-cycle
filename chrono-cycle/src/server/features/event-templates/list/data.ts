@@ -1,13 +1,12 @@
-import * as E from "fp-ts/Either";
-import { z } from "zod";
-
+import { EventTemplate } from "@/server/common/data";
 import {
     DoesNotExistError,
     InternalError,
     ValidationError,
 } from "@/server/common/errors";
-import { EventTemplate } from "@/server/common/data";
 import { encodedIdSchema } from "@/server/common/identifiers";
+import * as E from "fp-ts/Either";
+import { z } from "zod";
 
 export const listFormDataSchema = z.object({
     projectTemplateId: encodedIdSchema,

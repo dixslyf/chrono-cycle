@@ -1,15 +1,13 @@
-import * as E from "fp-ts/Either";
-import { pipe } from "fp-ts/function";
-import { redirect } from "next/navigation";
-
 import { BaseError, InternalError } from "@/common/errors";
-
 import { authLogger, serverActionLogger } from "@/server/features/utils/log";
 import {
     getCurrentUserSession,
     getSessionTokenFromCookie,
     UserSession,
 } from "@/server/lib/auth/sessions";
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
+import { redirect } from "next/navigation";
 
 type NormalisedArgsFunction<A extends unknown[], R> = (
     ...args: A
@@ -24,7 +22,7 @@ export function wrapAuth<A extends unknown[], R>(
     label: string,
     f: UserSessionArgFunction<A, R>,
 ): NormalisedArgsFunction<A, R> {
-    return async function(...args: A): Promise<R> {
+    return async function (...args: A): Promise<R> {
         // Verify user identity and redirect if authentication failed..
         const userSession = await getCurrentUserSession();
         if (!userSession) {
@@ -51,7 +49,7 @@ export function wrapLog<A extends unknown[], R>(
     label: string,
     f: NormalisedArgsFunction<A, R>,
 ): NormalisedArgsFunction<A, R> {
-    return async function(...args: A): Promise<R> {
+    return async function (...args: A): Promise<R> {
         serverActionLogger.trace({ args }, `Invoked "${label}"`);
 
         return f(...args).then((returnValue) => {
@@ -64,7 +62,7 @@ export function wrapLog<A extends unknown[], R>(
 export function wrapTryCatch<A extends unknown[], E extends BaseError, R>(
     f: NormalisedArgsFunction<A, E.Either<E, R>>,
 ): NormalisedArgsFunction<A, E.Either<E | InternalError, R>> {
-    return async function(
+    return async function (
         ...args: A
     ): Promise<E.Either<E | InternalError, R>> {
         try {
@@ -110,9 +108,9 @@ export function wrapServerActionWith<
 ): NormalisedArgsFunction<A, E.Either<E | InternalError, R>> {
     const newF = options.auth
         ? wrapAuth(
-            label,
-            f as UserSessionArgFunction<A, E.Either<E | InternalError, R>>,
-        )
+              label,
+              f as UserSessionArgFunction<A, E.Either<E | InternalError, R>>,
+          )
         : (f as NormalisedArgsFunction<A, E.Either<E | InternalError, R>>);
 
     return wrapLog(label, wrapTryCatch(newF));

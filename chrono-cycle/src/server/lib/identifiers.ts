@@ -44,14 +44,14 @@ const sqidses = {
 };
 
 function genEncodeId(entityType: keyof typeof sqidses) {
-    return function(id: number): string {
+    return function (id: number): string {
         const sqids = sqidses[entityType];
         return sqids.encode([id]);
     };
 }
 
 function genDecodeId(entityType: keyof typeof sqidses) {
-    return function(encodedId: string): number {
+    return function (encodedId: string): number {
         const sqids = sqidses[entityType];
         return sqids.decode(encodedId)[0];
     };

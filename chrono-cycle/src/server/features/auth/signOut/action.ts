@@ -5,9 +5,10 @@ import {
     invalidateSession,
     UserSession,
 } from "@/server/common/auth/sessions";
-import { type SignOutFormState } from "./data";
-import { redirect } from "next/navigation";
 import { wrapServerAction } from "@/server/features/decorators";
+import { redirect } from "next/navigation";
+
+import { type SignOutFormState } from "./data";
 
 async function signOutActionImpl(
     userSession: UserSession,

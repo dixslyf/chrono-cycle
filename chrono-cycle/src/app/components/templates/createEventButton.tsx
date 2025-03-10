@@ -1,9 +1,10 @@
 "use client";
 
 import { Button, Modal, useModalsStack } from "@mantine/core";
-import { CreateEventTemplateForm } from "./createEventForm";
 import { CalendarPlus } from "lucide-react";
 import { useCallback } from "react";
+
+import { CreateEventTemplateForm } from "./createEventForm";
 
 export function CreateEventTemplateButton<T extends string>({
     projectTemplateId,

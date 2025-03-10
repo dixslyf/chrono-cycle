@@ -1,11 +1,11 @@
 "use server";
 
+import { UserSession } from "@/server/common/auth/sessions";
+import { wrapServerAction } from "@/server/features/decorators";
 import * as E from "fp-ts/Either";
 
-import { UserSession } from "@/server/common/auth/sessions";
-import { getProjectTemplatesForUser } from "./lib";
 import { ListResult } from "./data";
-import { wrapServerAction } from "@/server/features/decorators";
+import { getProjectTemplatesForUser } from "./lib";
 
 async function listProjectTemplatesImpl(
     userSession: UserSession,

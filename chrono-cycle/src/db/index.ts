@@ -1,4 +1,5 @@
 import "dotenv/config";
+
 import { ExtractTablesWithRelations, sql } from "drizzle-orm";
 import {
     type NodePgDatabase,
@@ -13,15 +14,15 @@ import {
 export type Db = NodePgDatabase | PgliteDatabase;
 export type DbTransaction =
     | PgTransaction<
-        NodePgQueryResultHKT,
-        Record<string, never>,
-        ExtractTablesWithRelations<Record<string, never>>
-    >
+          NodePgQueryResultHKT,
+          Record<string, never>,
+          ExtractTablesWithRelations<Record<string, never>>
+      >
     | PgTransaction<
-        PgliteQueryResultHKT,
-        Record<string, never>,
-        ExtractTablesWithRelations<Record<string, never>>
-    >;
+          PgliteQueryResultHKT,
+          Record<string, never>,
+          ExtractTablesWithRelations<Record<string, never>>
+      >;
 export type DbLike = Db | DbTransaction;
 
 async function devDb(): Promise<PgliteDatabase> {

@@ -1,11 +1,12 @@
-import { pgTable, text, integer, timestamp } from "drizzle-orm/pg-core";
-import users from "./users";
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import {
     createInsertSchema,
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+
+import users from "./users";
 
 export const sessions = pgTable("sessions", {
     id: text("id").primaryKey(),

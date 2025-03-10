@@ -1,14 +1,14 @@
 "use server";
 
-import * as E from "fp-ts/Either";
-import * as O from "fp-ts/Option";
-import { pipe } from "fp-ts/function";
-
-import { retrieveProjectTemplate } from "./lib";
-import { RetrieveResult } from "./data";
-import { DoesNotExistError } from "@/server/common/errors";
 import { UserSession } from "@/server/common/auth/sessions";
+import { DoesNotExistError } from "@/server/common/errors";
 import { wrapServerAction } from "@/server/features/decorators";
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
+import * as O from "fp-ts/Option";
+
+import { RetrieveResult } from "./data";
+import { retrieveProjectTemplate } from "./lib";
 
 async function retrieveProjectTemplateImpl(
     userSession: UserSession,

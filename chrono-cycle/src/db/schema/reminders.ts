@@ -1,12 +1,13 @@
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import { pgTable, serial, integer, time, boolean } from "drizzle-orm/pg-core";
-import events from "./events";
-import reminderTemplates from "./reminderTemplates";
+import { boolean, integer, pgTable, serial, time } from "drizzle-orm/pg-core";
 import {
     createInsertSchema,
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+
+import events from "./events";
+import reminderTemplates from "./reminderTemplates";
 
 export const reminders = pgTable("reminders", {
     id: serial("id").primaryKey().unique(),

@@ -1,13 +1,6 @@
 // main navbar
 "use client";
 
-import { useState, useCallback, useEffect, useActionState } from "react";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import HamburgerMenu from "./menu";
-import Logo from "./logo";
-import { Bell, User, UserPen, LogOut } from "lucide-react";
-import Sidebar from "./sidebar";
 import { signOutAction } from "@/server/features/auth/signOut/action";
 import {
     MenuContent,
@@ -16,6 +9,14 @@ import {
     MenuTrigger,
     Text,
 } from "@chakra-ui/react";
+import { Bell, LogOut, User, UserPen } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useActionState, useCallback, useEffect, useState } from "react";
+
+import Logo from "./logo";
+import HamburgerMenu from "./menu";
+import Sidebar from "./sidebar";
 
 const Navbar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false); // handles sidebar

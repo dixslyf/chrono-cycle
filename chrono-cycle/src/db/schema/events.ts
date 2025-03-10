@@ -1,21 +1,22 @@
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
+    boolean,
+    integer,
+    pgEnum,
     pgTable,
     serial,
-    timestamp,
-    integer,
     text,
-    boolean,
-    pgEnum,
+    timestamp,
 } from "drizzle-orm/pg-core";
-import eventTypeEnum from "./eventType";
-import projects from "./projects";
-import eventTemplates from "./eventTemplates";
 import {
     createInsertSchema,
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+
+import eventTemplates from "./eventTemplates";
+import eventTypeEnum from "./eventType";
+import projects from "./projects";
 
 export const statusEnum = pgEnum("status", [
     "none",

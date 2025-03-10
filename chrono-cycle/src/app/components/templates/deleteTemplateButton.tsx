@@ -1,15 +1,12 @@
 "use client";
 
-import { startTransition, useActionState, useEffect } from "react";
-import { Button } from "@mantine/core";
-import { Trash } from "lucide-react";
-
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
-
+import { deleteProjectTemplateAction } from "@/server/features/project-templates/delete/action";
+import { Button } from "@mantine/core";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
-
-import { deleteProjectTemplateAction } from "@/server/features/project-templates/delete/action";
+import { Trash } from "lucide-react";
+import { startTransition, useActionState, useEffect } from "react";
 
 export function DeleteTemplateButton({
     projectTemplateId,

@@ -1,16 +1,16 @@
 "use server";
 
+import { UserSession } from "@/server/common/auth/sessions";
+import { ValidationError } from "@/server/common/errors";
+import { wrapServerAction } from "@/server/features/decorators";
 import * as E from "fp-ts/Either";
 
-import { UserSession } from "@/server/common/auth/sessions";
-import { deleteEventTemplates } from "./lib";
 import {
     DeleteEventTemplateData,
     deleteEventTemplatesDataSchema,
     DeleteEventTemplatesResult,
 } from "./data";
-import { ValidationError } from "@/server/common/errors";
-import { wrapServerAction } from "@/server/features/decorators";
+import { deleteEventTemplates } from "./lib";
 
 async function deleteEventTemplatesImpl(
     userSession: UserSession,

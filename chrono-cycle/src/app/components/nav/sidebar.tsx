@@ -1,12 +1,14 @@
 // side bar component
 "use client";
+
 // import { useEffect } from "react";
-import { usePathname } from "next/navigation";
-import { House, LayoutTemplate, CircleHelp, Cog } from "lucide-react";
+import { CircleHelp, Cog, House, LayoutTemplate } from "lucide-react";
 import Link from "next/link";
-import HamburgerMenu from "./menu";
-import Logo from "./logo";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+
+import Logo from "./logo";
+import HamburgerMenu from "./menu";
 
 interface SidebarProps {
     isSidebarOpen: boolean;

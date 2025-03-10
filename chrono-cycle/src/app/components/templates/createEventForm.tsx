@@ -1,25 +1,5 @@
 "use client";
 
-import * as E from "fp-ts/Either";
-import { startTransition, useActionState, useEffect, useState } from "react";
-import { useForm } from "@mantine/form";
-import { zodResolver } from "mantine-form-zod-resolver";
-import {
-    Button,
-    Checkbox,
-    Group,
-    NumberInput,
-    NativeSelect,
-    TagsInput,
-    Fieldset,
-    Stack,
-    ActionIcon,
-} from "@mantine/core";
-import { TimeInput } from "@mantine/dates";
-
-import { Textarea, TextInput } from "@mantine/core";
-import { pipe } from "fp-ts/lib/function";
-
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { createEventTemplateAction } from "@/server/features/event-templates/create/action";
 import {
@@ -27,7 +7,26 @@ import {
     CreateFormData,
     createFormDataSchema,
 } from "@/server/features/event-templates/create/data";
+import {
+    ActionIcon,
+    Button,
+    Checkbox,
+    Fieldset,
+    Group,
+    NativeSelect,
+    NumberInput,
+    Stack,
+    TagsInput,
+    Textarea,
+    TextInput,
+} from "@mantine/core";
+import { TimeInput } from "@mantine/dates";
+import { useForm } from "@mantine/form";
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/lib/function";
 import { Clock, Plus, Trash } from "lucide-react";
+import { zodResolver } from "mantine-form-zod-resolver";
+import { startTransition, useActionState, useEffect, useState } from "react";
 
 type ReminderData = Required<CreateEventTemplateFormData["reminders"][number]>;
 

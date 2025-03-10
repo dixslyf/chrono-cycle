@@ -1,5 +1,5 @@
-import * as E from "fp-ts/Either";
 import { DoesNotExistError } from "@/server/common/errors";
+import * as E from "fp-ts/Either";
 
 export type DeleteError = DoesNotExistError;
 

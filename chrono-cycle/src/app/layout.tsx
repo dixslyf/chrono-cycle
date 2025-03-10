@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+
 import RootProvider from "./provider";
 
 import "@mantine/core/styles.css";

@@ -1,11 +1,11 @@
-import * as E from "fp-ts/Either";
 import {
     DoesNotExistError,
     InternalError,
     ValidationError,
 } from "@/server/common/errors";
-import { z } from "zod";
 import { encodedIdSchema } from "@/server/common/identifiers";
+import * as E from "fp-ts/Either";
+import { z } from "zod";
 
 export const deleteEventTemplatesDataSchema = z.object({
     eventTemplateIds: z.array(encodedIdSchema),

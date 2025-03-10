@@ -1,14 +1,14 @@
 "use server";
 
-import * as E from "fp-ts/Either";
-import * as O from "fp-ts/Option";
-
 import { UserSession } from "@/server/common/auth/sessions";
-import { deleteProjectTemplate } from "./lib";
-import { DeleteResult } from "./data";
-import { revalidatePath } from "next/cache";
 import { DoesNotExistError } from "@/server/common/errors";
 import { wrapServerAction } from "@/server/features/decorators";
+import * as E from "fp-ts/Either";
+import * as O from "fp-ts/Option";
+import { revalidatePath } from "next/cache";
+
+import { DeleteResult } from "./data";
+import { deleteProjectTemplate } from "./lib";
 
 async function deleteProjectTemplateImpl(
     userSession: UserSession,

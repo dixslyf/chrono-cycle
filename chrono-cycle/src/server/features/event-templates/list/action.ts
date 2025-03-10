@@ -1,12 +1,12 @@
 "use server";
 
-import * as E from "fp-ts/Either";
-
-import { ListResult, listFormDataSchema } from "./data";
-import { listEventTemplates } from "./lib";
 import { UserSession } from "@/server/common/auth/sessions";
 import { ValidationError } from "@/server/common/errors";
 import { wrapServerAction } from "@/server/features/decorators";
+import * as E from "fp-ts/Either";
+
+import { listFormDataSchema, ListResult } from "./data";
+import { listEventTemplates } from "./lib";
 
 async function listEventTemplatesActionImpl(
     userSession: UserSession,

@@ -1,8 +1,8 @@
-import * as E from "fp-ts/Either";
 import { ProjectOverview } from "@/server/common/data";
 import { InternalError, ValidationError } from "@/server/common/errors";
-import { z } from "zod";
 import { encodedIdSchema } from "@/server/common/identifiers";
+import * as E from "fp-ts/Either";
+import { z } from "zod";
 
 export const listProjectsDataSchema = z.object({
     projectTemplateId: encodedIdSchema,

@@ -1,19 +1,16 @@
-import type { DbUser, DbSession } from "@/server/db/schema";
+import getDb from "@/server/db";
+import type { DbSession, DbUser } from "@/server/db/schema";
 import {
     sessions as sessionsTable,
     users as usersTable,
 } from "@/server/db/schema";
-import getDb from "@/server/db";
-
-import { cookies } from "next/headers";
-
-import { eq } from "drizzle-orm";
 import { sha256 } from "@oslojs/crypto/sha2";
-
 import {
     encodeBase32LowerCaseNoPadding,
     encodeHexLowerCase,
 } from "@oslojs/encoding";
+import { eq } from "drizzle-orm";
+import { cookies } from "next/headers";
 
 function sessionIdFromToken(token: string): string {
     // Session ID is the SHA256 hash of the token.

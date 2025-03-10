@@ -1,20 +1,18 @@
 "use client";
 
-import { Modal, Group, Stack, useModalsStack } from "@mantine/core";
+import { notifyError } from "@/app/utils/notifications";
+import { ProjectTemplateOverview } from "@/server/common/data";
+import { retrieveProjectTemplateAction } from "@/server/features/project-templates/retrieve/action";
+import { ProjectTemplateData } from "@/server/features/project-templates/retrieve/data";
+import { Group, Modal, Stack, useModalsStack } from "@mantine/core";
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
 import { DataTable } from "mantine-datatable";
 import { useCallback, useState } from "react";
 
-import * as E from "fp-ts/Either";
-import { pipe } from "fp-ts/function";
-
-import { notifyError } from "@/app/utils/notifications";
-import { TemplateDetails, TemplateDetailsSkeleton } from "./templateDetails";
-import { DeleteTemplateButton } from "./deleteTemplateButton";
-
-import { retrieveProjectTemplateAction } from "@/server/features/project-templates/retrieve/action";
-import { ProjectTemplateOverview } from "@/server/common/data";
-import { ProjectTemplateData } from "@/server/features/project-templates/retrieve/data";
 import { CreateEventTemplateButton } from "./createEventButton";
+import { DeleteTemplateButton } from "./deleteTemplateButton";
+import { TemplateDetails, TemplateDetailsSkeleton } from "./templateDetails";
 
 const columns = [
     { accessor: "name", title: "Name" },

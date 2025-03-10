@@ -1,8 +1,7 @@
 "use client";
 
-import { Text, Skeleton, Stack } from "@mantine/core";
-
 import { ProjectTemplateData } from "@/server/features/project-templates/retrieve/data";
+import { Skeleton, Stack, Text } from "@mantine/core";
 
 export function TemplateDetailsSkeleton(): React.ReactNode {
     return (

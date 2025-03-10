@@ -1,11 +1,11 @@
 "use server";
 
-import * as E from "fp-ts/Either";
-
-import { CreateResult, reminderTemplateCreateSchema } from "./data";
 import { UserSession } from "@/server/common/auth/sessions";
 import { ValidationError } from "@/server/common/errors";
 import { wrapServerAction } from "@/server/features/decorators";
+import * as E from "fp-ts/Either";
+
+import { CreateResult, reminderTemplateCreateSchema } from "./data";
 import { createReminderTemplates } from "./lib";
 
 async function createReminderTemplateActionImpl(

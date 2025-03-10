@@ -1,5 +1,5 @@
-import { type NotificationData, notifications } from "@mantine/notifications";
-import { CircleX, CircleCheck } from "lucide-react";
+import { notifications, type NotificationData } from "@mantine/notifications";
+import { CircleCheck, CircleX } from "lucide-react";
 
 const DEFAULT_ERROR_DATA = {
     title: "An error occurred!",

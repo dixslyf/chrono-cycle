@@ -1,12 +1,13 @@
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import { pgTable, integer, primaryKey } from "drizzle-orm/pg-core";
-import tags from "./tags";
-import eventTemplates from "./eventTemplates";
+import { integer, pgTable, primaryKey } from "drizzle-orm/pg-core";
 import {
     createInsertSchema,
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+
+import eventTemplates from "./eventTemplates";
+import tags from "./tags";
 
 export const eventTemplateTags = pgTable(
     "event_template_tags",

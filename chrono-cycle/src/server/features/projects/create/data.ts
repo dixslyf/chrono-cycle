@@ -1,16 +1,14 @@
-import * as E from "fp-ts/Either";
-
-import { z } from "zod";
-
 import { Project } from "@/server/common/data";
 import {
     DuplicateNameError,
     InternalError,
     ValidationError,
 } from "@/server/common/errors";
-import { projectInsertSchema } from "@/server/db/schema";
 import { encodedIdSchema } from "@/server/common/identifiers";
+import { projectInsertSchema } from "@/server/db/schema";
 import { ListError as ListEventTemplatesError } from "@/server/features/event-templates/list/data";
+import * as E from "fp-ts/Either";
+import { z } from "zod";
 
 export const createFormSchema = z.object({
     name: projectInsertSchema.shape.name,

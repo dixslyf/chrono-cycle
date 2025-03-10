@@ -1,13 +1,13 @@
 "use server";
 
 import { UserSession } from "@/server/common/auth/sessions";
-import { z } from "zod";
+import { getUserSettings } from "@/server/common/auth/users";
 import getDb from "@/server/db";
 import { userSettings } from "@/server/db/schema/userSettings";
+import { wrapServerAction } from "@/server/features/decorators";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { getUserSettings } from "@/server/common/auth/users";
-import { wrapServerAction } from "@/server/features/decorators";
+import { z } from "zod";
 
 const db = await getDb();
 

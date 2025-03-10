@@ -4,7 +4,7 @@ import {
     fetchSettingsAction,
     updateSettingsAction,
 } from "@/server/features/settings/actions";
-import { useState, useEffect, startTransition, useActionState } from "react";
+import { startTransition, useActionState, useEffect, useState } from "react";
 
 const SettingsForm = () => {
     const [startDayOfWeek, setStartDayOfWeek] = useState<string>("Monday");

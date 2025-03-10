@@ -1,14 +1,14 @@
 "use server";
 
-import * as E from "fp-ts/Either";
-
 import { UserSession } from "@/server/common/auth/sessions";
-import { UpdateData, updateDataSchema, UpdateResult } from "./data";
-import { revalidatePath } from "next/cache";
 import { ValidationError } from "@/server/common/errors";
-import { wrapServerAction } from "@/server/features/decorators";
-import { updateProjectTemplate } from "./lib";
 import getDb from "@/server/db";
+import { wrapServerAction } from "@/server/features/decorators";
+import * as E from "fp-ts/Either";
+import { revalidatePath } from "next/cache";
+
+import { UpdateData, updateDataSchema, UpdateResult } from "./data";
+import { updateProjectTemplate } from "./lib";
 
 async function updateProjectTemplateActionImpl(
     userSession: UserSession,

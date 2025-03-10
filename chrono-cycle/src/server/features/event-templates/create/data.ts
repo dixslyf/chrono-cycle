@@ -1,16 +1,15 @@
-import * as E from "fp-ts/Either";
-import { z } from "zod";
-
+import { EventTemplate, tagNameSchema } from "@/server/common/data";
 import {
     DoesNotExistError,
     InternalError,
     ValidationError,
 } from "@/server/common/errors";
-import { eventTemplateInsertSchema } from "@/server/db/schema/eventTemplates";
-import { EventTemplate, tagNameSchema } from "@/server/common/data";
-import { CreateError as CreateTagError } from "@/server/features/tags/create/data";
 import { encodedIdSchema } from "@/server/common/identifiers";
+import { eventTemplateInsertSchema } from "@/server/db/schema/eventTemplates";
 import { reminderTemplateCreateSchema } from "@/server/features/reminder-templates/create/data";
+import { CreateError as CreateTagError } from "@/server/features/tags/create/data";
+import * as E from "fp-ts/Either";
+import { z } from "zod";
 
 export const createFormDataSchema = z
     .object({
@@ -41,14 +40,14 @@ export type CreateReturnData = EventTemplate;
 
 export type CreateError =
     | ValidationError<
-        | "name"
-        | "offsetDays"
-        | "duration"
-        | "note"
-        | "eventType"
-        | "autoReschedule"
-        | "projectTemplateId"
-    >
+          | "name"
+          | "offsetDays"
+          | "duration"
+          | "note"
+          | "eventType"
+          | "autoReschedule"
+          | "projectTemplateId"
+      >
     | DoesNotExistError
     | InternalError
     | CreateTagError;

@@ -1,11 +1,12 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { createUser, createUserSettings } from "@/server/common/auth/users";
 import getDb from "@/server/db";
-import { signUpFormSchema, SignUpFormState } from "./data";
 import { users } from "@/server/db/schema";
 import { wrapServerActionWith } from "@/server/features/decorators";
-import { createUser, createUserSettings } from "@/server/common/auth/users";
+import { eq } from "drizzle-orm";
+
+import { signUpFormSchema, SignUpFormState } from "./data";
 
 async function signUpActionImpl(
     _prevState: SignUpFormState,

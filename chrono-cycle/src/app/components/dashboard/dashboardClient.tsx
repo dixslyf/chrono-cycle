@@ -1,8 +1,11 @@
 "use client";
+
 import { useState } from "react";
+
 import DashNav from "./dashNav";
-import Timeline, { Day, Event } from "./timeline";
-import { Project } from "./timeline"; // should change this
+import Timeline, { Day, Event, Project } from "./timeline";
+
+// should change this
 
 interface DashboardProps {
     months: { value: string; label: string }[];

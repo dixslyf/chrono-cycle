@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import SigninForm from "./signin";
-import SignupForm from "./signup";
+
 import LeftOverlay from "./leftOverlay";
 import RightOverlay from "./rightOverlay";
+import SigninForm from "./signin";
+import SignupForm from "./signup";
 
 const Auth = () => {
     const [isSignUpActive, setSignUpActive] = useState<boolean>(false);

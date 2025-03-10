@@ -1,7 +1,3 @@
-import * as E from "fp-ts/Either";
-
-import { z } from "zod";
-
 import { ProjectTemplateOverview } from "@/server/common/data";
 import {
     DoesNotExistError,
@@ -9,8 +5,10 @@ import {
     InternalError,
     ValidationError,
 } from "@/server/common/errors";
-import { projectTemplateUpdateSchema } from "@/server/db/schema/projectTemplates";
 import { encodedIdSchema } from "@/server/common/identifiers";
+import { projectTemplateUpdateSchema } from "@/server/db/schema/projectTemplates";
+import * as E from "fp-ts/Either";
+import { z } from "zod";
 
 export const updateDataSchema = z.object({
     id: encodedIdSchema,

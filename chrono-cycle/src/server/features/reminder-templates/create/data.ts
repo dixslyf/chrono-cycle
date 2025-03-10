@@ -1,13 +1,12 @@
-import * as E from "fp-ts/Either";
-
+import { ReminderTemplate } from "@/server/common/data";
 import {
     DoesNotExistError,
     InternalError,
     ValidationError,
 } from "@/server/common/errors";
-import { ReminderTemplate } from "@/server/common/data";
-import { reminderTemplateInsertSchema } from "@/server/db/schema";
 import { encodedIdSchema } from "@/server/common/identifiers";
+import { reminderTemplateInsertSchema } from "@/server/db/schema";
+import * as E from "fp-ts/Either";
 import { z } from "zod";
 
 export const reminderTemplateCreateSchema = z.object({
@@ -33,11 +32,11 @@ export function DuplicateReminderError(): DuplicateReminderError {
 
 export type CreateError =
     | ValidationError<
-        | "daysBeforeEvent"
-        | "time"
-        | "emailNotifications"
-        | "desktopNotifications"
-    >
+          | "daysBeforeEvent"
+          | "time"
+          | "emailNotifications"
+          | "desktopNotifications"
+      >
     | DuplicateReminderError
     | DoesNotExistError
     | InternalError;

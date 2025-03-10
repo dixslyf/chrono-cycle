@@ -1,16 +1,16 @@
 "use server";
 
+import { UserSession } from "@/server/common/auth/sessions";
+import { ValidationError } from "@/server/common/errors";
+import { wrapServerAction } from "@/server/features/decorators";
 import * as E from "fp-ts/Either";
 
-import { UserSession } from "@/server/common/auth/sessions";
-import { deleteReminderTemplates } from "./lib";
 import {
     DeleteReminderTemplateData,
     deleteReminderTemplatesDataSchema,
     DeleteReminderTemplatesResult,
 } from "./data";
-import { ValidationError } from "@/server/common/errors";
-import { wrapServerAction } from "@/server/features/decorators";
+import { deleteReminderTemplates } from "./lib";
 
 async function deleteReminderTemplatesImpl(
     userSession: UserSession,

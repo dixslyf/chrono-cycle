@@ -1,15 +1,12 @@
 // template page
 
-import { Group, Stack } from "@mantine/core";
-
-import * as E from "fp-ts/Either";
-import { pipe } from "fp-ts/function";
-
-import { listProjectTemplatesAction } from "@/server/features/project-templates/list/action";
-import { ProjectTemplateOverview } from "@/server/common/data";
-
 import { CreateProjectTemplateButton } from "@/app/components/templates/createTemplateButton";
 import { TemplateTable } from "@/app/components/templates/templateTable";
+import { ProjectTemplateOverview } from "@/server/common/data";
+import { listProjectTemplatesAction } from "@/server/features/project-templates/list/action";
+import { Group, Stack } from "@mantine/core";
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
 
 export default async function Templates() {
     const listProjectTemplatesResult = await listProjectTemplatesAction();

@@ -83,7 +83,7 @@ export function ensureTagsExist(
                 pipe(
                     maybeStoredTag,
                     O.match(
-                        () => { },
+                        () => {},
                         (storedTag) =>
                             storedTagMap.set(storedTag.name, storedTag),
                     ),

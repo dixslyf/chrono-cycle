@@ -1,12 +1,13 @@
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import { pgTable, integer, primaryKey } from "drizzle-orm/pg-core";
-import events from "./events";
-import dependencyTypeEnum from "./dependencyType";
+import { integer, pgTable, primaryKey } from "drizzle-orm/pg-core";
 import {
     createInsertSchema,
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+
+import dependencyTypeEnum from "./dependencyType";
+import events from "./events";
 
 export const eventDependencies = pgTable(
     "event_dependencies",

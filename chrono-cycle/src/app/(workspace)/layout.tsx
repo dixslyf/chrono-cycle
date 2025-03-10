@@ -1,5 +1,5 @@
-import Navbar from "@/app/components/nav/navbar";
 import { wrapAuthRedirectLogin } from "@/app/components/auth/redirectWrapper";
+import Navbar from "@/app/components/nav/navbar";
 
 async function WorkspaceLayout({
     children,

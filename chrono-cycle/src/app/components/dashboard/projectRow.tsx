@@ -1,7 +1,9 @@
 "use client";
-import React from "react";
+
 import { Paper } from "@mantine/core";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import React from "react";
+
 import EventBar from "./eventBar";
 import { Day, Event, Project } from "./timeline";
 

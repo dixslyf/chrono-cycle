@@ -1,22 +1,19 @@
 "use client";
 
-import * as E from "fp-ts/Either";
-import { useActionState, useEffect } from "react";
-import { match, P } from "ts-pattern";
-import { useForm } from "@mantine/form";
-import { zodResolver } from "mantine-form-zod-resolver";
-import { Button, Group } from "@mantine/core";
-
+import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { ValidationIssues } from "@/server/common/errors";
 import { createProjectTemplateAction } from "@/server/features/project-templates/create/action";
 import {
     createFormSchema,
     CreateResult,
 } from "@/server/features/project-templates/create/data";
-import { Textarea, TextInput } from "@mantine/core";
+import { Button, Group, Textarea, TextInput } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
-
-import { notifyError, notifySuccess } from "@/app/utils/notifications";
+import { zodResolver } from "mantine-form-zod-resolver";
+import { useActionState, useEffect } from "react";
+import { match, P } from "ts-pattern";
 
 function getCreateErrorMessage(createState: CreateResult) {
     return match(createState)

@@ -1,13 +1,13 @@
 // sign up component
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
 import { signUpAction } from "@/server/features/auth/signUp/action";
 import {
+    signUpFormSchema,
     type SignUpFormData,
     type SignUpFormErrors,
-    signUpFormSchema,
 } from "@/server/features/auth/signUp/data";
+import { useActionState, useEffect, useState } from "react";
 
 const SignupForm = () => {
     // Server-side action for form submission.

@@ -1,19 +1,20 @@
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
+    date,
+    integer,
     pgTable,
     serial,
-    timestamp,
-    integer,
     text,
+    timestamp,
     unique,
-    date,
 } from "drizzle-orm/pg-core";
-import projectTemplates from "./projectTemplates";
 import {
     createInsertSchema,
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+
+import projectTemplates from "./projectTemplates";
 
 export const projects = pgTable(
     "projects",

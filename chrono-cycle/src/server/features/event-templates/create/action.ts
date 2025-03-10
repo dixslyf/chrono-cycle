@@ -1,12 +1,12 @@
 "use server";
 
-import * as E from "fp-ts/Either";
-
-import { CreateFormData, CreateResult, createFormDataSchema } from "./data";
-import { createEventTemplate } from "./lib";
 import { UserSession } from "@/server/common/auth/sessions";
 import { ValidationError } from "@/server/common/errors";
 import { wrapServerAction } from "@/server/features/decorators";
+import * as E from "fp-ts/Either";
+
+import { CreateFormData, createFormDataSchema, CreateResult } from "./data";
+import { createEventTemplate } from "./lib";
 
 async function createEventTemplateActionImpl(
     userSession: UserSession,

@@ -3,6 +3,7 @@
 import { Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Plus } from "lucide-react";
+
 import { CreateProjectTemplateForm } from "./createTemplateForm";
 
 export function CreateProjectTemplateButton() {
