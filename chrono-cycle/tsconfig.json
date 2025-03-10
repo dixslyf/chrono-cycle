@@ -22,8 +22,10 @@
       "@root/*": ["./*"],
       "@common": ["./src/common"],
       "@common/*": ["./src/common/*"],
-      "@server": ["./src/server"],
-      "@server/*": ["./src/server/*"],
+      "@features": ["./src/features"],
+      "@features/*": ["./src/features/*"],
+      "@lib": ["./src/lib"],
+      "@lib/*": ["./src/lib/*"],
       "@ui/*": ["./src/app/*"],
       "@db": ["./src/db"],
       "@db/*": ["./src/db/*"]
