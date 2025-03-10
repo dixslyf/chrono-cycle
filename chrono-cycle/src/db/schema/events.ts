@@ -17,6 +17,8 @@ import {
 import eventTemplates from "./eventTemplates";
 import eventTypeEnum from "./eventType";
 import projects from "./projects";
+import { DbReminder, DbReminderInsert } from "./reminders";
+import { DbTag, DbTagInsert } from "./tags";
 
 export const statusEnum = pgEnum("status", [
     "none",
@@ -54,6 +56,16 @@ export const events = pgTable("events", {
 
 export type DbEvent = InferSelectModel<typeof events>;
 export type DbEventInsert = InferInsertModel<typeof events>;
+
+export type DbExpandedEvent = {
+    reminders: DbReminder[];
+    tags: DbTag[];
+} & DbEvent;
+
+export type DbExpandedEventInsert = {
+    reminders: DbReminderInsert[];
+    tags: DbTagInsert[];
+} & DbEvent;
 
 export const eventSelectSchema = createSelectSchema(events);
 export const eventInsertSchema = createInsertSchema(events);

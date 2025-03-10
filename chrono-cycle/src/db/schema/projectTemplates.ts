@@ -13,6 +13,10 @@ import {
     createUpdateSchema,
 } from "drizzle-zod";
 
+import {
+    DbExpandedEventTemplate,
+    DbExpandedEventTemplateInsert,
+} from "./eventTemplates";
 import users from "./users";
 
 export const projectTemplates = pgTable(
@@ -46,6 +50,14 @@ export type DbProjectTemplate = InferSelectModel<typeof projectTemplates>;
 export type DbProjectTemplateInsert = InferInsertModel<typeof projectTemplates>;
 export type DbProjectTemplateUpdate = Pick<DbProjectTemplate, "id"> &
     Partial<Omit<DbProjectTemplateInsert, "id" | "createdAt" | "updatedAt">>;
+
+export type DbExpandedProjectTemplate = {
+    events: DbExpandedEventTemplate[];
+} & DbProjectTemplate;
+
+export type DbExpandedProjectTemplateInsert = {
+    events: DbExpandedEventTemplateInsert[];
+} & DbProjectTemplateInsert;
 
 export const projectTemplateSelectSchema = createSelectSchema(projectTemplates);
 export const projectTemplateInsertSchema = createInsertSchema(projectTemplates);
