@@ -1,54 +1,32 @@
 "use server";
 
-import { UserSession } from "@/server/common/auth/sessions";
-import { DuplicateNameError, ValidationError } from "@/server/common/errors";
-import { encodeProjectTemplateId } from "@/server/common/identifiers";
-import { wrapServerAction } from "@/server/features/decorators";
-import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
+import * as TE from "fp-ts/TaskEither";
 import { revalidatePath } from "next/cache";
 
-import { createFormSchema, CreateResult } from "./data";
-import { insertProjectTemplateDb, isDuplicateProjectTemplateName } from "./lib";
+import { UserSession } from "@common/data/userSession";
+
+import { wrapServerAction } from "@features/utils/decorators";
+import { validate } from "@features/utils/validation";
+
+import { bridge } from "./bridge";
+import { payloadSchema, Result } from "./data";
 
 async function createProjectTemplateActionImpl(
     userSession: UserSession,
-    _prevState: CreateResult | null,
-    formData: FormData,
-): Promise<CreateResult> {
-    // Validate form schema.
-    const parseResult = createFormSchema.safeParse({
-        name: formData.get("name"),
-        description: formData.get("description"),
-    });
-
-    if (!parseResult.success) {
-        const formattedZodErrors = parseResult.error.format();
-        return E.left(
-            ValidationError({
-                name: formattedZodErrors.name?._errors || [],
-                description: formattedZodErrors.description?._errors || [],
+    _prevState: Result | null,
+    payload: FormData,
+): Promise<Result> {
+    return await pipe(
+        TE.fromEither(
+            validate(payloadSchema, {
+                name: payload.get("name"),
+                description: payload.get("description"),
             }),
-        );
-    }
-
-    const { name, description } = parseResult.data;
-    const userId = userSession.user.id;
-
-    // Check if name is taken.
-    if (await isDuplicateProjectTemplateName(name, userId)) {
-        return E.left(DuplicateNameError());
-    }
-
-    const inserted = await insertProjectTemplateDb(name, description, userId);
-
-    revalidatePath("/templates");
-    return E.right({
-        id: encodeProjectTemplateId(inserted.id),
-        name: inserted.name,
-        description: inserted.description,
-        createdAt: inserted.createdAt,
-        updatedAt: inserted.updatedAt,
-    });
+        ),
+        TE.chain((payloadP) => bridge(userSession.user.id, payloadP)),
+        TE.tap((_) => TE.fromIO(() => revalidatePath("/templates"))),
+    )();
 }
 
 export const createProjectTemplateAction = wrapServerAction(

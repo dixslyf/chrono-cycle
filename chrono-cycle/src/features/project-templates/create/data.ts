@@ -1,20 +1,21 @@
-import { ProjectTemplateOverview } from "@/server/common/data";
-import { DuplicateNameError, ValidationError } from "@/server/common/errors";
-import { projectTemplateInsertSchema } from "@/server/db/schema/projectTemplates";
 import * as E from "fp-ts/Either";
 import { z } from "zod";
 
-export const createFormSchema = z.object({
+import { ProjectTemplateOverview } from "@common/data/domain";
+import { DuplicateNameError, ValidationError } from "@common/errors";
+
+import { projectTemplateInsertSchema } from "@db/schema";
+
+export const payloadSchema = z.object({
     name: projectTemplateInsertSchema.shape.name,
     description: projectTemplateInsertSchema.shape.description,
 });
 
-export type CreateFormData = z.output<typeof createFormSchema>;
+export type Payload = z.input<typeof payloadSchema>;
+export type ParsedPayload = z.output<typeof payloadSchema>;
 
-export type CreateReturnData = ProjectTemplateOverview;
-
-export type CreateError =
+export type Failure =
     | ValidationError<"name" | "description">
     | DuplicateNameError;
 
-export type CreateResult = E.Either<CreateError, CreateReturnData>;
+export type Result = E.Either<Failure, ProjectTemplateOverview>;
