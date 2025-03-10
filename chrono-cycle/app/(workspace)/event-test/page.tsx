@@ -1,6 +1,6 @@
 "use client";
 
-import DisplayEventDetails from "@/app/components/projects/displayEventDetails";
+import DisplayEventDetails from "@/app/components/event/EventDetails";
 import Link from "next/link";
 import { sampleEvent, sampleEvent2, sampleEvent3 } from "@/app/utils/sampleEventData";
 
