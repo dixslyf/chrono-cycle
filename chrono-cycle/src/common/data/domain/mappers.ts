@@ -1,14 +1,12 @@
 import {
-    Event,
-    EventTemplate,
-    Project,
-    ProjectOverview,
-    ProjectTemplate,
-    ProjectTemplateOverview,
-    Reminder,
-    ReminderTemplate,
-    Tag,
-} from "@common/data/domain";
+    encodeEventId,
+    encodeEventTemplateId,
+    encodeProjectId,
+    encodeProjectTemplateId,
+    encodeReminderId,
+    encodeReminderTemplateId,
+    encodeTagId,
+} from "@lib/identifiers";
 
 import {
     DbExpandedEvent,
@@ -23,14 +21,16 @@ import {
 } from "@db/schema";
 
 import {
-    encodeEventId,
-    encodeEventTemplateId,
-    encodeProjectId,
-    encodeProjectTemplateId,
-    encodeReminderId,
-    encodeReminderTemplateId,
-    encodeTagId,
-} from "./identifiers";
+    Event,
+    EventTemplate,
+    Project,
+    ProjectOverview,
+    ProjectTemplate,
+    ProjectTemplateOverview,
+    Reminder,
+    ReminderTemplate,
+    Tag,
+} from "./types";
 
 export function toProjectTemplateOverview(
     dbPt: DbProjectTemplate,
