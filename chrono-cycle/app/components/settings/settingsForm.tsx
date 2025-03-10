@@ -2,8 +2,18 @@
 
 import { useState, useEffect, startTransition, useActionState } from "react";
 import { updateSettings, fetchSettings } from "@/server/settings/actions";
+import { Select, Button } from "@mantine/core";
+import Toggle from "./toggle";
 
 const SettingsForm = () => {
+    // store initial settings here
+    const [initialSettings, setInitialSettings] = useState<{
+        startDayOfWeek: string;
+        dateFormat: string;
+        enableEmailNotifications: boolean;
+        enableDesktopNotifications: boolean;
+    } | null>(null);
+
     const [startDayOfWeek, setStartDayOfWeek] = useState<string>("Monday");
     const [dateFormat, setDateFormat] = useState<string>("DD/MM/YYYY");
     const [enableEmailNotifications, setEmailNotifications] =
@@ -22,19 +32,34 @@ const SettingsForm = () => {
         const loadSettings = async () => {
             const settingsResponse = await fetchSettings();
             if (settingsResponse.submitSuccess) {
-                setStartDayOfWeek(settingsResponse.startDayOfWeek || "Monday");
-                setDateFormat(settingsResponse.dateFormat || "DD/MM/YYYY");
-                setEmailNotifications(
-                    settingsResponse.enableEmailNotifications || false,
-                );
-                setDesktopNotifications(
-                    settingsResponse.enableDesktopNotifications || false,
-                );
+                const settings = {
+                    startDayOfWeek: settingsResponse.startDayOfWeek || "Monday",
+                    dateFormat: settingsResponse.dateFormat || "DD/MM/YYYY",
+                    enableEmailNotifications:
+                        settingsResponse.enableEmailNotifications || false,
+                    enableDesktopNotifications:
+                        settingsResponse.enableDesktopNotifications || false,
+                };
+                setInitialSettings(settings);
+                setStartDayOfWeek(settings.startDayOfWeek);
+                setDateFormat(settings.dateFormat);
+                setEmailNotifications(settings.enableEmailNotifications);
+                setDesktopNotifications(settings.enableDesktopNotifications);
             }
         };
 
         loadSettings();
     }, []);
+
+    // check if any of the settings have changed
+    const hasChanges =
+        initialSettings &&
+        (startDayOfWeek !== initialSettings.startDayOfWeek ||
+            dateFormat !== initialSettings.dateFormat ||
+            enableEmailNotifications !==
+                initialSettings.enableEmailNotifications ||
+            enableDesktopNotifications !==
+                initialSettings.enableDesktopNotifications);
 
     // Handle form submission
     const handleSubmit = async (event: React.FormEvent) => {
@@ -59,87 +84,92 @@ const SettingsForm = () => {
 
     return (
         <form onSubmit={handleSubmit}>
-            <section>
-                <h1>General</h1>
-                <span>Manage general settings</span>
+            <section className="flex flex-col gap-3">
+                <h1 className="text-4xl font-bold">General</h1>
+                <span className="text-gray-400 font-semibold mb-2">
+                    Manage general settings
+                </span>
 
-                <div>
-                    <label htmlFor="day">Start Day of Week</label>
-                    <select
-                        name="day"
-                        id="day"
-                        value={startDayOfWeek}
-                        onChange={(e) => setStartDayOfWeek(e.target.value)}
-                    >
-                        {["Monday", "Sunday"].map((day) => (
-                            <option value={day} key={day}>
-                                {day}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                <div className="flex justify-between my-2">
+                    <div className="flex w-2/5 justify-between">
+                        <label className="text-xl font-semibold">
+                            Start Day of Week:
+                        </label>
+                        <Select
+                            data={["Monday", "Sunday"]}
+                            value={startDayOfWeek}
+                            onChange={(value, _) => {
+                                setStartDayOfWeek(value ?? "");
+                            }}
+                        />
+                    </div>
 
-                <div>
-                    <label htmlFor="dateFormat">Date Format</label>
-                    <select
-                        name="dateFormat"
-                        id="dateFormat"
-                        value={dateFormat}
-                        onChange={(e) => setDateFormat(e.target.value)}
-                    >
-                        {["MM/DD/YYYY", "DD/MM/YYYY", "YYYY/MM/DD"].map(
-                            (format) => (
-                                <option value={format} key={format}>
-                                    {format}
-                                </option>
-                            ),
-                        )}
-                    </select>
+                    <div className="flex w-2/5 justify-between">
+                        <label className="text-xl font-semibold">
+                            Date Format:
+                        </label>
+                        <Select
+                            data={["MM/DD/YYYY", "DD/MM/YYYY", "YYYY/MM/DD"]}
+                            value={dateFormat}
+                            onChange={(value, _) => setDateFormat(value ?? "")}
+                        />
+                    </div>
                 </div>
                 <hr />
             </section>
 
-            <section>
-                <h1>Notifications</h1>
-                <span>Update your notification preferences</span>
+            <section className="flex flex-col gap-3">
+                <h1 className="text-4xl font-bold">Notifications</h1>
+                <span className="text-gray-400 font-semibold mb-2">
+                    Update your notification preferences
+                </span>
 
-                <div>
-                    <label htmlFor="emailToggle">Email Notifications</label>
-                    <input
-                        type="checkbox"
-                        name="emailToggle"
-                        id="emailToggle"
-                        checked={enableEmailNotifications}
-                        onChange={(e) =>
-                            setEmailNotifications(e.target.checked)
-                        }
-                    />
-                </div>
+                <div className="flex justify-between my-2">
+                    <div className="flex w-2/5 justify-between">
+                        <label className="text-xl font-semibold">
+                            Email Notifications:
+                        </label>
+                        <Toggle
+                            checked={enableEmailNotifications}
+                            onChange={(e) =>
+                                setEmailNotifications(e.target.checked)
+                            }
+                        />
+                    </div>
 
-                <div>
-                    <label htmlFor="desktopToggle">Desktop Notifications</label>
-                    <input
-                        type="checkbox"
-                        name="desktopToggle"
-                        id="desktopToggle"
-                        checked={enableDesktopNotifications}
-                        onChange={(e) =>
-                            setDesktopNotifications(e.target.checked)
-                        }
-                    />
+                    <div className="flex w-2/5 justify-between">
+                        <label className="text-xl font-semibold">
+                            Desktop Notifications:
+                        </label>
+                        <Toggle
+                            checked={enableDesktopNotifications}
+                            onChange={(e) =>
+                                setDesktopNotifications(e.target.checked)
+                            }
+                        />
+                    </div>
                 </div>
                 <hr />
             </section>
 
-            <section>
-                <p>
+            <section className="flex flex-col gap-3 items-center mt-2">
+                <p
+                    className={`font-semibold text-xl ${formStatus.submitSuccess ? "text-green-500" : "text-red-500"}`}
+                >
                     {formStatus.submitSuccess
                         ? "Settings updated successfully!"
                         : formStatus.errorMessage}
                 </p>
-                <button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Saving..." : "Save Changes"}
-                </button>
+                <div className="w-full flex justify-end">
+                    {hasChanges && (
+                        <Button
+                            type="submit"
+                            className="bg-palette2 hover:bg-palette1 transition-colors duration-200 ease-linear"
+                        >
+                            {isSubmitting ? "Saving..." : "Save Changes"}
+                        </Button>
+                    )}
+                </div>
             </section>
         </form>
     );
