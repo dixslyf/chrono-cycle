@@ -8,7 +8,7 @@ import {
     Reminder,
     ReminderTemplate,
     Tag,
-} from "@common/data";
+} from "@common/data/domain";
 
 import {
     DbExpandedEvent,
