@@ -1,6 +1,9 @@
 import { dirname } from "path";
 import { fileURLToPath } from "url";
+
 import { FlatCompat } from "@eslint/eslintrc";
+import importPlugin from "eslint-plugin-import";
+import noRelativeImportPaths from "eslint-plugin-no-relative-import-paths";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 
 import { MIGRATIONS_BASE_PATH } from "./drizzle/shared.js";
@@ -15,6 +18,34 @@ const compat = new FlatCompat({
 const eslintConfig = [
     ...compat.extends("next/core-web-vitals", "next/typescript"),
     eslintPluginPrettierRecommended,
+    {
+        rules: {
+            ...importPlugin.flatConfigs.recommended.rules,
+            "import/no-useless-path-segments": "error",
+            "import/no-self-import": "error",
+        },
+        settings: {
+            "import/parsers": {
+                "@typescript-eslint/parser": [".ts", ".tsx"],
+            },
+            "import/resolver": {
+                typescript: {},
+            },
+        },
+    },
+    {
+        plugins: {
+            "no-relative-import-paths": noRelativeImportPaths,
+        },
+        rules: {
+            "no-relative-import-paths/no-relative-import-paths": [
+                "error",
+                {
+                    allowSameFolder: true,
+                },
+            ],
+        },
+    },
     {
         ignores: [`${MIGRATIONS_BASE_PATH}/*`],
         rules: {
