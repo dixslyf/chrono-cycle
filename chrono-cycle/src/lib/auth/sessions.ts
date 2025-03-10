@@ -1,9 +1,3 @@
-import getDb from "@/server/db";
-import type { DbSession, DbUser } from "@/server/db/schema";
-import {
-    sessions as sessionsTable,
-    users as usersTable,
-} from "@/server/db/schema";
 import { sha256 } from "@oslojs/crypto/sha2";
 import {
     encodeBase32LowerCaseNoPadding,
@@ -11,6 +5,16 @@ import {
 } from "@oslojs/encoding";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
+
+import {
+    Session,
+    toSession,
+    toUserSession,
+    UserSession,
+} from "@common/data/userSession";
+
+import getDb from "@db";
+import { sessions as sessionsTable, users as usersTable } from "@db/schema";
 
 function sessionIdFromToken(token: string): string {
     // Session ID is the SHA256 hash of the token.
@@ -30,23 +34,18 @@ export function generateSessionToken(): string {
 export async function createSession(
     token: string,
     userId: number,
-): Promise<DbSession> {
-    const session: DbSession = {
+): Promise<Session> {
+    const dbSession = {
         id: sessionIdFromToken(token),
         userId,
         expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // Session lasts for 30 days.
     };
 
     const db = await getDb();
-    await db.insert(sessionsTable).values(session);
+    await db.insert(sessionsTable).values(dbSession);
 
-    return session;
+    return toSession(dbSession);
 }
-
-export type UserSession = {
-    session: DbSession;
-    user: DbUser;
-};
 
 export async function validateSessionToken(
     token: string,
@@ -66,25 +65,28 @@ export async function validateSessionToken(
         return null;
     }
 
-    const { user, session } = sessionUserResult[0];
+    const { user: dbUser, session: dbSession } = sessionUserResult[0];
 
     // Session expired.
-    if (Date.now() >= session.expiresAt.getTime()) {
-        invalidateSession(session.id);
+    if (Date.now() >= dbSession.expiresAt.getTime()) {
+        invalidateSession(dbSession.id);
         return null;
     }
 
     // Extend session by 30 days if it is within 10 days of expiry.
-    if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 10) {
-        session.expiresAt = new Date(Date.now() + 1000 + 60 + 60 + 24 + 30);
+    if (
+        Date.now() >=
+        dbSession.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 10
+    ) {
+        dbSession.expiresAt = new Date(Date.now() + 1000 + 60 + 60 + 24 + 30);
         await db
             .update(sessionsTable)
-            .set({ expiresAt: session.expiresAt })
-            .where(eq(sessionsTable.id, session.id));
+            .set({ expiresAt: dbSession.expiresAt })
+            .where(eq(sessionsTable.id, dbSession.id));
     }
 
     // Successful validation if we've reached here.
-    return { session, user };
+    return toUserSession(dbUser, dbSession);
 }
 
 export async function invalidateSession(sessionId: string): Promise<void> {
