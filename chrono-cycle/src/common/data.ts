@@ -8,6 +8,10 @@ export type ProjectTemplateOverview = {
     updatedAt: Date;
 };
 
+export type ProjectTemplate = {
+    events: EventTemplate[];
+} & ProjectTemplateOverview;
+
 export type EventTemplate = {
     id: string; // Encoded ID.
     name: string;
@@ -24,6 +28,7 @@ export type EventTemplate = {
 
 export type ReminderTemplate = {
     id: string; // Encoded ID.
+    eventTemplateId: string; // Encoded ID.
     daysBeforeEvent: number;
     time: string;
     emailNotifications: boolean;
@@ -63,6 +68,7 @@ export type Event = {
 
 export type Reminder = {
     id: string; // Encoded ID.
+    eventId: string; // Encoded ID.
     daysBeforeEvent: number;
     time: string;
     emailNotifications: boolean;
