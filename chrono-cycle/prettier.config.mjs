@@ -1,0 +1,30 @@
+const config = {
+    plugins: ["@ianvs/prettier-plugin-sort-imports"],
+    importOrder: [
+        "<BUILTIN_MODULES>",
+        "",
+        "<THIRD_PARTY_MODULES>",
+        "",
+        "^@root$",
+        "^@root/(.*)$",
+        "",
+        "^@ui$",
+        "^@ui/(.*)$",
+        "",
+        "^@common$",
+        "^@common/(.*)$",
+        "",
+        "^@server$",
+        "^@server/(.*)$",
+        "",
+        "^@db$",
+        "^@db/(.*)$",
+        "",
+        "^[./]",
+        "",
+        "^(?!.*[.]css$)[./].*$",
+        ".css$",
+    ],
+};
+
+export default config;
