@@ -2,7 +2,7 @@
 
 import { useState, useEffect, startTransition, useActionState } from "react";
 import { updateSettings, fetchSettings } from "@/server/settings/actions";
-import { Select, Button } from "@mantine/core";
+import { NativeSelect, Button } from "@mantine/core";
 import Toggle from "./toggle";
 
 const SettingsForm = () => {
@@ -95,11 +95,11 @@ const SettingsForm = () => {
                         <label className="text-xl font-semibold">
                             Start Day of Week:
                         </label>
-                        <Select
+                        <NativeSelect
                             data={["Monday", "Sunday"]}
                             value={startDayOfWeek}
-                            onChange={(value, _) => {
-                                setStartDayOfWeek(value ?? "");
+                            onChange={(event) => {
+                                setStartDayOfWeek(event.currentTarget.value);
                             }}
                         />
                     </div>
@@ -108,10 +108,12 @@ const SettingsForm = () => {
                         <label className="text-xl font-semibold">
                             Date Format:
                         </label>
-                        <Select
+                        <NativeSelect
                             data={["MM/DD/YYYY", "DD/MM/YYYY", "YYYY/MM/DD"]}
                             value={dateFormat}
-                            onChange={(value, _) => setDateFormat(value ?? "")}
+                            onChange={(event) =>
+                                setDateFormat(event.currentTarget.value)
+                            }
                         />
                     </div>
                 </div>
