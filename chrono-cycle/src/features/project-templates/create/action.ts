@@ -1,22 +1,25 @@
 "use server";
 
+import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 import { revalidatePath } from "next/cache";
 
+import { ProjectTemplateOverview } from "@common/data/domain";
 import { UserSession } from "@common/data/userSession";
+import { RestoreAssertionError } from "@common/errors";
 
 import { wrapServerAction } from "@features/utils/decorators";
 import { validate } from "@features/utils/validation";
 
 import { bridge } from "./bridge";
-import { payloadSchema, Result } from "./data";
+import { Failure, payloadSchema, Result } from "./data";
 
 async function createProjectTemplateActionImpl(
     userSession: UserSession,
     _prevState: Result | null,
     payload: FormData,
-): Promise<Result> {
+): Promise<E.Either<RestoreAssertionError<Failure>, ProjectTemplateOverview>> {
     return await pipe(
         TE.fromEither(
             validate(payloadSchema, {
@@ -24,7 +27,7 @@ async function createProjectTemplateActionImpl(
                 description: payload.get("description"),
             }),
         ),
-        TE.chain((payloadP) => bridge(userSession.user.id, payloadP)),
+        TE.chainW((payloadP) => bridge(userSession.user.id, payloadP)),
         TE.tap((_) => TE.fromIO(() => revalidatePath("/templates"))),
     )();
 }

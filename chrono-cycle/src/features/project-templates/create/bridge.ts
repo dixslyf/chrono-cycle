@@ -5,12 +5,13 @@ import {
     ProjectTemplateOverview,
     toProjectTemplateOverview,
 } from "@common/data/domain";
+import { DuplicateNameError } from "@common/errors";
 
 import getDb from "@db";
 import { createProjectTemplate } from "@db/queries/project-templates/create";
 import { DbProjectTemplateInsert } from "@db/schema";
 
-import { Failure, ParsedPayload } from "./data";
+import { ParsedPayload } from "./data";
 
 function toDbInsert(
     userId: number,
@@ -25,7 +26,7 @@ function toDbInsert(
 export function bridge(
     userId: number,
     payloadP: ParsedPayload,
-): TE.TaskEither<Failure, ProjectTemplateOverview> {
+): TE.TaskEither<DuplicateNameError, ProjectTemplateOverview> {
     return pipe(
         TE.fromTask(() => getDb()),
         TE.chain((db) =>
