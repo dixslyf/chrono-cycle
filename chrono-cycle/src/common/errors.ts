@@ -50,6 +50,12 @@ export function InternalError(context?: string): InternalError {
     };
 }
 
+export type EraseAssertionError<E> = Exclude<E, AssertionError> | InternalError;
+
+export type RestoreAssertionError<E> =
+    | Exclude<E, InternalError>
+    | AssertionError;
+
 export type ValidationIssues<K extends string = never> = {
     [Key in K]: string[];
 };
