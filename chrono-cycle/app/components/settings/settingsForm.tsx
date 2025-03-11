@@ -61,6 +61,24 @@ const SettingsForm = () => {
             enableDesktopNotifications !==
                 initialSettings.enableDesktopNotifications);
 
+    // update intial settings after submit to persist locally
+    useEffect(() => {
+        if (formStatus.submitSuccess) {
+            setInitialSettings({
+                startDayOfWeek,
+                dateFormat,
+                enableEmailNotifications,
+                enableDesktopNotifications,
+            });
+        }
+    }, [
+        formStatus.submitSuccess,
+        startDayOfWeek,
+        dateFormat,
+        enableEmailNotifications,
+        enableDesktopNotifications,
+    ]);
+
     // Handle form submission
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -162,16 +180,6 @@ const SettingsForm = () => {
                         ? "Settings updated successfully!"
                         : formStatus.errorMessage}
                 </p>
-                {/* <div className="w-full flex justify-end">
-                    {hasChanges && (
-                        <Button
-                            type="submit"
-                            className="bg-palette2 hover:bg-palette1 transition-colors duration-200 ease-linear"
-                        >
-                            {isSubmitting ? "Saving..." : "Save Changes"}
-                        </Button>
-                    )}
-                </div> */}
                 <div className="w-full flex justify-end">
                     <Button
                         type="submit"
