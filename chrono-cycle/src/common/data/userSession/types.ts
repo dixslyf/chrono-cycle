@@ -6,7 +6,7 @@ export type User = {
 };
 
 export type Session = {
-    token: string;
+    id: string;
     expiresAt: Date;
 };
 

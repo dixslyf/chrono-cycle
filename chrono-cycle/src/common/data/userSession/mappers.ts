@@ -10,7 +10,7 @@ export function toUser(dbUser: DbUser): User {
 export function toSession(dbSession: DbSession): Session {
     const { id, expiresAt } = dbSession;
     return {
-        token: id,
+        id,
         expiresAt,
     };
 }
