@@ -16,7 +16,7 @@ import { toUserSession, UserSession } from "@common/data/userSession";
 
 import getDb from "@db";
 
-function sessionIdFromToken(token: string): string {
+export function sessionIdFromToken(token: string): string {
     // Session ID is the SHA256 hash of the token.
     return encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 }

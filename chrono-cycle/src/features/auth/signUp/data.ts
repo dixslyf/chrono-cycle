@@ -1,4 +1,11 @@
+import * as E from "fp-ts/Either";
 import { z } from "zod";
+
+import {
+    DuplicateNameError,
+    InternalError,
+    ValidationError,
+} from "@common/errors";
 
 export const usernameSchema = z
     .string()
@@ -20,22 +27,18 @@ export const passwordSchema = z
     .min(8, "Password must be at least 8 characters long")
     .max(128, "Password cannot exceed 128 characters");
 
-export const signUpFormSchema = z.object({
+export const payloadSchema = z.object({
     username: usernameSchema,
     email: emailSchema,
     password: passwordSchema,
 });
 
-export type SignUpFormData = z.output<typeof signUpFormSchema>;
+export type Payload = z.input<typeof payloadSchema>;
+export type ParsedPayload = z.output<typeof payloadSchema>;
 
-export type SignUpFormErrors = {
-    username?: string;
-    email?: string;
-    password?: string;
-};
+export type Failure =
+    | ValidationError<"username" | "email" | "password">
+    | DuplicateNameError
+    | InternalError;
 
-export type SignUpFormState = {
-    submitSuccess: boolean;
-    errorMessage?: string;
-    errors?: SignUpFormErrors;
-};
+export type Result = E.Either<Failure, void>;
