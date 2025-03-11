@@ -1,22 +1,32 @@
 "use server";
 
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/lib/function";
+import * as TE from "fp-ts/TaskEither";
+import { redirect } from "next/navigation";
+
+import { UserSession } from "@root/src/common/data/userSession";
+import { RestoreAssertionError } from "@root/src/common/errors";
+
+import { wrapServerAction } from "@features/utils/decorators";
+
 import {
     deleteSessionTokenCookie,
     invalidateSession,
-    UserSession,
-} from "@/server/common/auth/sessions";
-import { wrapServerAction } from "@/server/features/decorators";
-import { redirect } from "next/navigation";
+} from "@lib/auth/sessions";
 
-import { type SignOutFormState } from "./data";
+import { Failure } from "./data";
 
 async function signOutActionImpl(
     userSession: UserSession,
-): Promise<SignOutFormState> {
-    invalidateSession(userSession.session.id);
-    deleteSessionTokenCookie();
+): Promise<E.Either<RestoreAssertionError<Failure>, never>> {
+    const task = pipe(
+        () => invalidateSession(userSession.session.id),
+        TE.chain(() => TE.fromTask(deleteSessionTokenCookie)),
+        TE.map(() => redirect("/")),
+    );
 
-    return redirect("/");
+    return await task();
 }
 
 export const signOutAction = wrapServerAction("signOut", signOutActionImpl);
