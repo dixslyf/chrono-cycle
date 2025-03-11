@@ -1,70 +1,30 @@
 "use server";
 
-import { verifyPassword } from "@/server/common/auth/passwords";
-import {
-    createSession,
-    generateSessionToken,
-    setSessionTokenCookie,
-} from "@/server/common/auth/sessions";
-import { getUserFromUsername } from "@/server/common/auth/users";
-import { wrapServerActionWith } from "@/server/features/decorators";
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
+import * as TE from "fp-ts/TaskEither";
 import { redirect } from "next/navigation";
 
-import { signInFormSchema, SignInFormState } from "./data";
+import { RestoreAssertionError } from "@common/errors";
+
+import { wrapServerActionWith } from "@features/utils/decorators";
+import { validate } from "@features/utils/validation";
+
+import { bridge } from "./bridge";
+import { Failure, Payload, payloadSchema, Result } from "./data";
 
 async function signInActionImpl(
-    _prevState: SignInFormState,
-    formData: FormData,
-): Promise<SignInFormState> {
+    _prevState: Result | null,
+    payload: Payload,
+): Promise<E.Either<RestoreAssertionError<Failure>, never>> {
     // Validate form inputs.
-    const parseResult = signInFormSchema.safeParse({
-        username: formData.get("username"),
-        password: formData.get("password"),
-        remember: formData.get("remember"),
-    });
+    const task = pipe(
+        TE.fromEither(validate(payloadSchema, payload)),
+        TE.chainW((payloadP) => bridge(payloadP)),
+        TE.map(() => redirect("/dashboard")),
+    );
 
-    if (!parseResult.success) {
-        const formattedZodErrors = parseResult.error.format();
-        return {
-            errorMessage: "Invalid or missing fields",
-            errors: {
-                username: formattedZodErrors.username?._errors[0],
-                password: formattedZodErrors.password?._errors[0],
-            },
-        };
-    }
-
-    const { username, password, remember } = parseResult.data;
-
-    // Check if the user exists.
-    const user = await getUserFromUsername(username);
-    if (!user) {
-        return {
-            errorMessage: "Incorrect username or password",
-        };
-    }
-
-    // Check if the password is correct.
-    const passwordCorrect = await verifyPassword(user.hashedPassword, password);
-    if (!passwordCorrect) {
-        return {
-            errorMessage: "Incorrect username or password",
-        };
-    }
-
-    // Create session.
-    const sessionToken = generateSessionToken();
-    const session = await createSession(sessionToken, user.id);
-
-    if (remember) {
-        // If "remember me", create a cookie that lasts until the session expiry.
-        await setSessionTokenCookie(sessionToken, session.expiresAt);
-    } else {
-        // Otherwise, set no expiry (meaning the cookie will expire at the end of the browser session).
-        await setSessionTokenCookie(sessionToken, undefined);
-    }
-
-    return redirect("/dashboard");
+    return await task();
 }
 
 export const signInAction = wrapServerActionWith(

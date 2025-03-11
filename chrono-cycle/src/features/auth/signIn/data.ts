@@ -1,4 +1,7 @@
+import * as E from "fp-ts/Either";
 import { z } from "zod";
+
+import { InvalidCredentialsError, ValidationError } from "@common/errors";
 
 export const usernameSchema = z
     .string()
@@ -8,22 +11,19 @@ export const passwordSchema = z
     .string()
     .nonempty("Please enter your password.");
 
-export const rememberSchema = z.string().optional().nullable();
+export const rememberSchema = z.boolean();
 
-export const signInFormSchema = z.object({
+export const payloadSchema = z.object({
     username: usernameSchema,
     password: passwordSchema,
     remember: rememberSchema,
 });
 
-export type SignInFormData = z.output<typeof signInFormSchema>;
+export type Payload = z.input<typeof payloadSchema>;
+export type ParsedPayload = z.output<typeof payloadSchema>;
 
-export type SignInFormErrors = {
-    username?: string;
-    password?: string;
-};
+export type Failure =
+    | ValidationError<"username" | "password" | "remember">
+    | InvalidCredentialsError;
 
-export type SignInFormState = {
-    errorMessage?: string;
-    errors?: SignInFormErrors;
-};
+export type Result = E.Either<Failure, void>;
