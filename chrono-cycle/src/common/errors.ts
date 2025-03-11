@@ -70,3 +70,13 @@ export function ValidationError<K extends string = never>(
 ): ValidationError<K> {
     return { _errorKind: "ValidationError", issues };
 }
+
+export type InvalidCredentialsError = {
+    _errorKind: "InvalidCredentialsError";
+};
+
+export function InvalidCredentialsError(): InvalidCredentialsError {
+    return {
+        _errorKind: "InvalidCredentialsError",
+    };
+}
