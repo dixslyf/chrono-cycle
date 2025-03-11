@@ -1,13 +1,18 @@
-import { BaseError, InternalError } from "@/common/errors";
-import { authLogger, serverActionLogger } from "@/server/features/utils/log";
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
+import * as T from "fp-ts/Task";
+import * as TO from "fp-ts/TaskOption";
+import { redirect } from "next/navigation";
+
+import { UserSession } from "@common/data/userSession";
+import { BaseError, InternalError } from "@common/errors";
+
+import { authLogger, serverActionLogger } from "@features/utils/log";
+
 import {
     getCurrentUserSession,
     getSessionTokenFromCookie,
-    UserSession,
-} from "@/server/lib/auth/sessions";
-import * as E from "fp-ts/Either";
-import { pipe } from "fp-ts/function";
-import { redirect } from "next/navigation";
+} from "@lib/auth/sessions";
 
 type NormalisedArgsFunction<A extends unknown[], R> = (
     ...args: A
@@ -22,26 +27,33 @@ export function wrapAuth<A extends unknown[], R>(
     label: string,
     f: UserSessionArgFunction<A, R>,
 ): NormalisedArgsFunction<A, R> {
-    return async function (...args: A): Promise<R> {
-        // Verify user identity and redirect if authentication failed..
-        const userSession = await getCurrentUserSession();
-        if (!userSession) {
-            const token = await getSessionTokenFromCookie();
-            authLogger.warn(
-                { token },
-                `Authentication failed while invoking "${label}"`,
-            );
-            redirect("/");
-        }
+    return async function(...args: A): Promise<R> {
+        const task = pipe(
+            // Verify user identity.
+            getCurrentUserSession,
+            TO.tapIO((userSession) =>
+                authLogger.info(
+                    userSession,
+                    `Authentication succeeded for "${label}"`,
+                ),
+            ),
+            TO.map((userSession) => f(userSession, ...args)),
+            // Redirect if authentication failed.
+            TO.getOrElseW(() =>
+                pipe(
+                    getSessionTokenFromCookie(),
+                    T.flatMapIO((maybeToken) =>
+                        authLogger.warn(
+                            { maybeToken },
+                            `Authentication failed while invoking "${label}"`,
+                        ),
+                    ),
+                    T.map(() => redirect("/")),
+                ),
+            ),
+        );
 
-        const logData = {
-            sessionToken: userSession.session.id,
-            sessionExpiry: userSession.session.expiresAt,
-            userId: userSession.user.id,
-            username: userSession.user.username,
-        };
-        authLogger.info(logData, `Authentication succeeded for "${label}"`);
-        return f(userSession, ...args);
+        return await task();
     };
 }
 
@@ -49,7 +61,7 @@ export function wrapLog<A extends unknown[], R>(
     label: string,
     f: NormalisedArgsFunction<A, R>,
 ): NormalisedArgsFunction<A, R> {
-    return async function (...args: A): Promise<R> {
+    return async function(...args: A): Promise<R> {
         serverActionLogger.trace({ args }, `Invoked "${label}"`);
 
         return f(...args).then((returnValue) => {
@@ -62,7 +74,7 @@ export function wrapLog<A extends unknown[], R>(
 export function wrapTryCatch<A extends unknown[], E extends BaseError, R>(
     f: NormalisedArgsFunction<A, E.Either<E, R>>,
 ): NormalisedArgsFunction<A, E.Either<E | InternalError, R>> {
-    return async function (
+    return async function(
         ...args: A
     ): Promise<E.Either<E | InternalError, R>> {
         try {
@@ -108,9 +120,9 @@ export function wrapServerActionWith<
 ): NormalisedArgsFunction<A, E.Either<E | InternalError, R>> {
     const newF = options.auth
         ? wrapAuth(
-              label,
-              f as UserSessionArgFunction<A, E.Either<E | InternalError, R>>,
-          )
+            label,
+            f as UserSessionArgFunction<A, E.Either<E | InternalError, R>>,
+        )
         : (f as NormalisedArgsFunction<A, E.Either<E | InternalError, R>>);
 
     return wrapLog(label, wrapTryCatch(newF));
