@@ -24,8 +24,10 @@ export const userSettings = pgTable("user_settings", {
         .references(() => users.id, { onDelete: "cascade" })
         .primaryKey()
         .notNull(),
-    startDayOfWeek: startDayOfWeekEnum("start_day_of_week").notNull(),
-    dateFormat: dateFormatEnum("date_format").notNull(),
+    startDayOfWeek: startDayOfWeekEnum("start_day_of_week")
+        .notNull()
+        .default("Monday"),
+    dateFormat: dateFormatEnum("date_format").notNull().default("DD/MM/YYYY"),
     enableEmailNotifications: boolean("enable_email_notifications")
         .notNull()
         .default(false),
