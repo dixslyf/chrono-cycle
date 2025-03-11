@@ -5,7 +5,7 @@ import * as TO from "fp-ts/TaskOption";
 import { redirect } from "next/navigation";
 
 import { UserSession } from "@common/data/userSession";
-import { BaseError, InternalError } from "@common/errors";
+import { AssertionError, BaseError, InternalError } from "@common/errors";
 
 import { authLogger, serverActionLogger } from "@features/utils/log";
 
@@ -73,10 +73,13 @@ export function wrapLog<A extends unknown[], R>(
 
 export function wrapTryCatch<A extends unknown[], E extends BaseError, R>(
     f: NormalisedArgsFunction<A, E.Either<E, R>>,
-): NormalisedArgsFunction<A, E.Either<E | InternalError, R>> {
+): NormalisedArgsFunction<
+    A,
+    E.Either<Exclude<E, AssertionError> | InternalError, R>
+> {
     return async function(
         ...args: A
-    ): Promise<E.Either<E | InternalError, R>> {
+    ): Promise<E.Either<Exclude<E, AssertionError> | InternalError, R>> {
         try {
             const result = await f(...args);
 
@@ -88,7 +91,7 @@ export function wrapTryCatch<A extends unknown[], E extends BaseError, R>(
                         serverActionLogger.err(err, "An assertion failed");
                         return InternalError();
                     }
-                    return err;
+                    return err as Exclude<E, AssertionError>;
                 }),
             );
         } catch (err) {
@@ -117,7 +120,10 @@ export function wrapServerActionWith<
     f: O extends { auth: false }
         ? NormalisedArgsFunction<A, E.Either<E | InternalError, R>>
         : UserSessionArgFunction<A, E.Either<E | InternalError, R>>,
-): NormalisedArgsFunction<A, E.Either<E | InternalError, R>> {
+): NormalisedArgsFunction<
+    A,
+    E.Either<Exclude<E, AssertionError> | InternalError, R>
+> {
     const newF = options.auth
         ? wrapAuth(
             label,
