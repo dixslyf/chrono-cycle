@@ -1,15 +1,24 @@
-import { DoesNotExistError } from "@/server/common/errors";
 import * as E from "fp-ts/Either";
+import { z } from "zod";
 
-export type ProjectTemplateData = {
-    id: string; // Encoded ID.
-    name: string;
-    description: string;
-    createdAt: Date;
-    updatedAt: Date;
-    // TODO: Add more in the future (e.g., event data).
-};
+import {
+    DoesNotExistError,
+    InternalError,
+    ValidationError,
+} from "@common/errors";
 
-export type RetrieveError = DoesNotExistError;
+import { encodedIdSchema } from "@lib/identifiers";
 
-export type RetrieveResult = E.Either<RetrieveError, ProjectTemplateData>;
+export const payloadSchema = z.object({
+    projectTemplateId: encodedIdSchema,
+});
+
+export type Payload = z.input<typeof payloadSchema>;
+export type ParsedPayload = z.output<typeof payloadSchema>;
+
+export type Failure =
+    | ValidationError<"projectTemplateId">
+    | DoesNotExistError
+    | InternalError;
+
+export type Result = E.Either<Failure, void>;
