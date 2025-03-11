@@ -84,8 +84,8 @@ const SettingsForm = () => {
 
     return (
         <form onSubmit={handleSubmit}>
-            <section className="flex flex-col gap-3">
-                <h1 className="text-4xl font-bold">General</h1>
+            <section className="pb-8 flex flex-col gap-3">
+                <h2 className="text-3xl font-bold">General</h2>
                 <span className="text-gray-400 font-semibold mb-2">
                     Manage general settings
                 </span>
@@ -121,7 +121,7 @@ const SettingsForm = () => {
             </section>
 
             <section className="flex flex-col gap-3">
-                <h1 className="text-4xl font-bold">Notifications</h1>
+                <h2 className="text-3xl font-bold">Notifications</h2>
                 <span className="text-gray-400 font-semibold mb-2">
                     Update your notification preferences
                 </span>
@@ -162,7 +162,7 @@ const SettingsForm = () => {
                         ? "Settings updated successfully!"
                         : formStatus.errorMessage}
                 </p>
-                <div className="w-full flex justify-end">
+                {/* <div className="w-full flex justify-end">
                     {hasChanges && (
                         <Button
                             type="submit"
@@ -171,6 +171,21 @@ const SettingsForm = () => {
                             {isSubmitting ? "Saving..." : "Save Changes"}
                         </Button>
                     )}
+                </div> */}
+                <div className="w-full flex justify-end">
+                    <Button
+                        type="submit"
+                        disabled={!hasChanges || isSubmitting}
+                        loading={isSubmitting}
+                        // className="bg-palette2 hover:bg-palette1 transition-colors duration-200 ease-linear"
+                        className={`transition-colors duration-200 ease-linear ${
+                            !hasChanges || isSubmitting
+                                ? "bg-gray-400 cursor-default text-palette3"
+                                : "bg-palette2 hover:bg-palette1"
+                        }`}
+                    >
+                        Save Changes
+                    </Button>
                 </div>
             </section>
         </form>
