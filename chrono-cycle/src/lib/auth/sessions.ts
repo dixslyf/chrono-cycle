@@ -3,18 +3,18 @@ import {
     encodeBase32LowerCaseNoPadding,
     encodeHexLowerCase,
 } from "@oslojs/encoding";
-import { eq } from "drizzle-orm";
+import { pipe } from "fp-ts/function";
+import * as O from "fp-ts/Option";
+import * as TE from "fp-ts/TaskEither";
+import * as TO from "fp-ts/TaskOption";
 import { cookies } from "next/headers";
 
-import {
-    Session,
-    toSession,
-    toUserSession,
-    UserSession,
-} from "@common/data/userSession";
+import { deleteSession } from "@root/src/db/queries/auth/deleteSession";
+import { retrieveUserSession } from "@root/src/db/queries/auth/retrieveUserSession";
+
+import { toUserSession, UserSession } from "@common/data/userSession";
 
 import getDb from "@db";
-import { sessions as sessionsTable, users as usersTable } from "@db/schema";
 
 function sessionIdFromToken(token: string): string {
     // Session ID is the SHA256 hash of the token.
@@ -31,67 +31,30 @@ export function generateSessionToken(): string {
     return token;
 }
 
-export async function createSession(
+export function validateSessionToken(
     token: string,
-    userId: number,
-): Promise<Session> {
-    const dbSession = {
-        id: sessionIdFromToken(token),
-        userId,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // Session lasts for 30 days.
-    };
-
-    const db = await getDb();
-    await db.insert(sessionsTable).values(dbSession);
-
-    return toSession(dbSession);
-}
-
-export async function validateSessionToken(
-    token: string,
-): Promise<UserSession | null> {
-    const db = await getDb();
-
+): TO.TaskOption<UserSession> {
     const sessionId = sessionIdFromToken(token);
+    return pipe(
+        TE.fromTask(getDb),
+        TE.chain((db) => retrieveUserSession(db, sessionId)),
+        TO.fromTaskEither,
+        TO.chain((dbUserSession) => {
+            // Session expired.
+            if (Date.now() >= dbUserSession.session.expiresAt.getTime()) {
+                invalidateSession(dbUserSession.session.id);
+                return TO.none;
+            }
 
-    // Select the session and the user matching the sessionId.
-    const sessionUserResult = await db
-        .select({ user: usersTable, session: sessionsTable })
-        .from(sessionsTable)
-        .innerJoin(usersTable, eq(sessionsTable.userId, usersTable.id))
-        .where(eq(sessionsTable.id, sessionId));
-
-    if (sessionUserResult.length < 1) {
-        return null;
-    }
-
-    const { user: dbUser, session: dbSession } = sessionUserResult[0];
-
-    // Session expired.
-    if (Date.now() >= dbSession.expiresAt.getTime()) {
-        invalidateSession(dbSession.id);
-        return null;
-    }
-
-    // Extend session by 30 days if it is within 10 days of expiry.
-    if (
-        Date.now() >=
-        dbSession.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 10
-    ) {
-        dbSession.expiresAt = new Date(Date.now() + 1000 + 60 + 60 + 24 + 30);
-        await db
-            .update(sessionsTable)
-            .set({ expiresAt: dbSession.expiresAt })
-            .where(eq(sessionsTable.id, dbSession.id));
-    }
-
-    // Successful validation if we've reached here.
-    return toUserSession(dbUser, dbSession);
+            // Successful validation.
+            return TO.some(toUserSession(dbUserSession));
+        }),
+    );
 }
 
 export async function invalidateSession(sessionId: string): Promise<void> {
     const db = await getDb();
-    await db.delete(sessionsTable).where(eq(sessionsTable.id, sessionId));
+    deleteSession(db, sessionId);
 }
 
 export async function setSessionTokenCookie(
@@ -119,17 +82,20 @@ export async function deleteSessionTokenCookie(): Promise<void> {
     });
 }
 
-export async function getSessionTokenFromCookie(): Promise<string | null> {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("session")?.value ?? null;
-    return token;
+export function getSessionTokenFromCookie(): TO.TaskOption<string> {
+    return pipe(
+        TO.fromTask(() => cookies()),
+        TO.chain((cookieStore) =>
+            TO.fromNullable(cookieStore.get("session")?.value),
+        ),
+    );
 }
 
-export async function getCurrentUserSession(): Promise<UserSession | null> {
-    const token = await getSessionTokenFromCookie();
-    if (token === null) {
-        return null;
-    }
-    const result = await validateSessionToken(token);
-    return result;
+export async function getCurrentUserSession(): Promise<O.Option<UserSession>> {
+    const task = pipe(
+        getSessionTokenFromCookie(),
+        TO.chain((token) => validateSessionToken(token)),
+    );
+
+    return await task();
 }

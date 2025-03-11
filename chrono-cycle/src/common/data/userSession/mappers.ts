@@ -15,12 +15,12 @@ export function toSession(dbSession: DbSession): Session {
     };
 }
 
-export function toUserSession(
-    dbUser: DbUser,
-    dbSession: DbSession,
-): UserSession {
+export function toUserSession(dbUserSession: {
+    user: DbUser;
+    session: DbSession;
+}): UserSession {
     return {
-        user: toUser(dbUser),
-        session: toSession(dbSession),
+        user: toUser(dbUserSession.user),
+        session: toSession(dbUserSession.session),
     };
 }
