@@ -1,8 +1,8 @@
-import { ProjectTemplateOverview } from "@/server/common/data";
 import * as E from "fp-ts/Either";
 
-export type ListReturnData = ProjectTemplateOverview;
+import { ProjectTemplateOverview } from "@common/data/domain";
+import { InternalError } from "@common/errors";
 
-export type ListError = void;
+export type Failure = InternalError;
 
-export type ListResult = E.Either<ListError, ListReturnData[]>;
+export type Result = E.Either<Failure, ProjectTemplateOverview[]>;

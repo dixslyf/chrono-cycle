@@ -1,18 +1,19 @@
 "use server";
 
-import { UserSession } from "@/server/common/auth/sessions";
-import { wrapServerAction } from "@/server/features/decorators";
 import * as E from "fp-ts/Either";
 
-import { ListResult } from "./data";
-import { getProjectTemplatesForUser } from "./lib";
+import { ProjectTemplateOverview } from "@common/data/domain";
+import { UserSession } from "@common/data/userSession";
+
+import { wrapServerAction } from "@features/utils/decorators";
+
+import { bridge } from "./bridge";
 
 async function listProjectTemplatesImpl(
     userSession: UserSession,
-): Promise<ListResult> {
-    // Fetch project templates for the user.
-    const userId = userSession.user.id;
-    return E.right(await getProjectTemplatesForUser(userId));
+): Promise<E.Either<never, ProjectTemplateOverview[]>> {
+    const task = bridge(userSession.user.id);
+    return await task();
 }
 
 export const listProjectTemplatesAction = wrapServerAction(
