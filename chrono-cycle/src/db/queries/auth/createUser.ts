@@ -21,7 +21,10 @@ export async function createUser(
 ): Promise<DbExpandedUser> {
     return db.transaction(async (tx) => {
         const user = (await tx.insert(users).values(toInsert).returning())[0];
-        const settings = await createUserSettings(tx, { userId: user.id });
+        const settings = await createUserSettings(tx, {
+            userId: user.id,
+            ...toInsert.settings,
+        });
         return {
             ...user,
             settings,

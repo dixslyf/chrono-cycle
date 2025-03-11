@@ -6,7 +6,7 @@ import {
     createUpdateSchema,
 } from "drizzle-zod";
 
-import { DbUserSettings } from "./userSettings";
+import { DbUserSettings, DbUserSettingsInsert } from "./userSettings";
 
 export const users = pgTable("users", {
     id: serial("id").primaryKey().unique(),
@@ -26,7 +26,7 @@ export type DbUserInsert = InferInsertModel<typeof users>;
 
 export type DbExpandedUser = DbUser & { settings: DbUserSettings };
 export type DbExpandedUserInsert = DbUserInsert & {
-    settings: Omit<DbUserSettings, "userId">;
+    settings?: Omit<DbUserSettingsInsert, "userId"> | undefined;
 };
 
 export const userSelectSchema = createSelectSchema(users);
