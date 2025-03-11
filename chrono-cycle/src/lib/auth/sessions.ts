@@ -3,18 +3,19 @@ import {
     encodeBase32LowerCaseNoPadding,
     encodeHexLowerCase,
 } from "@oslojs/encoding";
+import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import * as TO from "fp-ts/TaskOption";
 import { cookies } from "next/headers";
 
-import { deleteSession } from "@root/src/db/queries/auth/deleteSession";
-import { retrieveUserSession } from "@root/src/db/queries/auth/retrieveUserSession";
-
 import { toUserSession, UserSession } from "@common/data/userSession";
+import { AssertionError, DoesNotExistError } from "@common/errors";
 
 import getDb from "@db";
+import { deleteSession } from "@db/queries/auth/deleteSession";
+import { retrieveUserSession } from "@db/queries/auth/retrieveUserSession";
 
 export function sessionIdFromToken(token: string): string {
     // Session ID is the SHA256 hash of the token.
@@ -52,9 +53,15 @@ export function validateSessionToken(
     );
 }
 
-export async function invalidateSession(sessionId: string): Promise<void> {
+export async function invalidateSession(
+    sessionId: string,
+): Promise<E.Either<DoesNotExistError | AssertionError, void>> {
     const db = await getDb();
-    deleteSession(db, sessionId);
+    const task = pipe(
+        deleteSession(db, sessionId),
+        TE.map(() => undefined),
+    );
+    return await task();
 }
 
 export async function setSessionTokenCookie(
