@@ -1,6 +1,24 @@
-import { DoesNotExistError } from "@/server/common/errors";
 import * as E from "fp-ts/Either";
+import { z } from "zod";
 
-export type DeleteError = DoesNotExistError;
+import {
+    DoesNotExistError,
+    InternalError,
+    ValidationError,
+} from "@common/errors";
 
-export type DeleteResult = E.Either<DeleteError, {}>;
+import { encodedIdSchema } from "@lib/identifiers";
+
+export const payloadSchema = z.object({
+    projectTemplateId: encodedIdSchema,
+});
+
+export type Payload = z.input<typeof payloadSchema>;
+export type ParsedPayload = z.output<typeof payloadSchema>;
+
+export type Failure =
+    | ValidationError<"projectTemplateId">
+    | DoesNotExistError
+    | InternalError;
+
+export type Result = E.Either<Failure, void>;

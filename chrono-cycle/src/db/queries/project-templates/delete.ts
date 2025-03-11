@@ -12,8 +12,8 @@ import {
 
 export function deleteProjectTemplate(
     db: DbLike,
-    projectTemplateId: number,
     userId: number,
+    projectTemplateId: number,
 ): TE.TaskEither<DoesNotExistError, DbProjectTemplate> {
     return pipe(
         TE.fromTask(() =>
