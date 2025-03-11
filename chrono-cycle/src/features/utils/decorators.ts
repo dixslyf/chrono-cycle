@@ -137,7 +137,10 @@ export function wrapServerActionWith<
 export function wrapServerAction<A extends unknown[], E extends BaseError, R>(
     label: string,
     f: UserSessionArgFunction<A, E.Either<E | InternalError, R>>,
-): NormalisedArgsFunction<A, E.Either<E | InternalError, R>> {
+): NormalisedArgsFunction<
+    A,
+    E.Either<Exclude<E, AssertionError> | InternalError, R>
+> {
     // Use default options if not specified.
     return wrapServerActionWith<
         A,
