@@ -2,7 +2,14 @@
 
 import { useState, useEffect, startTransition, useActionState } from "react";
 import { updateSettings, fetchSettings } from "@/server/settings/actions";
-import { NativeSelect, Button } from "@mantine/core";
+import {
+    NativeSelect,
+    Button,
+    Stack,
+    Text,
+    Group,
+    SimpleGrid,
+} from "@mantine/core";
 import Toggle from "./toggle";
 
 const SettingsForm = () => {
@@ -102,17 +109,17 @@ const SettingsForm = () => {
 
     return (
         <form onSubmit={handleSubmit}>
-            <section className="pb-8 flex flex-col gap-3">
-                <h2 className="text-3xl font-bold">General</h2>
-                <span className="text-gray-400 font-semibold mb-2">
-                    Manage general settings
-                </span>
+            <Stack gap="md" align="stretch" className="pb-8">
+                <Text className="text-3xl font-bold">General</Text>
+                <Text className="text-gray-400 font-semibold mb-2">
+                    Manage General Settings
+                </Text>
 
-                <div className="flex justify-between my-2">
-                    <div className="flex w-2/5 justify-between">
-                        <label className="text-xl font-semibold">
+                <SimpleGrid cols={3}>
+                    <Group justify="space-between">
+                        <Text className="text-xl font-semibold">
                             Start Day of Week:
-                        </label>
+                        </Text>
                         <NativeSelect
                             data={["Monday", "Sunday"]}
                             value={startDayOfWeek}
@@ -120,12 +127,12 @@ const SettingsForm = () => {
                                 setStartDayOfWeek(event.currentTarget.value);
                             }}
                         />
-                    </div>
-
-                    <div className="flex w-2/5 justify-between">
-                        <label className="text-xl font-semibold">
+                    </Group>
+                    <div /> {/* center column left empty */}
+                    <Group justify="space-between">
+                        <Text className="text-xl font-semibold">
                             Date Format:
-                        </label>
+                        </Text>
                         <NativeSelect
                             data={["MM/DD/YYYY", "DD/MM/YYYY", "YYYY/MM/DD"]}
                             value={dateFormat}
@@ -133,59 +140,58 @@ const SettingsForm = () => {
                                 setDateFormat(event.currentTarget.value)
                             }
                         />
-                    </div>
-                </div>
+                    </Group>
+                </SimpleGrid>
                 <hr />
-            </section>
+            </Stack>
 
-            <section className="flex flex-col gap-3">
-                <h2 className="text-3xl font-bold">Notifications</h2>
-                <span className="text-gray-400 font-semibold mb-2">
-                    Update your notification preferences
-                </span>
+            <Stack>
+                <Text className="text-3xl font-bold">Notifications</Text>
+                <Text className="text-gray-400 font-semibold mb-2">
+                    Update Your Notification Perferences
+                </Text>
 
-                <div className="flex justify-between my-2">
-                    <div className="flex w-2/5 justify-between">
-                        <label className="text-xl font-semibold">
+                <SimpleGrid cols={3}>
+                    <Group justify="space-between">
+                        <Text className="text-xl font-semibold">
                             Email Notifications:
-                        </label>
+                        </Text>
                         <Toggle
                             checked={enableEmailNotifications}
                             onChange={(e) =>
                                 setEmailNotifications(e.target.checked)
                             }
                         />
-                    </div>
-
-                    <div className="flex w-2/5 justify-between">
-                        <label className="text-xl font-semibold">
+                    </Group>
+                    <div /> {/* center column left */}
+                    <Group justify="space-between">
+                        <Text className="text-xl font-semibold">
                             Desktop Notifications:
-                        </label>
+                        </Text>
                         <Toggle
                             checked={enableDesktopNotifications}
                             onChange={(e) =>
                                 setDesktopNotifications(e.target.checked)
                             }
                         />
-                    </div>
-                </div>
+                    </Group>
+                </SimpleGrid>
                 <hr />
-            </section>
+            </Stack>
 
-            <section className="flex flex-col gap-3 items-center mt-2">
-                <p
+            <Stack gap="md" className="mt-2 items-center">
+                <Text
                     className={`font-semibold text-xl ${formStatus.submitSuccess ? "text-green-500" : "text-red-500"}`}
                 >
                     {formStatus.submitSuccess
                         ? "Settings updated successfully!"
                         : formStatus.errorMessage}
-                </p>
-                <div className="w-full flex justify-end">
+                </Text>
+                <Group className="w-full" justify="flex-end">
                     <Button
                         type="submit"
                         disabled={!hasChanges || isSubmitting}
                         loading={isSubmitting}
-                        // className="bg-palette2 hover:bg-palette1 transition-colors duration-200 ease-linear"
                         className={`transition-colors duration-200 ease-linear ${
                             !hasChanges || isSubmitting
                                 ? "bg-gray-400 cursor-default text-palette3"
@@ -194,8 +200,8 @@ const SettingsForm = () => {
                     >
                         Save Changes
                     </Button>
-                </div>
-            </section>
+                </Group>
+            </Stack>
         </form>
     );
 };
