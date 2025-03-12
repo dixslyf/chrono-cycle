@@ -1,49 +1,39 @@
 "use server";
 
-import { UserSession } from "@/server/common/auth/sessions";
-import { ValidationError } from "@/server/common/errors";
-import { wrapServerAction } from "@/server/features/decorators";
 import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
+import * as TE from "fp-ts/TaskEither";
 
-import { CreateFormData, createFormDataSchema, CreateResult } from "./data";
-import { createEventTemplate } from "./lib";
+import { EventTemplate } from "@common/data/domain";
+import { UserSession } from "@common/data/userSession";
+import { RestoreAssertionError } from "@common/errors";
+
+import { wrapServerAction } from "@features/utils/decorators";
+
+import { validate } from "../../utils/validation";
+import { bridge } from "./bridge";
+import { Failure, Payload, payloadSchema, Result } from "./data";
 
 async function createEventTemplateActionImpl(
     userSession: UserSession,
-    _prevState: CreateResult | null,
-    data: CreateFormData,
-): Promise<CreateResult> {
+    _prevState: Result | null,
+    payload: Payload,
+): Promise<E.Either<RestoreAssertionError<Failure>, EventTemplate>> {
     // Validate form schema.
-    const parseResult = createFormDataSchema.safeParse(data);
-    if (!parseResult.success) {
-        const formattedZodErrors = parseResult.error.format();
-        return E.left(
-            ValidationError({
-                name: formattedZodErrors.name?._errors || [],
-                offsetDays: formattedZodErrors.offsetDays?._errors || [],
-                duration: formattedZodErrors.duration?._errors || [],
-                note: formattedZodErrors.note?._errors || [],
-                eventType: formattedZodErrors.eventType?._errors || [],
-                autoReschedule:
-                    formattedZodErrors.autoReschedule?._errors || [],
-                projectTemplateId:
-                    formattedZodErrors.projectTemplateId?._errors || [],
-            }),
-        );
-    }
-
-    const userId = userSession.user.id;
-    const createResult = await createEventTemplate(userId, parseResult.data);
-
-    if (E.isRight(createResult)) {
+    const task = pipe(
+        TE.fromEither(validate(payloadSchema, payload)),
+        TE.chainW((payloadP) => bridge(userSession.user.id, payloadP)),
         // TODO: What path to revalidate?
         // revalidatePath("/templates");
-    }
+    );
 
-    return createResult;
+    return await task();
 }
 
-export const createEventTemplateAction = wrapServerAction(
+export const createEventTemplateAction: (
+    _prevState: Result | null,
+    payload: Payload,
+) => Promise<Result> = wrapServerAction(
     "createEventTemplate",
     createEventTemplateActionImpl,
 );

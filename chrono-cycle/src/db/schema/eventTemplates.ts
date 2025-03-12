@@ -49,9 +49,9 @@ export type DbExpandedEventTemplate = {
 } & DbEventTemplate;
 
 export type DbExpandedEventTemplateInsert = {
-    reminders: DbReminderTemplateInsert[];
+    reminders: Omit<DbReminderTemplateInsert, "eventTemplateId">[];
     tags: DbTagInsert[];
-} & DbEventTemplate;
+} & DbEventTemplateInsert;
 
 export const eventTemplateSelectSchema = createSelectSchema(eventTemplates);
 export const eventTemplateInsertSchema = createInsertSchema(eventTemplates);

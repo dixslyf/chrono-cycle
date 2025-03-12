@@ -12,8 +12,6 @@ import {
     DbEventTemplateTag,
     DbExpandedEventTemplate,
     DbExpandedEventTemplateInsert,
-    DbReminder,
-    DbReminderTemplate,
     DbTag,
     eventTemplates as eventTemplatesTable,
     eventTemplateTags,
@@ -62,37 +60,19 @@ function unsafeRawInsertExpandedEventTemplate(
         // Try inserting the event template.
         TE.fromTask(() => rawInsertEventTemplate(db, data)),
         // Ensure that all tags exist.
-        TE.chain((eventTemplate) =>
-            pipe(
-                ensureTagsExist(db, data.tags),
-                TE.map((tags) => ({ ...eventTemplate, tags })),
-            ),
-        ),
+        TE.bind("tags", () => ensureTagsExist(db, data.tags)),
         // Link the tags with the event template.
-        TE.chain<
-            AssertionError,
-            Omit<DbExpandedEventTemplate, "reminders">,
-            Omit<DbExpandedEventTemplate, "reminders">
-        >((partialExpandedEt) =>
-            pipe(
-                TE.fromTask(() =>
-                    linkTags(db, partialExpandedEt.id, partialExpandedEt.tags),
-                ),
-                // Ignore the return of `linkTagsTask`, just return the event template and tags.
-                TE.map(() => partialExpandedEt),
-            ),
-        ),
+        TE.tap(({ id, tags }) => TE.fromTask(() => linkTags(db, id, tags))),
         // Insert the reminders.
-        TE.chain<
-            AssertionError,
-            Omit<DbExpandedEventTemplate, "reminders">,
-            DbExpandedEventTemplate
-        >((partialExpandedEt) =>
-            pipe(
-                TE.fromTask(() =>
-                    rawInsertReminderTemplates(db, data.reminders),
+        TE.bind("reminders", ({ id: eventTemplateId }) =>
+            TE.fromTask(() =>
+                rawInsertReminderTemplates(
+                    db,
+                    data.reminders.map((reminder) => ({
+                        eventTemplateId,
+                        ...reminder,
+                    })),
                 ),
-                TE.map((reminders) => ({ ...partialExpandedEt, reminders })),
             ),
         ),
     );

@@ -1,17 +1,21 @@
-import { EventTemplate, tagNameSchema } from "@/server/common/data";
-import {
-    DoesNotExistError,
-    InternalError,
-    ValidationError,
-} from "@/server/common/errors";
-import { encodedIdSchema } from "@/server/common/identifiers";
-import { eventTemplateInsertSchema } from "@/server/db/schema/eventTemplates";
-import { reminderTemplateCreateSchema } from "@/server/features/reminder-templates/create/data";
-import { CreateError as CreateTagError } from "@/server/features/tags/create/data";
 import * as E from "fp-ts/Either";
 import { z } from "zod";
 
-export const createFormDataSchema = z
+import { EventTemplate, tagNameSchema } from "@common/data/domain";
+import {
+    DoesNotExistError,
+    InternalError,
+    TagExistsError,
+    ValidationError,
+} from "@common/errors";
+
+import { payloadSchema as createReminderTemplatePayloadSchema } from "@features/reminder-templates/create/data";
+
+import { encodedIdSchema } from "@lib/identifiers";
+
+import { eventTemplateInsertSchema } from "@db/schema";
+
+export const payloadSchema = z
     .object({
         name: eventTemplateInsertSchema.shape.name,
         offsetDays: eventTemplateInsertSchema.shape.offsetDays,
@@ -21,7 +25,7 @@ export const createFormDataSchema = z
         autoReschedule: eventTemplateInsertSchema.shape.autoReschedule,
         projectTemplateId: encodedIdSchema, // Sqid, not the actual ID.
         reminders: z.array(
-            reminderTemplateCreateSchema.omit({ eventTemplateId: true }),
+            createReminderTemplatePayloadSchema.omit({ eventTemplateId: true }),
         ),
         tags: z.array(tagNameSchema),
     })
@@ -34,22 +38,23 @@ export const createFormDataSchema = z
         "Duration for an activity must be at least 1 day",
     );
 
-export type CreateFormData = z.output<typeof createFormDataSchema>;
+export type Payload = z.input<typeof payloadSchema>;
+export type ParsedPayload = z.output<typeof payloadSchema>;
 
-export type CreateReturnData = EventTemplate;
-
-export type CreateError =
+export type Failure =
     | ValidationError<
-          | "name"
-          | "offsetDays"
-          | "duration"
-          | "note"
-          | "eventType"
-          | "autoReschedule"
-          | "projectTemplateId"
-      >
+        | "name"
+        | "offsetDays"
+        | "duration"
+        | "note"
+        | "eventType"
+        | "autoReschedule"
+        | "projectTemplateId"
+        | "reminders"
+        | "tags"
+    >
     | DoesNotExistError
-    | InternalError
-    | CreateTagError;
+    | TagExistsError
+    | InternalError;
 
-export type CreateResult = E.Either<CreateError, CreateReturnData>;
+export type Result = E.Either<Failure, EventTemplate>;
