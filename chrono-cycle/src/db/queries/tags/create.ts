@@ -13,6 +13,9 @@ export async function insertTagsUnchecked(
     db: DbLike,
     tags: DbTagInsert[],
 ): Promise<DbTag[]> {
+    if (tags.length === 0) {
+        return [];
+    }
     return await db.insert(tagsTable).values(tags).returning();
 }
 
@@ -55,6 +58,10 @@ export function createTags(
     db: DbLike,
     tags: DbTagInsert[],
 ): TE.TaskEither<AssertionError | TagExistsError, DbTag[]> {
+    if (tags.length === 0) {
+        return TE.right([]);
+    }
+
     return pipe(
         getTagsIfExist(db, tags),
         TE.chain<AssertionError | TagExistsError, O.Option<DbTag>[], DbTag[]>(
@@ -83,7 +90,7 @@ export function ensureTagsExist(
                 pipe(
                     maybeStoredTag,
                     O.match(
-                        () => {},
+                        () => { },
                         (storedTag) =>
                             storedTagMap.set(storedTag.name, storedTag),
                     ),

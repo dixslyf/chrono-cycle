@@ -16,6 +16,9 @@ export async function rawInsertReminderTemplates(
     db: DbLike,
     rts: DbReminderTemplateInsert[],
 ): Promise<DbReminderTemplate[]> {
+    if (rts.length === 0) {
+        return [];
+    }
     return await db.insert(reminderTemplates).values(rts).returning();
 }
 
