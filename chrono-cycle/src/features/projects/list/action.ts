@@ -1,34 +1,33 @@
 "use server";
 
-import { UserSession } from "@/server/common/auth/sessions";
-import { ValidationError } from "@/server/common/errors";
-import { wrapServerAction } from "@/server/features/decorators";
 import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/lib/function";
+import * as TE from "fp-ts/TaskEither";
 
-import { ListData, listProjectsDataSchema, ListResult } from "./data";
-import { listProjects } from "./lib";
+import { ProjectOverview } from "@common/data/domain";
+import { UserSession } from "@common/data/userSession";
+import { RestoreAssertionError } from "@common/errors";
+
+import { wrapServerAction } from "@features/utils/decorators";
+import { validate } from "@features/utils/validation";
+
+import { bridge } from "./bridge";
+import { Failure, Payload, payloadSchema, Result } from "./data";
 
 async function listProjectsImpl(
     userSession: UserSession,
-    data: ListData,
-): Promise<ListResult> {
+    payload: Payload,
+): Promise<E.Either<RestoreAssertionError<Failure>, ProjectOverview[]>> {
     // Validate form schema.
-    const parseResult = listProjectsDataSchema.safeParse(data);
-    if (!parseResult.success) {
-        const formattedZodErrors = parseResult.error.format();
-        return E.left(
-            ValidationError({
-                projectTemplateId:
-                    formattedZodErrors.projectTemplateId?._errors || [],
-            }),
-        );
-    }
+    const task = pipe(
+        TE.fromEither(validate(payloadSchema, payload)),
+        TE.chain((payloadP) =>
+            TE.fromTask(bridge(userSession.user.id, payloadP)),
+        ),
+    );
 
-    const userId = userSession.user.id;
-    return await listProjects(userId, parseResult.data.projectTemplateId);
+    return await task();
 }
 
-export const listProjectsAction = wrapServerAction(
-    "listProjects",
-    listProjectsImpl,
-);
+export const listProjectsAction: (payload: Payload) => Promise<Result> =
+    wrapServerAction("listProjects", listProjectsImpl);

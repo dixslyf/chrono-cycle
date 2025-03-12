@@ -1,15 +1,18 @@
-import { ProjectOverview } from "@/server/common/data";
-import { InternalError, ValidationError } from "@/server/common/errors";
-import { encodedIdSchema } from "@/server/common/identifiers";
 import * as E from "fp-ts/Either";
 import { z } from "zod";
 
-export const listProjectsDataSchema = z.object({
+import { ProjectOverview } from "@common/data/domain";
+import { InternalError, ValidationError } from "@common/errors";
+
+import { encodedIdSchema } from "@lib/identifiers";
+
+export const payloadSchema = z.object({
     projectTemplateId: encodedIdSchema,
 });
 
-export type ListData = z.output<typeof listProjectsDataSchema>;
+export type Payload = z.input<typeof payloadSchema>;
+export type ParsedPayload = z.output<typeof payloadSchema>;
 
-export type ListError = ValidationError<"projectTemplateId"> | InternalError;
+export type Failure = ValidationError<"projectTemplateId"> | InternalError;
 
-export type ListResult = E.Either<ListError, ProjectOverview[]>;
+export type Result = E.Either<Failure, ProjectOverview[]>;
