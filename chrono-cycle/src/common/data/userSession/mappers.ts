@@ -1,4 +1,4 @@
-import { DbSession, DbUser, DbUserSettings } from "@db/schema";
+import { DbSession, DbUser, DbUserSettings } from "@/db/schema";
 
 import { Session, User, UserSession, UserSettings } from "./types";
 

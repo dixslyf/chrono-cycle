@@ -1,7 +1,7 @@
 import * as E from "fp-ts/Either";
 import { z } from "zod";
 
-import { InvalidCredentialsError, ValidationError } from "@common/errors";
+import { InvalidCredentialsError, ValidationError } from "@/common/errors";
 
 export const usernameSchema = z
     .string()

@@ -1,5 +1,7 @@
 import "dotenv/config";
+
 import { defineConfig } from "drizzle-kit";
+
 import { MIGRATIONS_BASE_PATH, SCHEMA_PATH } from "@root/drizzle/shared";
 
 export default defineConfig({

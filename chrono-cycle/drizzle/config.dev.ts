@@ -1,4 +1,5 @@
 import { defineConfig } from "drizzle-kit";
+
 import { MIGRATIONS_BASE_PATH, SCHEMA_PATH } from "@root/drizzle/shared";
 
 export const DB_PATH = "dev-db";

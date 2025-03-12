@@ -4,12 +4,12 @@ import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { ProjectTemplate } from "@common/data/domain";
-import { UserSession } from "@common/data/userSession";
-import { RestoreAssertionError } from "@common/errors";
+import { ProjectTemplate } from "@/common/data/domain";
+import { UserSession } from "@/common/data/userSession";
+import { RestoreAssertionError } from "@/common/errors";
 
-import { wrapServerAction } from "@features/utils/decorators";
-import { validate } from "@features/utils/validation";
+import { wrapServerAction } from "@/features/utils/decorators";
+import { validate } from "@/features/utils/validation";
 
 import { bridge } from "./bridge";
 import { Failure, Payload, payloadSchema } from "./data";

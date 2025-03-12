@@ -5,10 +5,10 @@ import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 import { redirect } from "next/navigation";
 
-import { RestoreAssertionError } from "@common/errors";
+import { RestoreAssertionError } from "@/common/errors";
 
-import { wrapServerActionWith } from "@features/utils/decorators";
-import { validate } from "@features/utils/validation";
+import { wrapServerActionWith } from "@/features/utils/decorators";
+import { validate } from "@/features/utils/validation";
 
 import { bridge } from "./bridge";
 import { Failure, Payload, payloadSchema, Result } from "./data";

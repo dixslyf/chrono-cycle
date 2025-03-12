@@ -2,14 +2,14 @@ import { eq } from "drizzle-orm";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { DoesNotExistError, DuplicateNameError } from "@common/errors";
+import { DoesNotExistError, DuplicateNameError } from "@/common/errors";
 
-import { DbLike } from "@db";
+import { DbLike } from "@/db";
 import {
     DbProjectTemplate,
     DbProjectTemplateUpdate,
     projectTemplates as projectTemplatesTable,
-} from "@db/schema";
+} from "@/db/schema";
 
 import { checkDuplicateProjectTemplateName } from "./checkDuplicateName";
 

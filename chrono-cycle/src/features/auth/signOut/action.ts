@@ -5,15 +5,15 @@ import { pipe } from "fp-ts/lib/function";
 import * as TE from "fp-ts/TaskEither";
 import { redirect } from "next/navigation";
 
-import { UserSession } from "@root/src/common/data/userSession";
-import { RestoreAssertionError } from "@root/src/common/errors";
+import { UserSession } from "@/common/data/userSession";
+import { RestoreAssertionError } from "@/common/errors";
 
-import { wrapServerAction } from "@features/utils/decorators";
+import { wrapServerAction } from "@/features/utils/decorators";
 
 import {
     deleteSessionTokenCookie,
     invalidateSession,
-} from "@lib/auth/sessions";
+} from "@/lib/auth/sessions";
 
 import { Failure } from "./data";
 

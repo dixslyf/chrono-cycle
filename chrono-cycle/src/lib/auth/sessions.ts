@@ -10,12 +10,12 @@ import * as TE from "fp-ts/TaskEither";
 import * as TO from "fp-ts/TaskOption";
 import { cookies } from "next/headers";
 
-import { toUserSession, UserSession } from "@common/data/userSession";
-import { AssertionError, DoesNotExistError } from "@common/errors";
+import { toUserSession, UserSession } from "@/common/data/userSession";
+import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import getDb from "@db";
-import { deleteSession } from "@db/queries/auth/deleteSession";
-import { retrieveUserSession } from "@db/queries/auth/retrieveUserSession";
+import getDb from "@/db";
+import { deleteSession } from "@/db/queries/auth/deleteSession";
+import { retrieveUserSession } from "@/db/queries/auth/retrieveUserSession";
 
 export function sessionIdFromToken(token: string): string {
     // Session ID is the SHA256 hash of the token.

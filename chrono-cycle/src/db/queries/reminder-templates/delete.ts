@@ -2,14 +2,14 @@ import { eq, or } from "drizzle-orm";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { AssertionError, DoesNotExistError } from "@common/errors";
+import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import { DbLike } from "@db";
-import { checkUserOwnsReminderTemplates } from "@db/queries/reminder-templates/checkOwnership";
+import { DbLike } from "@/db";
+import { checkUserOwnsReminderTemplates } from "@/db/queries/reminder-templates/checkOwnership";
 import {
     reminderTemplates,
     reminderTemplates as reminderTemplatesTable,
-} from "@db/schema";
+} from "@/db/schema";
 
 export function deleteReminderTemplates(
     db: DbLike,

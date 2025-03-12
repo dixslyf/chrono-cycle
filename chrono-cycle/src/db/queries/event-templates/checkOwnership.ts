@@ -2,14 +2,14 @@ import { and, eq, or } from "drizzle-orm";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { AssertionError, DoesNotExistError } from "@common/errors";
+import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import { DbLike } from "@db";
+import { DbLike } from "@/db";
 import {
     eventTemplates as eventTemplatesTable,
     projectTemplates as projectTemplatesTable,
     users as usersTable,
-} from "@db/schema";
+} from "@/db/schema";
 
 // Checks that the user owns the event templates.
 export function checkUserOwnsEventTemplates(

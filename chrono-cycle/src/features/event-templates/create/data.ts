@@ -1,19 +1,19 @@
 import * as E from "fp-ts/Either";
 import { z } from "zod";
 
-import { EventTemplate, tagNameSchema } from "@common/data/domain";
+import { EventTemplate, tagNameSchema } from "@/common/data/domain";
 import {
     DoesNotExistError,
     InternalError,
     TagExistsError,
     ValidationError,
-} from "@common/errors";
+} from "@/common/errors";
 
-import { payloadSchema as createReminderTemplatePayloadSchema } from "@features/reminder-templates/create/data";
+import { payloadSchema as createReminderTemplatePayloadSchema } from "@/features/reminder-templates/create/data";
 
-import { encodedIdSchema } from "@lib/identifiers";
+import { encodedIdSchema } from "@/lib/identifiers";
 
-import { eventTemplateInsertSchema } from "@db/schema";
+import { eventTemplateInsertSchema } from "@/db/schema";
 
 export const payloadSchema = z
     .object({
@@ -43,16 +43,16 @@ export type ParsedPayload = z.output<typeof payloadSchema>;
 
 export type Failure =
     | ValidationError<
-        | "name"
-        | "offsetDays"
-        | "duration"
-        | "note"
-        | "eventType"
-        | "autoReschedule"
-        | "projectTemplateId"
-        | "reminders"
-        | "tags"
-    >
+          | "name"
+          | "offsetDays"
+          | "duration"
+          | "note"
+          | "eventType"
+          | "autoReschedule"
+          | "projectTemplateId"
+          | "reminders"
+          | "tags"
+      >
     | DoesNotExistError
     | TagExistsError
     | InternalError;

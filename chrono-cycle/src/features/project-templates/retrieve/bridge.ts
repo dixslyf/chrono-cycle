@@ -1,15 +1,13 @@
 import { pipe } from "fp-ts/lib/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { ProjectTemplate, toProjectTemplate } from "@common/data/domain";
-import { AssertionError, DoesNotExistError } from "@common/errors";
+import { ProjectTemplate, toProjectTemplate } from "@/common/data/domain";
+import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import { decodeProjectTemplateId } from "@lib/identifiers";
+import { decodeProjectTemplateId } from "@/lib/identifiers";
 
-import getDb from "@db";
-import {
-    retrieveExpandedProjectTemplate,
-} from "@db/queries/project-templates/retrieve";
+import getDb from "@/db";
+import { retrieveExpandedProjectTemplate } from "@/db/queries/project-templates/retrieve";
 
 import { ParsedPayload } from "./data";
 

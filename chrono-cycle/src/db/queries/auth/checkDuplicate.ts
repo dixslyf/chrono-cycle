@@ -2,12 +2,10 @@ import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 import { match } from "ts-pattern";
 
-import {
-    AssertionError,
-    DuplicateNameError,
-} from "@root/src/common/errors";
+import { AssertionError, DuplicateNameError } from "@/common/errors";
 
-import { DbLike } from "../..";
+import { DbLike } from "@/db";
+
 import { retrieveUserByEmail, retrieveUserByUsername } from "./retrieveUser";
 
 export function checkDuplicateUsername(

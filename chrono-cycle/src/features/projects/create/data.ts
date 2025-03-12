@@ -1,17 +1,17 @@
 import * as E from "fp-ts/Either";
 import { z } from "zod";
 
-import { Project } from "@common/data/domain";
+import { Project } from "@/common/data/domain";
 import {
     DoesNotExistError,
     DuplicateNameError,
     InternalError,
     ValidationError,
-} from "@common/errors";
+} from "@/common/errors";
 
-import { encodedIdSchema } from "@lib/identifiers";
+import { encodedIdSchema } from "@/lib/identifiers";
 
-import { projectInsertSchema } from "@db/schema";
+import { projectInsertSchema } from "@/db/schema";
 
 export const payloadSchema = z.object({
     name: projectInsertSchema.shape.name,

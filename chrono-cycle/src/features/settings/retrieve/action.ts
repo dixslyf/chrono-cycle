@@ -2,10 +2,10 @@
 
 import * as E from "fp-ts/Either";
 
-import { UserSession, UserSettings } from "@common/data/userSession";
-import { RestoreAssertionError } from "@common/errors";
+import { UserSession, UserSettings } from "@/common/data/userSession";
+import { RestoreAssertionError } from "@/common/errors";
 
-import { wrapServerAction } from "@features/utils/decorators";
+import { wrapServerAction } from "@/features/utils/decorators";
 
 import { bridge } from "./bridge";
 import { Failure, Result } from "./data";

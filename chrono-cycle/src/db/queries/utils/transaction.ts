@@ -1,9 +1,9 @@
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { BaseError } from "@common/errors";
+import { BaseError } from "@/common/errors";
 
-import { DbLike, DbTransaction } from "@db";
+import { DbLike, DbTransaction } from "@/db";
 
 export function wrapWithTransaction<E extends BaseError, R>(
     db: DbLike,

@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 
-import { DbLike } from "@db";
-import { DbProject, projects as projectsTable } from "@db/schema";
+import { DbLike } from "@/db";
+import { DbProject, projects as projectsTable } from "@/db/schema";
 
 export async function listProjects(
     db: DbLike,

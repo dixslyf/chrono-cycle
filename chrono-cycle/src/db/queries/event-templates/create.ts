@@ -1,11 +1,13 @@
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { AssertionError, DoesNotExistError } from "@common/errors";
+import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import { DbLike } from "@db";
-import { rawInsertReminderTemplates } from "@db/queries/reminder-templates/create";
-import { ensureTagsExist } from "@db/queries/tags/create";
+import { DbLike } from "@/db";
+import { checkProjectTemplateExists } from "@/db/queries/project-templates/checkExists";
+import { rawInsertReminderTemplates } from "@/db/queries/reminder-templates/create";
+import { ensureTagsExist } from "@/db/queries/tags/create";
+import { wrapWithTransaction } from "@/db/queries/utils/transaction";
 import {
     DbEventTemplate,
     DbEventTemplateInsert,
@@ -15,10 +17,7 @@ import {
     DbTag,
     eventTemplates as eventTemplatesTable,
     eventTemplateTags,
-} from "@db/schema";
-
-import { checkProjectTemplateExists } from "../project-templates/checkExists";
-import { wrapWithTransaction } from "../utils/transaction";
+} from "@/db/schema";
 
 // Task to insert the event template.
 async function rawInsertEventTemplate(

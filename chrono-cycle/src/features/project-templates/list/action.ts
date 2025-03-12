@@ -2,10 +2,10 @@
 
 import * as E from "fp-ts/Either";
 
-import { ProjectTemplateOverview } from "@common/data/domain";
-import { UserSession } from "@common/data/userSession";
+import { ProjectTemplateOverview } from "@/common/data/domain";
+import { UserSession } from "@/common/data/userSession";
 
-import { wrapServerAction } from "@features/utils/decorators";
+import { wrapServerAction } from "@/features/utils/decorators";
 
 import { bridge } from "./bridge";
 

@@ -2,11 +2,11 @@ import { eq, or } from "drizzle-orm";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { AssertionError, DoesNotExistError } from "@common/errors";
+import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import { DbLike } from "@db";
-import { checkUserOwnsEventTemplates } from "@db/queries/event-templates/checkOwnership";
-import { eventTemplates as eventTemplatesTable } from "@db/schema";
+import { DbLike } from "@/db";
+import { checkUserOwnsEventTemplates } from "@/db/queries/event-templates/checkOwnership";
+import { eventTemplates as eventTemplatesTable } from "@/db/schema";
 
 export function deleteEventTemplates(
     db: DbLike,

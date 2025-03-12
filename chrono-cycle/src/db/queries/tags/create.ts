@@ -4,10 +4,10 @@ import { pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 
-import { AssertionError, TagExistsError } from "@common/errors";
+import { AssertionError, TagExistsError } from "@/common/errors";
 
-import type { DbLike } from "@db";
-import { tags as tagsTable, type DbTag, type DbTagInsert } from "@db/schema";
+import type { DbLike } from "@/db";
+import { tags as tagsTable, type DbTag, type DbTagInsert } from "@/db/schema";
 
 export async function insertTagsUnchecked(
     db: DbLike,

@@ -5,9 +5,9 @@ import {
     DoesNotExistError,
     InternalError,
     ValidationError,
-} from "@common/errors";
+} from "@/common/errors";
 
-import { encodedIdSchema } from "@lib/identifiers";
+import { encodedIdSchema } from "@/lib/identifiers";
 
 export const payloadSchema = z.object({
     eventTemplateIds: z.array(encodedIdSchema),

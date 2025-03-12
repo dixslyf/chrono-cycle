@@ -2,10 +2,10 @@ import { and, eq } from "drizzle-orm";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { DuplicateNameError } from "@common/errors";
+import { DuplicateNameError } from "@/common/errors";
 
-import { DbLike } from "@db";
-import { projectTemplates as projectTemplatesTable } from "@db/schema";
+import { DbLike } from "@/db";
+import { projectTemplates as projectTemplatesTable } from "@/db/schema";
 
 export function checkDuplicateProjectTemplateName(
     db: DbLike,

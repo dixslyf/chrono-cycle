@@ -1,6 +1,6 @@
 import * as E from "fp-ts/Either";
 
-import { DoesNotExistError, InternalError } from "@common/errors";
+import { DoesNotExistError, InternalError } from "@/common/errors";
 
 export type Failure = DoesNotExistError | InternalError;
 

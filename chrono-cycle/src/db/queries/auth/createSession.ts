@@ -1,9 +1,9 @@
-import { DbLike } from "@db";
+import { DbLike } from "@/db";
 import {
     DbSession,
     DbSessionInsert,
     sessions as sessionsTable,
-} from "@db/schema";
+} from "@/db/schema";
 
 export async function createSession(
     db: DbLike,

@@ -4,11 +4,11 @@ import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { RestoreAssertionError } from "@root/src/common/errors";
+import { RestoreAssertionError } from "@/common/errors";
 
-import { wrapServerActionWith } from "@features/utils/decorators";
+import { wrapServerActionWith } from "@/features/utils/decorators";
+import { validate } from "@/features/utils/validation";
 
-import { validate } from "../../utils/validation";
 import { bridge } from "./bridge";
 import { Failure, Payload, payloadSchema, Result } from "./data";
 

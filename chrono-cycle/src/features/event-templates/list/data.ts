@@ -1,14 +1,14 @@
 import * as E from "fp-ts/Either";
 import { z } from "zod";
 
-import { EventTemplate } from "@common/data/domain";
+import { EventTemplate } from "@/common/data/domain";
 import {
     DoesNotExistError,
     InternalError,
     ValidationError,
-} from "@common/errors";
+} from "@/common/errors";
 
-import { encodedIdSchema } from "@lib/identifiers";
+import { encodedIdSchema } from "@/lib/identifiers";
 
 export const payloadSchema = z.object({
     projectTemplateId: encodedIdSchema,

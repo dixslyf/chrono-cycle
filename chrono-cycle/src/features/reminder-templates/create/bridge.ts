@@ -1,13 +1,13 @@
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { ReminderTemplate, toReminderTemplate } from "@common/data/domain";
-import { AssertionError, DoesNotExistError } from "@common/errors";
+import { ReminderTemplate, toReminderTemplate } from "@/common/data/domain";
+import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import { decodeEventTemplateId } from "@lib/identifiers";
+import { decodeEventTemplateId } from "@/lib/identifiers";
 
-import getDb from "@db";
-import { createReminderTemplates } from "@db/queries/reminder-templates/create";
+import getDb from "@/db";
+import { createReminderTemplates } from "@/db/queries/reminder-templates/create";
 
 import { ParsedPayload } from "./data";
 

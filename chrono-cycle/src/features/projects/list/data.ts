@@ -1,10 +1,10 @@
 import * as E from "fp-ts/Either";
 import { z } from "zod";
 
-import { ProjectOverview } from "@common/data/domain";
-import { InternalError, ValidationError } from "@common/errors";
+import { ProjectOverview } from "@/common/data/domain";
+import { InternalError, ValidationError } from "@/common/errors";
 
-import { encodedIdSchema } from "@lib/identifiers";
+import { encodedIdSchema } from "@/lib/identifiers";
 
 export const payloadSchema = z.object({
     projectTemplateId: encodedIdSchema,

@@ -2,10 +2,10 @@ import { eq } from "drizzle-orm";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { AssertionError, DoesNotExistError } from "@root/src/common/errors";
+import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import { DbLike } from "../..";
-import { DbUser, DbUserSettings, users, userSettings } from "../../schema";
+import { DbLike } from "@/db";
+import { DbUser, DbUserSettings, users, userSettings } from "@/db/schema";
 
 export function retrieveUserByUsername(
     db: DbLike,

@@ -2,13 +2,13 @@ import { and, eq } from "drizzle-orm";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { DoesNotExistError } from "@common/errors";
+import { DoesNotExistError } from "@/common/errors";
 
-import { DbLike } from "@db";
+import { DbLike } from "@/db";
 import {
     DbProjectTemplate,
     projectTemplates as projectTemplatesTable,
-} from "@db/schema";
+} from "@/db/schema";
 
 export function deleteProjectTemplate(
     db: DbLike,

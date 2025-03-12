@@ -2,10 +2,10 @@ import { eq } from "drizzle-orm";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { AssertionError, DoesNotExistError } from "@common/errors";
+import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import { DbLike } from "@db";
-import { DbSession, sessions as sessionsTable } from "@db/schema";
+import { DbLike } from "@/db";
+import { DbSession, sessions as sessionsTable } from "@/db/schema";
 
 export function extendSession(
     db: DbLike,

@@ -1,14 +1,14 @@
 import * as E from "fp-ts/Either";
 import { z } from "zod";
 
-import { UserSettings } from "@common/data/userSession";
+import { UserSettings } from "@/common/data/userSession";
 import {
     DoesNotExistError,
     InternalError,
     ValidationError,
-} from "@common/errors";
+} from "@/common/errors";
 
-import { userSettingsInsertSchema } from "@db/schema";
+import { userSettingsInsertSchema } from "@/db/schema";
 
 export const payloadSchema = z.object({
     startDayOfWeek: userSettingsInsertSchema.shape.startDayOfWeek,
@@ -24,11 +24,11 @@ export type ParsedPayload = z.output<typeof payloadSchema>;
 
 export type Failure =
     | ValidationError<
-        | "startDayOfWeek"
-        | "dateFormat"
-        | "enableEmailNotifications"
-        | "enableDesktopNotifications"
-    >
+          | "startDayOfWeek"
+          | "dateFormat"
+          | "enableEmailNotifications"
+          | "enableDesktopNotifications"
+      >
     | DoesNotExistError
     | InternalError;
 

@@ -1,7 +1,7 @@
 import * as E from "fp-ts/Either";
 import { z, type ZodTypeDef } from "zod";
 
-import { ValidationError } from "@common/errors";
+import { ValidationError } from "@/common/errors";
 
 export function validate<
     Schema extends z.ZodType<Output, Def, Input>,

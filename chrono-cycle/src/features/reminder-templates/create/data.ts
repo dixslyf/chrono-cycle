@@ -1,17 +1,17 @@
 import * as E from "fp-ts/Either";
 import { z } from "zod";
 
-import { ReminderTemplate } from "@common/data/domain";
+import { ReminderTemplate } from "@/common/data/domain";
 import {
     DoesNotExistError,
     DuplicateReminderError,
     InternalError,
     ValidationError,
-} from "@common/errors";
+} from "@/common/errors";
 
-import { encodedIdSchema } from "@lib/identifiers";
+import { encodedIdSchema } from "@/lib/identifiers";
 
-import { reminderTemplateInsertSchema } from "@db/schema";
+import { reminderTemplateInsertSchema } from "@/db/schema";
 
 export const payloadSchema = z.object({
     eventTemplateId: encodedIdSchema,
@@ -27,11 +27,11 @@ export type ParsedPayload = z.output<typeof payloadSchema>;
 
 export type Failure =
     | ValidationError<
-        | "daysBeforeEvent"
-        | "time"
-        | "emailNotifications"
-        | "desktopNotifications"
-    >
+          | "daysBeforeEvent"
+          | "time"
+          | "emailNotifications"
+          | "desktopNotifications"
+      >
     | DuplicateReminderError
     | DoesNotExistError
     | InternalError;

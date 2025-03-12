@@ -2,15 +2,15 @@ import { and, eq, or } from "drizzle-orm";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { AssertionError, DoesNotExistError } from "@common/errors";
+import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import { DbLike } from "@db/index";
+import { DbLike } from "@/db/index";
 import {
     eventTemplates as eventTemplatesTable,
     projectTemplates as projectTemplatesTable,
     reminderTemplates as reminderTemplatesTable,
     users as usersTable,
-} from "@db/schema";
+} from "@/db/schema";
 
 // Checks that the user owns the reminder templates.
 export function checkUserOwnsReminderTemplates(

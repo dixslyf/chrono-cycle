@@ -2,14 +2,14 @@ import { and, eq } from "drizzle-orm";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { AssertionError, DoesNotExistError } from "@common/errors";
+import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import { DbLike } from "@db";
+import { DbLike } from "@/db";
 import {
     DbExpandedProjectTemplate,
     DbProjectTemplate,
     projectTemplates as projectTemplatesTable,
-} from "@db/schema";
+} from "@/db/schema";
 
 export function retrieveProjectTemplate(
     db: DbLike,

@@ -5,11 +5,11 @@ import { pipe } from "fp-ts/lib/function";
 import * as TE from "fp-ts/TaskEither";
 import { revalidatePath } from "next/cache";
 
-import { UserSession, UserSettings } from "@common/data/userSession";
-import { RestoreAssertionError } from "@common/errors";
+import { UserSession, UserSettings } from "@/common/data/userSession";
+import { RestoreAssertionError } from "@/common/errors";
 
-import { wrapServerAction } from "@features/utils/decorators";
-import { validate } from "@features/utils/validation";
+import { wrapServerAction } from "@/features/utils/decorators";
+import { validate } from "@/features/utils/validation";
 
 import { bridge } from "./bridge";
 import { Failure, Payload, payloadSchema, Result } from "./data";

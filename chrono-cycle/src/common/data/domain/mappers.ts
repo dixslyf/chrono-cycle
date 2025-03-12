@@ -6,7 +6,7 @@ import {
     encodeReminderId,
     encodeReminderTemplateId,
     encodeTagId,
-} from "@lib/identifiers";
+} from "@/lib/identifiers";
 
 import {
     DbExpandedEvent,
@@ -18,7 +18,7 @@ import {
     DbReminder,
     DbReminderTemplate,
     DbTag,
-} from "@db/schema";
+} from "@/db/schema";
 
 import {
     Event,

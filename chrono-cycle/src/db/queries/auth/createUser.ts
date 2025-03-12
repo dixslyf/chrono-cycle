@@ -1,4 +1,4 @@
-import { DbLike } from "@db";
+import { DbLike } from "@/db";
 import {
     DbExpandedUser,
     DbExpandedUserInsert,
@@ -6,7 +6,7 @@ import {
     DbUserSettingsInsert,
     users,
     userSettings,
-} from "@db/schema";
+} from "@/db/schema";
 
 async function createUserSettings(
     db: DbLike,

@@ -2,15 +2,15 @@ import { pipe } from "fp-ts/function";
 import { type NonEmptyArray } from "fp-ts/NonEmptyArray";
 import * as TE from "fp-ts/TaskEither";
 
-import { AssertionError, DoesNotExistError } from "@common/errors";
+import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import { DbLike } from "@db";
-import { checkUserOwnsEventTemplates } from "@db/queries/event-templates/checkOwnership";
+import { DbLike } from "@/db";
+import { checkUserOwnsEventTemplates } from "@/db/queries/event-templates/checkOwnership";
 import {
     DbReminderTemplate,
     DbReminderTemplateInsert,
     reminderTemplates,
-} from "@db/schema";
+} from "@/db/schema";
 
 export async function rawInsertReminderTemplates(
     db: DbLike,

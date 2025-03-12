@@ -5,7 +5,7 @@ import {
     DuplicateNameError,
     InternalError,
     ValidationError,
-} from "@common/errors";
+} from "@/common/errors";
 
 export const usernameSchema = z
     .string()

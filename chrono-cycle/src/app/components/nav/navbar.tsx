@@ -21,7 +21,7 @@ import Sidebar from "./sidebar";
 const Navbar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false); // handles sidebar
     const [isNotiOpen, setIsNotiOpen] = useState<boolean>(false); // handles notification dropdown
-    const [notifications, _setNotifications] = useState<number>(3); // eslint-disable-line @typescript-eslint/no-unused-vars
+    const [notifications, _setNotifications] = useState<number>(3);
     const pathname = usePathname();
 
     // Server-side action for logging out.

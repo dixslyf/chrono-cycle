@@ -1,10 +1,10 @@
 import { eq } from "drizzle-orm";
 
-import { DbLike } from "@db";
+import { DbLike } from "@/db";
 import {
     DbProjectTemplate,
     projectTemplates as projectTemplatesTable,
-} from "@db/schema/projectTemplates";
+} from "@/db/schema/projectTemplates";
 
 export async function listProjectTemplatesForUser(
     db: DbLike,

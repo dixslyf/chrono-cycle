@@ -1,12 +1,12 @@
 import { pipe } from "fp-ts/lib/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { AssertionError, DoesNotExistError } from "@common/errors";
+import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import { decodeProjectId } from "@lib/identifiers";
+import { decodeProjectId } from "@/lib/identifiers";
 
-import getDb from "@db";
-import { deleteProject } from "@db/queries/projects/delete";
+import getDb from "@/db";
+import { deleteProject } from "@/db/queries/projects/delete";
 
 import { ParsedPayload } from "./data";
 

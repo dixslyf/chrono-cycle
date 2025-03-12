@@ -1,18 +1,17 @@
 import { pipe } from "fp-ts/lib/function";
 import * as TE from "fp-ts/TaskEither";
 
+import { Project, toProject } from "@/common/data/domain";
 import {
     AssertionError,
     DoesNotExistError,
     DuplicateNameError,
-} from "@root/src/common/errors";
+} from "@/common/errors";
 
-import { Project, toProject } from "@common/data/domain";
+import { decodeProjectTemplateId } from "@/lib/identifiers";
 
-import { decodeProjectTemplateId } from "@lib/identifiers";
-
-import getDb from "@db";
-import { createProject } from "@db/queries/projects/create";
+import getDb from "@/db";
+import { createProject } from "@/db/queries/projects/create";
 
 import { ParsedPayload } from "./data";
 

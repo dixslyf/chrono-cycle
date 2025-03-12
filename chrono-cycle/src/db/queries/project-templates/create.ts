@@ -1,14 +1,14 @@
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { DuplicateNameError } from "@common/errors";
+import { DuplicateNameError } from "@/common/errors";
 
-import { DbLike } from "@db";
+import { DbLike } from "@/db";
 import {
     DbProjectTemplate,
     DbProjectTemplateInsert,
     projectTemplates as projectTemplatesTable,
-} from "@db/schema";
+} from "@/db/schema";
 
 import { checkDuplicateProjectTemplateName } from "./checkDuplicateName";
 

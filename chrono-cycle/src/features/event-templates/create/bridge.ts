@@ -1,13 +1,13 @@
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { EventTemplate, toEventTemplate } from "@common/data/domain";
-import { AssertionError, DoesNotExistError } from "@common/errors";
+import { EventTemplate, toEventTemplate } from "@/common/data/domain";
+import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import { decodeProjectTemplateId } from "@lib/identifiers";
+import { decodeProjectTemplateId } from "@/lib/identifiers";
 
-import getDb from "@db";
-import { createEventTemplate } from "@db/queries/event-templates/create";
+import getDb from "@/db";
+import { createEventTemplate } from "@/db/queries/event-templates/create";
 
 import { ParsedPayload } from "./data";
 

@@ -42,6 +42,8 @@ const eslintConfig = [
                 "error",
                 {
                     allowSameFolder: true,
+                    rootDir: "src",
+                    prefix: "@",
                 },
             ],
         },

@@ -3,24 +3,24 @@ import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 import { match } from "ts-pattern";
 
-import { Session, toSession } from "@common/data/userSession";
+import { Session, toSession } from "@/common/data/userSession";
 import {
     AssertionError,
     InvalidCredentialsError,
     RestoreAssertionError,
-} from "@common/errors";
+} from "@/common/errors";
 
-import { verifyPassword } from "@lib/auth/passwords";
+import { verifyPassword } from "@/lib/auth/passwords";
 import {
     generateSessionToken,
     sessionIdFromToken,
     setSessionTokenCookie,
-} from "@lib/auth/sessions";
+} from "@/lib/auth/sessions";
 
-import getDb, { DbLike } from "@db";
-import { createSession } from "@db/queries/auth/createSession";
-import { retrieveUserByUsername } from "@db/queries/auth/retrieveUser";
-import { DbUser } from "@db/schema";
+import getDb, { DbLike } from "@/db";
+import { createSession } from "@/db/queries/auth/createSession";
+import { retrieveUserByUsername } from "@/db/queries/auth/retrieveUser";
+import { DbUser } from "@/db/schema";
 
 import { Failure, ParsedPayload } from "./data";
 

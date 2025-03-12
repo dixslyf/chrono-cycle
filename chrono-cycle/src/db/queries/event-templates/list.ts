@@ -4,22 +4,22 @@ import * as NEA from "fp-ts/NonEmptyArray";
 import * as R from "fp-ts/Record";
 import * as TE from "fp-ts/TaskEither";
 
-import { AssertionError, DoesNotExistError } from "@common/errors";
+import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import { DbLike } from "@db";
-import { retrieveProjectTemplate } from "@db/queries/project-templates/retrieve";
+import { DbLike } from "@/db";
+import { retrieveProjectTemplate } from "@/db/queries/project-templates/retrieve";
 import {
     DbReminderTemplate,
     DbTag,
     eventTemplateTags,
     reminderTemplates,
     tags,
-} from "@db/schema";
+} from "@/db/schema";
 import {
     DbEventTemplate,
     DbExpandedEventTemplate,
     eventTemplates,
-} from "@db/schema/eventTemplates";
+} from "@/db/schema/eventTemplates";
 
 // Combination of DbEventTemplate, DbTag and DbReminderTemplate.
 type DbFatEventTemplate = {
