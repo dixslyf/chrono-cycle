@@ -1,45 +1,39 @@
 "use server";
 
-import { UserSession } from "@/server/common/auth/sessions";
-import { ValidationError } from "@/server/common/errors";
-import getDb from "@/server/db";
-import { wrapServerAction } from "@/server/features/decorators";
 import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
+import * as TE from "fp-ts/TaskEither";
 import { revalidatePath } from "next/cache";
 
-import { UpdateData, updateDataSchema, UpdateResult } from "./data";
-import { updateProjectTemplate } from "./lib";
+import { ProjectTemplateOverview } from "@common/data/domain";
+import { UserSession } from "@common/data/userSession";
+import { RestoreAssertionError } from "@common/errors";
+
+import { wrapServerAction } from "@features/utils/decorators";
+
+import { validate } from "../../utils/validation";
+import { bridge } from "./bridge";
+import { Failure, Payload, payloadSchema, Result } from "./data";
 
 async function updateProjectTemplateActionImpl(
     userSession: UserSession,
-    _prevState: UpdateResult | null,
-    updateData: UpdateData,
-): Promise<UpdateResult> {
+    _prevState: Result | null,
+    payload: Payload,
+): Promise<E.Either<RestoreAssertionError<Failure>, ProjectTemplateOverview>> {
     // Validate form schema.
-    const parseResult = updateDataSchema.safeParse(updateData);
-    if (!parseResult.success) {
-        const formattedZodErrors = parseResult.error.format();
-        return E.left(
-            ValidationError({
-                id: formattedZodErrors.id?._errors || [],
-                name: formattedZodErrors.name?._errors || [],
-                description: formattedZodErrors.description?._errors || [],
-            }),
-        );
-    }
-
-    const db = await getDb();
-    const task = updateProjectTemplate(
-        db,
-        userSession.user.id,
-        parseResult.data,
+    const task = pipe(
+        TE.fromEither(validate(payloadSchema, payload)),
+        TE.chainW((payloadP) => bridge(userSession.user.id, payloadP)),
+        TE.tapIO(() => () => revalidatePath("/templates")),
     );
-    const updated = await task();
-    revalidatePath("/templates");
-    return updated;
+
+    return await task();
 }
 
-export const updateProjectTemplateAction = wrapServerAction(
+export const updateProjectTemplateAction: (
+    _prevState: Result | null,
+    payload: Payload,
+) => Promise<Result> = wrapServerAction(
     "updateProjectTemplate",
     updateProjectTemplateActionImpl,
 );

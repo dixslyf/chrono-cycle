@@ -1,27 +1,31 @@
-import { ProjectTemplateOverview } from "@/server/common/data";
+import * as E from "fp-ts/Either";
+import { z } from "zod";
+
+import { ProjectTemplateOverview } from "@common/data/domain";
 import {
     DoesNotExistError,
     DuplicateNameError,
     InternalError,
     ValidationError,
-} from "@/server/common/errors";
-import { encodedIdSchema } from "@/server/common/identifiers";
-import { projectTemplateUpdateSchema } from "@/server/db/schema/projectTemplates";
-import * as E from "fp-ts/Either";
-import { z } from "zod";
+} from "@common/errors";
 
-export const updateDataSchema = z.object({
+import { encodedIdSchema } from "@lib/identifiers";
+
+import { projectTemplateUpdateSchema } from "@db/schema";
+
+export const payloadSchema = z.object({
     id: encodedIdSchema,
     name: projectTemplateUpdateSchema.shape.name,
     description: projectTemplateUpdateSchema.shape.description,
 });
 
-export type UpdateData = z.output<typeof updateDataSchema>;
+export type Payload = z.input<typeof payloadSchema>;
+export type ParsedPayload = z.output<typeof payloadSchema>;
 
-export type UpdateError =
-    | InternalError
+export type Failure =
     | ValidationError<"id" | "name" | "description">
     | DoesNotExistError
-    | DuplicateNameError;
+    | DuplicateNameError
+    | InternalError;
 
-export type UpdateResult = E.Either<UpdateError, ProjectTemplateOverview>;
+export type Result = E.Either<Failure, ProjectTemplateOverview>;
