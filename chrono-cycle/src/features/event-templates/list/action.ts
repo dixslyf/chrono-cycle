@@ -12,20 +12,16 @@ import { wrapServerAction } from "@features/utils/decorators";
 import { validate } from "@features/utils/validation";
 
 import { bridge } from "./bridge";
-import { Failure, payloadSchema, Result } from "./data";
+import { Failure, Payload, payloadSchema, Result } from "./data";
 
 async function listEventTemplatesActionImpl(
     userSession: UserSession,
     _prevState: Result | null,
-    formData: FormData,
+    payload: Payload,
 ): Promise<E.Either<RestoreAssertionError<Failure>, EventTemplate[]>> {
     // Validate form schema.
     const task = pipe(
-        TE.fromEither(
-            validate(payloadSchema, {
-                projectTemplateId: formData.get("projectTemplateId"),
-            }),
-        ),
+        TE.fromEither(validate(payloadSchema, payload)),
         TE.chainW((payloadP) => bridge(userSession.user.id, payloadP)),
     );
 
@@ -34,7 +30,7 @@ async function listEventTemplatesActionImpl(
 
 export const listEventTemplatesAction: (
     _prevState: Result | null,
-    formData: FormData,
+    payload: Payload,
 ) => Promise<Result> = wrapServerAction(
     "listEventTemplates",
     listEventTemplatesActionImpl,

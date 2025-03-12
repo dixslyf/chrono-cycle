@@ -10,21 +10,15 @@ import { wrapServerActionWith } from "@features/utils/decorators";
 
 import { validate } from "../../utils/validation";
 import { bridge } from "./bridge";
-import { Failure, payloadSchema, Result } from "./data";
+import { Failure, Payload, payloadSchema, Result } from "./data";
 
 async function signUpActionImpl(
     _prevState: Result | null,
-    formData: FormData,
+    payload: Payload,
 ): Promise<E.Either<RestoreAssertionError<Failure>, void>> {
     // Validate form schema.
     const task = pipe(
-        TE.fromEither(
-            validate(payloadSchema, {
-                username: formData.get("username"),
-                email: formData.get("email"),
-                password: formData.get("password"),
-            }),
-        ),
+        TE.fromEither(validate(payloadSchema, payload)),
         TE.chainW((payloadP) => bridge(payloadP)),
     );
     return await task();

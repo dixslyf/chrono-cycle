@@ -13,20 +13,15 @@ import { wrapServerAction } from "@features/utils/decorators";
 import { validate } from "@features/utils/validation";
 
 import { bridge } from "./bridge";
-import { Failure, payloadSchema, Result } from "./data";
+import { Failure, Payload, payloadSchema, Result } from "./data";
 
 async function createProjectTemplateActionImpl(
     userSession: UserSession,
     _prevState: Result | null,
-    payload: FormData,
+    payload: Payload,
 ): Promise<E.Either<RestoreAssertionError<Failure>, ProjectTemplateOverview>> {
     return await pipe(
-        TE.fromEither(
-            validate(payloadSchema, {
-                name: payload.get("name"),
-                description: payload.get("description"),
-            }),
-        ),
+        TE.fromEither(validate(payloadSchema, payload)),
         TE.chainW((payloadP) => bridge(userSession.user.id, payloadP)),
         TE.tap((_) => TE.fromIO(() => revalidatePath("/templates"))),
     )();

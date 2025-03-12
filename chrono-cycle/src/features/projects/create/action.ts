@@ -12,23 +12,16 @@ import { wrapServerAction } from "@features/utils/decorators";
 import { validate } from "@features/utils/validation";
 
 import { bridge } from "./bridge";
-import { Failure, payloadSchema, Result } from "./data";
+import { Failure, Payload, payloadSchema, Result } from "./data";
 
 async function createProjectActionImpl(
     userSession: UserSession,
     _prevState: Result | null,
-    formData: FormData,
+    payload: Payload,
 ): Promise<E.Either<RestoreAssertionError<Failure>, Project>> {
     // Validate form schema.
     const task = pipe(
-        TE.fromEither(
-            validate(payloadSchema, {
-                name: formData.get("name"),
-                description: formData.get("description"),
-                startsAt: formData.get("startsAt"),
-                projectTemplateId: formData.get("projectTemplateId"),
-            }),
-        ),
+        TE.fromEither(validate(payloadSchema, payload)),
         TE.chainW((payloadP) => bridge(userSession.user.id, payloadP)),
         // TODO: What path to revalidate?
         // revalidatePath("/templates");
@@ -39,7 +32,7 @@ async function createProjectActionImpl(
 
 export const createProjectAction: (
     _prevState: Result | null,
-    formData: FormData,
+    payload: Payload,
 ) => Promise<Result> = wrapServerAction(
     "createProject",
     createProjectActionImpl,
