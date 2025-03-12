@@ -1,28 +1,32 @@
-import { Project } from "@/server/common/data";
-import {
-    DuplicateNameError,
-    InternalError,
-    ValidationError,
-} from "@/server/common/errors";
-import { encodedIdSchema } from "@/server/common/identifiers";
-import { projectInsertSchema } from "@/server/db/schema";
-import { ListError as ListEventTemplatesError } from "@/server/features/event-templates/list/data";
 import * as E from "fp-ts/Either";
 import { z } from "zod";
 
-export const createFormSchema = z.object({
+import { Project } from "@common/data/domain";
+import {
+    DoesNotExistError,
+    DuplicateNameError,
+    InternalError,
+    ValidationError,
+} from "@common/errors";
+
+import { encodedIdSchema } from "@lib/identifiers";
+
+import { projectInsertSchema } from "@db/schema";
+
+export const payloadSchema = z.object({
     name: projectInsertSchema.shape.name,
     description: projectInsertSchema.shape.description,
-    startsAt: projectInsertSchema.shape.startsAt,
+    startsAt: z.string().date().pipe(z.coerce.date()),
     projectTemplateId: encodedIdSchema,
 });
 
-export type CreateFormData = z.output<typeof createFormSchema>;
+export type Payload = z.input<typeof payloadSchema>;
+export type ParsedPayload = z.output<typeof payloadSchema>;
 
-export type CreateError =
+export type Failure =
     | ValidationError<"name" | "description" | "startsAt" | "projectTemplateId">
     | DuplicateNameError
-    | ListEventTemplatesError
+    | DoesNotExistError
     | InternalError;
 
-export type CreateResult = E.Either<CreateError, Project>;
+export type Result = E.Either<Failure, Project>;

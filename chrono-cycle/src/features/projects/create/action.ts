@@ -1,45 +1,46 @@
 "use server";
 
-import { UserSession } from "@/server/common/auth/sessions";
-import { ValidationError } from "@/server/common/errors";
-import { wrapServerAction } from "@/server/features/decorators";
 import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/lib/function";
+import * as TE from "fp-ts/TaskEither";
 
-import { createFormSchema, CreateResult } from "./data";
-import { createProject } from "./lib";
+import { Project } from "@common/data/domain";
+import { UserSession } from "@common/data/userSession";
+import { RestoreAssertionError } from "@common/errors";
+
+import { wrapServerAction } from "@features/utils/decorators";
+import { validate } from "@features/utils/validation";
+
+import { bridge } from "./bridge";
+import { Failure, payloadSchema, Result } from "./data";
 
 async function createProjectActionImpl(
     userSession: UserSession,
-    _prevState: CreateResult | null,
+    _prevState: Result | null,
     formData: FormData,
-): Promise<CreateResult> {
+): Promise<E.Either<RestoreAssertionError<Failure>, Project>> {
     // Validate form schema.
-    const parseResult = createFormSchema.safeParse({
-        name: formData.get("name"),
-        description: formData.get("description"),
-        startsAt: formData.get("startsAt"),
-        projectTemplateId: formData.get("projectTemplateId"),
-    });
-
-    if (!parseResult.success) {
-        const formattedZodErrors = parseResult.error.format();
-        return E.left(
-            ValidationError({
-                name: formattedZodErrors.name?._errors || [],
-                description: formattedZodErrors.description?._errors || [],
-                startsAt: formattedZodErrors.startsAt?._errors || [],
-                projectTemplateId:
-                    formattedZodErrors.projectTemplateId?._errors || [],
+    const task = pipe(
+        TE.fromEither(
+            validate(payloadSchema, {
+                name: formData.get("name"),
+                description: formData.get("description"),
+                startsAt: formData.get("startsAt"),
+                projectTemplateId: formData.get("projectTemplateId"),
             }),
-        );
-    }
+        ),
+        TE.chainW((payloadP) => bridge(userSession.user.id, payloadP)),
+        // TODO: What path to revalidate?
+        // revalidatePath("/templates");
+    );
 
-    // TODO: What path to revalidate?
-    // revalidatePath("/templates");
-    return await createProject(userSession.user.id, parseResult.data);
+    return await task();
 }
 
-export const createProjectAction = wrapServerAction(
+export const createProjectAction: (
+    _prevState: Result | null,
+    formData: FormData,
+) => Promise<Result> = wrapServerAction(
     "createProject",
     createProjectActionImpl,
 );
