@@ -38,6 +38,8 @@ export const userSettings = pgTable("user_settings", {
 
 export type DbUserSettings = InferSelectModel<typeof userSettings>;
 export type DbUserSettingsInsert = InferInsertModel<typeof userSettings>;
+export type DbUserSettingsUpdate = Pick<DbUserSettings, "userId"> &
+    Partial<Omit<DbUserSettingsInsert, "userId">>;
 
 export const userSettingsSelectSchema = createSelectSchema(userSettings);
 export const userSettingsInsertSchema = createInsertSchema(userSettings);
