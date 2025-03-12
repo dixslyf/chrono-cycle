@@ -2,6 +2,7 @@ import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import * as T from "fp-ts/Task";
 import * as TO from "fp-ts/TaskOption";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
 
 import { UserSession } from "@/common/data/userSession";
@@ -88,14 +89,18 @@ export function wrapTryCatch<A extends unknown[], E extends BaseError, R>(
                 result,
                 E.mapLeft((err) => {
                     if (err._errorKind === "AssertionError") {
-                        serverActionLogger.err(err, "An assertion failed");
+                        serverActionLogger.error(err, "An assertion failed");
                         return InternalError();
                     }
                     return err as Exclude<E, AssertionError>;
                 }),
             );
         } catch (err) {
-            serverActionLogger.err(err, "An internal error occurred");
+            // Hack: Next.js throws an error when using `redirect()`, so we bubble that up..
+            if (isRedirectError(err)) {
+                throw err;
+            }
+            serverActionLogger.error(err, "An internal error occurred");
             return E.left(InternalError());
         }
     };

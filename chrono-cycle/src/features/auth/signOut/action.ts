@@ -23,7 +23,7 @@ async function signOutActionImpl(
     const task = pipe(
         () => invalidateSession(userSession.session.id),
         TE.chain(() => TE.fromTask(deleteSessionTokenCookie)),
-        TE.map(() => redirect("/")),
+        TE.flatMapIO(() => () => redirect("/")),
     );
 
     return await task();

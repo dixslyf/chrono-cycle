@@ -1,14 +1,16 @@
 "use client";
 
-import { notifyError } from "@/app/utils/notifications";
-import { ProjectTemplateOverview } from "@/server/common/data";
-import { retrieveProjectTemplateAction } from "@/server/features/project-templates/retrieve/action";
-import { ProjectTemplateData } from "@/server/features/project-templates/retrieve/data";
 import { Group, Modal, Stack, useModalsStack } from "@mantine/core";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { DataTable } from "mantine-datatable";
 import { useCallback, useState } from "react";
+
+import { notifyError } from "@/app/utils/notifications";
+
+import { ProjectTemplateOverview } from "@/common/data/domain";
+
+import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 
 import { CreateEventTemplateButton } from "./createEventButton";
 import { DeleteTemplateButton } from "./deleteTemplateButton";
@@ -40,7 +42,7 @@ export function TemplateTable({
 
     // State for storing the clicked project template.
     const [clickedProjectTemplateData, setClickedProjectTemplateData] =
-        useState<ProjectTemplateData | null>(null);
+        useState<ProjectTemplateOverview | null>(null);
 
     // Entries for the table.
     const records = entries.map(
@@ -55,7 +57,9 @@ export function TemplateTable({
 
     // Retrieve data for a clicked project template.
     async function retrieveProjectTemplateData(projectTemplateId: string) {
-        const result = await retrieveProjectTemplateAction(projectTemplateId);
+        const result = await retrieveProjectTemplateAction({
+            projectTemplateId,
+        });
         pipe(
             result,
             E.match(

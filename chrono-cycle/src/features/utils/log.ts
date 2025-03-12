@@ -1,4 +1,4 @@
-import { baseLogger } from "@/server/common/log";
+import { baseLogger } from "@/lib/log";
 
 // Authentication logs are disabled by default.
 const enableAuthLogs = (process.env.AUTH_LOG ?? "0") === "1";

@@ -1,12 +1,5 @@
 "use client";
 
-import { notifyError, notifySuccess } from "@/app/utils/notifications";
-import { createEventTemplateAction } from "@/server/features/event-templates/create/action";
-import {
-    CreateFormData as CreateEventTemplateFormData,
-    CreateFormData,
-    createFormDataSchema,
-} from "@/server/features/event-templates/create/data";
 import {
     ActionIcon,
     Button,
@@ -28,7 +21,12 @@ import { Clock, Plus, Trash } from "lucide-react";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { startTransition, useActionState, useEffect, useState } from "react";
 
-type ReminderData = Required<CreateEventTemplateFormData["reminders"][number]>;
+import { notifyError, notifySuccess } from "@/app/utils/notifications";
+
+import { createEventTemplateAction } from "@/features/event-templates/create/action";
+import { Payload, payloadSchema } from "@/features/event-templates/create/data";
+
+type ReminderData = Required<Payload["reminders"][number]>;
 
 export function CreateEventTemplateForm({
     projectTemplateId,
@@ -66,7 +64,7 @@ export function CreateEventTemplateForm({
         );
     }, [createResult, onSuccess]);
 
-    const form = useForm<CreateFormData>({
+    const form = useForm<Payload>({
         mode: "uncontrolled",
         initialValues: {
             name: "",
@@ -79,7 +77,7 @@ export function CreateEventTemplateForm({
             reminders: [] as ReminderData[],
             tags: [] as string[],
         },
-        validate: zodResolver(createFormDataSchema),
+        validate: zodResolver(payloadSchema),
     });
 
     // Disable duration field and set it to 1 when event type is set to "task".
@@ -90,10 +88,6 @@ export function CreateEventTemplateForm({
         }
         setDurationDisabled(createPending || change.value === "task");
     });
-
-    useEffect(() => {
-        console.log(form.getValues());
-    }, [form]);
 
     return (
         <form

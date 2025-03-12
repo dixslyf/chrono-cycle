@@ -1,7 +1,8 @@
 "use client";
 
-import { ProjectTemplateData } from "@/server/features/project-templates/retrieve/data";
 import { Skeleton, Stack, Text } from "@mantine/core";
+
+import { ProjectTemplate } from "@/common/data/domain";
 
 export function TemplateDetailsSkeleton(): React.ReactNode {
     return (
@@ -17,7 +18,7 @@ export function TemplateDetailsSkeleton(): React.ReactNode {
 export function TemplateDetails({
     projectTemplateData: templateData,
 }: {
-    projectTemplateData: ProjectTemplateData;
+    projectTemplateData: ProjectTemplate;
 }): React.ReactNode {
     return (
         <Stack>

@@ -20,14 +20,19 @@ async function createProjectTemplateActionImpl(
     _prevState: Result | null,
     payload: Payload,
 ): Promise<E.Either<RestoreAssertionError<Failure>, ProjectTemplateOverview>> {
-    return await pipe(
+    const task = pipe(
         TE.fromEither(validate(payloadSchema, payload)),
         TE.chainW((payloadP) => bridge(userSession.user.id, payloadP)),
         TE.tap((_) => TE.fromIO(() => revalidatePath("/templates"))),
-    )();
+    );
+
+    return await task();
 }
 
-export const createProjectTemplateAction = wrapServerAction(
+export const createProjectTemplateAction: (
+    _prevState: Result | null,
+    payload: Payload,
+) => Promise<Result> = wrapServerAction(
     "createProjectTemplate",
     createProjectTemplateActionImpl,
 );

@@ -1,28 +1,73 @@
 // sign in component
 "use client";
 
-import { signInAction } from "@/server/features/auth/signIn/action";
-import { useActionState } from "react";
+import { useForm, zodResolver } from "@mantine/form";
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
+import { startTransition, useActionState } from "react";
+import { match } from "ts-pattern";
+
+import { signInAction } from "@/features/auth/signIn/action";
+import { payloadSchema, Result } from "@/features/auth/signIn/data";
+
+function getErrorMessage(formState: Result): string {
+    return pipe(
+        formState,
+        E.match(
+            (err) =>
+                match(err)
+                    .with(
+                        { _errorKind: "InvalidCredentialsError" },
+                        () => "Incorrect username or password",
+                    )
+                    .with(
+                        { _errorKind: "InternalError" },
+                        () => "An internal error occurred",
+                    )
+                    .with(
+                        { _errorKind: "ValidationError" },
+                        () => "Invalid or missing fields",
+                    )
+                    .exhaustive(),
+            () => "",
+        ),
+    );
+}
 
 const SigninForm = () => {
     // Server-side action for signing in.
-    const [formState, formAction, isPending] = useActionState(signInAction, {});
+    const [formState, formAction, isPending] = useActionState(
+        signInAction,
+        null,
+    );
+
+    const form = useForm({
+        mode: "uncontrolled",
+        initialValues: {
+            username: "",
+            password: "",
+            remember: false,
+        },
+        validate: zodResolver(payloadSchema),
+    });
 
     return (
         <div className="w-full h-full flex flex-col gap-10">
             {/* header */}
             <h1 className="text-palette1 font-bold text-3xl p-5">Sign In</h1>
             <form
-                action={formAction}
+                onSubmit={form.onSubmit((values) =>
+                    startTransition(() => formAction(values)),
+                )}
                 className="flex flex-col items-center gap-16"
             >
                 <div className="w-full flex flex-col items-center gap-5">
                     {/* TODO: Style this properly. */}
                     {/* Error message for login failure. */}
                     <div className="w-full flex justify-center mb-4 font-semibold">
-                        {formState?.errorMessage && (
+                        {formState && (
                             <p className="text-red-500 text-lg">
-                                {formState.errorMessage}
+                                {getErrorMessage(formState)}
                             </p>
                         )}
                     </div>
@@ -41,6 +86,7 @@ const SigninForm = () => {
                             className="rounded-xl bg-[#dfdfdf] placeholder-[#989898] p-1 pl-2 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1"
                             placeholder="Username"
                             required
+                            {...form.getInputProps("username")}
                         />
                     </div>
 
@@ -59,6 +105,7 @@ const SigninForm = () => {
                             className="rounded-xl bg-[#dfdfdf] placeholder-[#989898] p-1 pl-2 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1"
                             placeholder="Password"
                             required
+                            {...form.getInputProps("password")}
                         />
                     </div>
                 </div>
@@ -87,6 +134,9 @@ const SigninForm = () => {
                                 "
                                 id="remember"
                                 name="remember"
+                                {...form.getInputProps("remember", {
+                                    type: "checkbox",
+                                })}
                             />
                             <label
                                 htmlFor="remember"

@@ -1,7 +1,6 @@
 // main navbar
 "use client";
 
-import { signOutAction } from "@/server/features/auth/signOut/action";
 import {
     MenuContent,
     MenuItem,
@@ -13,6 +12,8 @@ import { Bell, LogOut, User, UserPen } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useActionState, useCallback, useEffect, useState } from "react";
+
+import { signOutAction } from "@/features/auth/signOut/action";
 
 import Logo from "./logo";
 import HamburgerMenu from "./menu";

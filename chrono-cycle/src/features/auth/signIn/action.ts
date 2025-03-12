@@ -27,7 +27,10 @@ async function signInActionImpl(
     return await task();
 }
 
-export const signInAction = wrapServerActionWith(
+export const signInAction: (
+    _prevState: Result | null,
+    payload: Payload,
+) => Promise<Result> = wrapServerActionWith(
     "signIn",
     { auth: false },
     signInActionImpl,

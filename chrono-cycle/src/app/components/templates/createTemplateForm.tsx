@@ -1,21 +1,24 @@
 "use client";
 
-import { notifyError, notifySuccess } from "@/app/utils/notifications";
-import { ValidationIssues } from "@/server/common/errors";
-import { createProjectTemplateAction } from "@/server/features/project-templates/create/action";
-import {
-    createFormSchema,
-    CreateResult,
-} from "@/server/features/project-templates/create/data";
 import { Button, Group, Textarea, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { useActionState, useEffect } from "react";
+import { startTransition, useActionState, useEffect } from "react";
 import { match, P } from "ts-pattern";
 
-function getCreateErrorMessage(createState: CreateResult) {
+import { notifyError, notifySuccess } from "@/app/utils/notifications";
+
+import { ValidationIssues } from "@/common/errors";
+
+import { createProjectTemplateAction } from "@/features/project-templates/create/action";
+import {
+    payloadSchema,
+    Result,
+} from "@/features/project-templates/create/data";
+
+function getCreateErrorMessage(createState: Result) {
     return match(createState)
         .with(
             { left: { _errorKind: "ValidationError" } },
@@ -23,14 +26,18 @@ function getCreateErrorMessage(createState: CreateResult) {
         )
         .with(
             { left: { _errorKind: "DuplicateNameError" } },
-            () => "Project tempalte name is already used",
+            () => "Project template name is already taken",
+        )
+        .with(
+            { left: { _errorKind: "InternalError" } },
+            () => "An internal error occurred",
         )
         .with({ right: P.any }, () => "")
         .exhaustive();
 }
 
 function extractValidationIssues(
-    createState: CreateResult | null,
+    createState: Result | null,
 ): ValidationIssues<"name" | "description"> {
     const noIssue = { name: [], description: [] };
     if (!createState) {
@@ -88,11 +95,15 @@ export function CreateProjectTemplateForm({
             name: "",
             description: "",
         },
-        validate: zodResolver(createFormSchema),
+        validate: zodResolver(payloadSchema),
     });
 
     return (
-        <form action={createAction}>
+        <form
+            onSubmit={form.onSubmit((values) =>
+                startTransition(() => createAction(values)),
+            )}
+        >
             <TextInput
                 name="name"
                 label="Name"
