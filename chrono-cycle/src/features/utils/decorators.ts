@@ -32,22 +32,24 @@ export function wrapAuth<A extends unknown[], R>(
         const task = pipe(
             // Verify user identity.
             getCurrentUserSession,
-            TO.tapIO((userSession) =>
-                authLogger.info(
-                    userSession,
-                    `Authentication succeeded for "${label}"`,
-                ),
+            TO.tapIO(
+                (userSession) => () =>
+                    authLogger.info(
+                        userSession,
+                        `Authentication succeeded for "${label}"`,
+                    ),
             ),
             TO.map((userSession) => f(userSession, ...args)),
             // Redirect if authentication failed.
             TO.getOrElseW(() =>
                 pipe(
                     getSessionTokenFromCookie(),
-                    T.flatMapIO((maybeToken) =>
-                        authLogger.warn(
-                            { maybeToken },
-                            `Authentication failed while invoking "${label}"`,
-                        ),
+                    T.flatMapIO(
+                        (maybeToken) => () =>
+                            authLogger.warn(
+                                { maybeToken },
+                                `Authentication failed while invoking "${label}"`,
+                            ),
                     ),
                     T.map(() => redirect("/")),
                 ),
