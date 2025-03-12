@@ -1,6 +1,6 @@
-import { DbSession, DbUser } from "@db/schema";
+import { DbSession, DbUser, DbUserSettings } from "@db/schema";
 
-import { Session, User, UserSession } from "./types";
+import { Session, User, UserSession, UserSettings } from "./types";
 
 export function toUser(dbUser: DbUser): User {
     const { hashedPassword: _, ...rest } = dbUser;
@@ -23,4 +23,9 @@ export function toUserSession(dbUserSession: {
         user: toUser(dbUserSession.user),
         session: toSession(dbUserSession.session),
     };
+}
+
+export function toUserSettings(dbUserSettings: DbUserSettings): UserSettings {
+    const { userId, ...rest } = dbUserSettings;
+    return rest;
 }
