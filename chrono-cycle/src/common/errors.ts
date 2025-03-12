@@ -80,3 +80,11 @@ export function InvalidCredentialsError(): InvalidCredentialsError {
         _errorKind: "InvalidCredentialsError",
     };
 }
+
+export type DuplicateReminderError = {
+    _errorKind: "DuplicateReminderError";
+};
+
+export function DuplicateReminderError(): DuplicateReminderError {
+    return { _errorKind: "DuplicateReminderError" };
+}
