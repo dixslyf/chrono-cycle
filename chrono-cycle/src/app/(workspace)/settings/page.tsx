@@ -1,7 +1,28 @@
 // setting page
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/lib/function";
+
 import SettingsForm from "@/app/components/settings/settingsForm";
 
-export default function Setting() {
+import { UserSettings } from "@/common/data/userSession";
+
+import { retrieveSettingsAction } from "@/features/settings/retrieve/action";
+
+export default async function Settings() {
+    const initialSettings = pipe(
+        await retrieveSettingsAction(),
+        // Fallback
+        E.getOrElse(
+            () =>
+                ({
+                    startDayOfWeek: "Monday",
+                    dateFormat: "DD/MM/YYYY",
+                    enableEmailNotifications: true,
+                    enableDesktopNotifications: true,
+                }) satisfies UserSettings as UserSettings,
+        ),
+    );
+
     return (
         <>
             {/* title */}
@@ -15,7 +36,7 @@ export default function Setting() {
 
             {/* Options section */}
             <section className="px-8">
-                <SettingsForm />
+                <SettingsForm initialSettings={initialSettings} />
             </section>
         </>
     );

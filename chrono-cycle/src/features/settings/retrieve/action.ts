@@ -10,7 +10,7 @@ import { wrapServerAction } from "@/features/utils/decorators";
 import { bridge } from "./bridge";
 import { Failure, Result } from "./data";
 
-async function fetchSettingsActionImpl(
+async function retrieveSettingsActionImpl(
     userSession: UserSession,
 ): Promise<E.Either<RestoreAssertionError<Failure>, UserSettings>> {
     const userId = userSession.user.id;
@@ -18,7 +18,7 @@ async function fetchSettingsActionImpl(
     return await task();
 }
 
-export const fetchSettingsAction: () => Promise<Result> = wrapServerAction(
-    "fetchSettings",
-    fetchSettingsActionImpl,
+export const retrieveSettingsAction: () => Promise<Result> = wrapServerAction(
+    "retrieveSettings",
+    retrieveSettingsActionImpl,
 );

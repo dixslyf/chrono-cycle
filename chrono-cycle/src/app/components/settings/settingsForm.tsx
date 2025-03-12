@@ -6,112 +6,67 @@ import {
     NativeSelect,
     SimpleGrid,
     Stack,
+    Switch,
     Text,
 } from "@mantine/core";
-import { startTransition, useActionState, useEffect, useState } from "react";
+import { useForm, zodResolver } from "@mantine/form";
+import * as E from "fp-ts/Either";
+import { startTransition, useActionState, useEffect } from "react";
+import { match } from "ts-pattern";
 
-import { fetchSettingsAction } from "@/features/settings/retrieve/action";
+import { UserSettings } from "@/common/data/userSession";
+
 import { updateSettingsAction } from "@/features/settings/update/action";
+import { payloadSchema, Result } from "@/features/settings/update/data";
 
-import Toggle from "./toggle";
+function getUpdateStatusMessage(formStatus: Result): string {
+    return match(formStatus)
+        .with(
+            { left: { _errorKind: "ValidationError" } },
+            () => "Invalid or missing fields",
+        )
+        .with(
+            { left: { _errorKind: "InternalError" } },
+            () => "An internal error occurred",
+        )
+        .with(
+            { left: { _errorKind: "DoesNotExistError" } },
+            () => "Failed to retrieve user settings",
+        )
+        .with({ _tag: "Right" }, () => "Settings updated successfully!")
+        .exhaustive();
+}
 
-const SettingsForm = () => {
-    // store initial settings here
-    const [initialSettings, setInitialSettings] = useState<{
-        startDayOfWeek: string;
-        dateFormat: string;
-        enableEmailNotifications: boolean;
-        enableDesktopNotifications: boolean;
-    } | null>(null);
-
-    const [startDayOfWeek, setStartDayOfWeek] = useState<string>("Monday");
-    const [dateFormat, setDateFormat] = useState<string>("DD/MM/YYYY");
-    const [enableEmailNotifications, setEmailNotifications] =
-        useState<boolean>(false);
-    const [enableDesktopNotifications, setDesktopNotifications] =
-        useState<boolean>(false);
-
-    // Define the action state using useActionState
+function SettingsForm({ initialSettings }: { initialSettings: UserSettings }) {
     const [formStatus, submitAction, isSubmitting] = useActionState(
         updateSettingsAction,
-        { submitSuccess: false },
+        null,
     );
 
-    // Fetch settings on component mount
+    const form = useForm({
+        mode: "controlled",
+        initialValues: initialSettings,
+        validate: zodResolver(payloadSchema),
+    });
+
+    const { resetDirty: resetDirty } = form;
     useEffect(() => {
-        const loadSettings = async () => {
-            const settingsResponse = await fetchSettingsAction();
-            if (settingsResponse.submitSuccess) {
-                const settings = {
-                    startDayOfWeek: settingsResponse.startDayOfWeek || "Monday",
-                    dateFormat: settingsResponse.dateFormat || "DD/MM/YYYY",
-                    enableEmailNotifications:
-                        settingsResponse.enableEmailNotifications || false,
-                    enableDesktopNotifications:
-                        settingsResponse.enableDesktopNotifications || false,
-                };
-                setInitialSettings(settings);
-                setStartDayOfWeek(settings.startDayOfWeek);
-                setDateFormat(settings.dateFormat);
-                setEmailNotifications(settings.enableEmailNotifications);
-                setDesktopNotifications(settings.enableDesktopNotifications);
-            }
-        };
-
-        loadSettings();
-    }, []);
-
-    // check if any of the settings have changed
-    const hasChanges =
-        initialSettings &&
-        (startDayOfWeek !== initialSettings.startDayOfWeek ||
-            dateFormat !== initialSettings.dateFormat ||
-            enableEmailNotifications !==
-                initialSettings.enableEmailNotifications ||
-            enableDesktopNotifications !==
-                initialSettings.enableDesktopNotifications);
-
-    // update intial settings after submit to persist locally
-    useEffect(() => {
-        if (formStatus.submitSuccess) {
-            setInitialSettings({
-                startDayOfWeek,
-                dateFormat,
-                enableEmailNotifications,
-                enableDesktopNotifications,
-            });
+        if (!formStatus) {
+            return;
         }
-    }, [
-        formStatus.submitSuccess,
-        startDayOfWeek,
-        dateFormat,
-        enableEmailNotifications,
-        enableDesktopNotifications,
-    ]);
 
-    // Handle form submission
-    const handleSubmit = async (event: React.FormEvent) => {
-        event.preventDefault();
-
-        const formData = new FormData();
-        formData.append("startDayOfWeek", startDayOfWeek);
-        formData.append("dateFormat", dateFormat);
-        formData.append(
-            "enableEmailNotifications",
-            enableEmailNotifications.toString(),
-        );
-        formData.append(
-            "enableDesktopNotifications",
-            enableDesktopNotifications.toString(),
-        );
-
-        startTransition(() => {
-            submitAction(formData);
-        });
-    };
+        // Reset the dirty state of the form on success.
+        if (E.isRight(formStatus)) {
+            resetDirty();
+        }
+    }, [formStatus, resetDirty]);
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form
+            onSubmit={form.onSubmit((values) =>
+                startTransition(() => submitAction(values)),
+            )}
+        >
             <Stack gap="md" align="stretch" className="pb-8">
                 <Text className="text-3xl font-bold">General</Text>
                 <Text className="text-gray-400 font-semibold mb-2">
@@ -125,10 +80,7 @@ const SettingsForm = () => {
                         </Text>
                         <NativeSelect
                             data={["Monday", "Sunday"]}
-                            value={startDayOfWeek}
-                            onChange={(event) => {
-                                setStartDayOfWeek(event.currentTarget.value);
-                            }}
+                            {...form.getInputProps("startDayOfWeek")}
                         />
                     </Group>
                     <div /> {/* center column left empty */}
@@ -138,10 +90,7 @@ const SettingsForm = () => {
                         </Text>
                         <NativeSelect
                             data={["MM/DD/YYYY", "DD/MM/YYYY", "YYYY/MM/DD"]}
-                            value={dateFormat}
-                            onChange={(event) =>
-                                setDateFormat(event.currentTarget.value)
-                            }
+                            {...form.getInputProps("dateFormat")}
                         />
                     </Group>
                 </SimpleGrid>
@@ -159,11 +108,11 @@ const SettingsForm = () => {
                         <Text className="text-xl font-semibold">
                             Email Notifications:
                         </Text>
-                        <Toggle
-                            checked={enableEmailNotifications}
-                            onChange={(e) =>
-                                setEmailNotifications(e.target.checked)
-                            }
+                        <Switch
+                            size="md"
+                            {...form.getInputProps("enableEmailNotifications", {
+                                type: "checkbox",
+                            })}
                         />
                     </Group>
                     <div /> {/* center column left */}
@@ -171,11 +120,14 @@ const SettingsForm = () => {
                         <Text className="text-xl font-semibold">
                             Desktop Notifications:
                         </Text>
-                        <Toggle
-                            checked={enableDesktopNotifications}
-                            onChange={(e) =>
-                                setDesktopNotifications(e.target.checked)
-                            }
+                        <Switch
+                            size="md"
+                            {...form.getInputProps(
+                                "enableDesktopNotifications",
+                                {
+                                    type: "checkbox",
+                                },
+                            )}
                         />
                     </Group>
                 </SimpleGrid>
@@ -183,23 +135,22 @@ const SettingsForm = () => {
             </Stack>
 
             <Stack gap="md" className="mt-2 items-center">
-                <Text
-                    className={`font-semibold text-xl ${formStatus.submitSuccess ? "text-green-500" : "text-red-500"}`}
-                >
-                    {formStatus.submitSuccess
-                        ? "Settings updated successfully!"
-                        : formStatus.errorMessage}
-                </Text>
+                {formStatus && (
+                    <Text
+                        className={`font-semibold text-xl ${E.isRight(formStatus) ? "text-green-500" : "text-red-500"}`}
+                    >
+                        {getUpdateStatusMessage(formStatus)}
+                    </Text>
+                )}
                 <Group className="w-full" justify="flex-end">
                     <Button
                         type="submit"
-                        disabled={!hasChanges || isSubmitting}
+                        disabled={!form.isDirty()}
                         loading={isSubmitting}
-                        className={`transition-colors duration-200 ease-linear ${
-                            !hasChanges || isSubmitting
+                        className={`transition-colors duration-200 ease-linear ${!form.isDirty() || isSubmitting
                                 ? "bg-gray-400 cursor-default text-palette3"
                                 : "bg-palette2 hover:bg-palette1"
-                        }`}
+                            }`}
                     >
                         Save Changes
                     </Button>
@@ -207,6 +158,6 @@ const SettingsForm = () => {
             </Stack>
         </form>
     );
-};
+}
 
 export default SettingsForm;

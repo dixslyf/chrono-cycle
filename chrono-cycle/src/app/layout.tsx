@@ -12,6 +12,7 @@ import { ColorSchemeScript } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 
 import "./globals.css";
+import "./mantine-styles.css";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
