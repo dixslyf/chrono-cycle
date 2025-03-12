@@ -10,19 +10,14 @@ import { RestoreAssertionError } from "@/common/errors";
 
 import { wrapServerAction } from "@/features/utils/decorators";
 
-import {
-    deleteSessionTokenCookie,
-    invalidateSession,
-} from "@/lib/auth/sessions";
-
+import { bridge } from "./bridge";
 import { Failure } from "./data";
 
 async function signOutActionImpl(
     userSession: UserSession,
 ): Promise<E.Either<RestoreAssertionError<Failure>, never>> {
     const task = pipe(
-        () => invalidateSession(userSession.session.id),
-        TE.chain(() => TE.fromTask(deleteSessionTokenCookie)),
+        bridge(userSession.session.id),
         TE.flatMapIO(() => () => redirect("/")),
     );
 
