@@ -1,22 +1,25 @@
-import { EventTemplate } from "@/server/common/data";
+import * as E from "fp-ts/Either";
+import { z } from "zod";
+
+import { EventTemplate } from "@common/data/domain";
 import {
     DoesNotExistError,
     InternalError,
     ValidationError,
-} from "@/server/common/errors";
-import { encodedIdSchema } from "@/server/common/identifiers";
-import * as E from "fp-ts/Either";
-import { z } from "zod";
+} from "@common/errors";
 
-export const listFormDataSchema = z.object({
+import { encodedIdSchema } from "@lib/identifiers";
+
+export const payloadSchema = z.object({
     projectTemplateId: encodedIdSchema,
 });
 
-export type ListFormData = z.output<typeof listFormDataSchema>;
+export type Payload = z.input<typeof payloadSchema>;
+export type ParsedPayload = z.output<typeof payloadSchema>;
 
-export type ListError =
+export type Failure =
     | ValidationError<"projectTemplateId">
     | DoesNotExistError
     | InternalError;
 
-export type ListResult = E.Either<ListError, EventTemplate[]>;
+export type Result = E.Either<Failure, EventTemplate[]>;

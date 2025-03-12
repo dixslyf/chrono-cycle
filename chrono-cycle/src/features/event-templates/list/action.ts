@@ -1,37 +1,41 @@
 "use server";
 
-import { UserSession } from "@/server/common/auth/sessions";
-import { ValidationError } from "@/server/common/errors";
-import { wrapServerAction } from "@/server/features/decorators";
 import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/lib/function";
+import * as TE from "fp-ts/TaskEither";
 
-import { listFormDataSchema, ListResult } from "./data";
-import { listEventTemplates } from "./lib";
+import { EventTemplate } from "@common/data/domain";
+import { UserSession } from "@common/data/userSession";
+import { RestoreAssertionError } from "@common/errors";
+
+import { wrapServerAction } from "@features/utils/decorators";
+import { validate } from "@features/utils/validation";
+
+import { bridge } from "./bridge";
+import { Failure, payloadSchema, Result } from "./data";
 
 async function listEventTemplatesActionImpl(
     userSession: UserSession,
-    _prevState: ListResult | null,
+    _prevState: Result | null,
     formData: FormData,
-): Promise<ListResult> {
+): Promise<E.Either<RestoreAssertionError<Failure>, EventTemplate[]>> {
     // Validate form schema.
-    const parseResult = listFormDataSchema.safeParse(formData);
-    if (!parseResult.success) {
-        const formattedZodErrors = parseResult.error.format();
-        return E.left(
-            ValidationError({
-                projectTemplateId:
-                    formattedZodErrors.projectTemplateId?._errors || [],
+    const task = pipe(
+        TE.fromEither(
+            validate(payloadSchema, {
+                projectTemplateId: formData.get("projectTemplateId"),
             }),
-        );
-    }
-
-    return await listEventTemplates(
-        userSession.user.id,
-        parseResult.data.projectTemplateId,
+        ),
+        TE.chainW((payloadP) => bridge(userSession.user.id, payloadP)),
     );
+
+    return await task();
 }
 
-export const listEventTemplatesAction = wrapServerAction(
+export const listEventTemplatesAction: (
+    _prevState: Result | null,
+    formData: FormData,
+) => Promise<Result> = wrapServerAction(
     "listEventTemplates",
     listEventTemplatesActionImpl,
 );
