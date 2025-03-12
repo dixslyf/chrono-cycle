@@ -55,7 +55,7 @@ export type DbExpandedProject = {
 } & DbProject;
 
 export type DbExpandedProjectInsert = {
-    events: DbExpandedEventInsert[];
+    events: Omit<DbExpandedEventInsert[], "projectId">;
 } & DbProjectInsert;
 
 export const projectSelectSchema = createSelectSchema(projects);

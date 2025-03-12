@@ -1,14 +1,21 @@
-import { and, eq } from "drizzle-orm";
 import { pipe } from "fp-ts/function";
 import * as NEA from "fp-ts/NonEmptyArray";
+import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 
-import { DuplicateNameError } from "@common/errors";
+import {
+    AssertionError,
+    DoesNotExistError,
+    DuplicateNameError,
+} from "@common/errors";
 
 import { DbLike } from "@db";
 import { listEventTemplates } from "@db/queries/event-templates/list";
 import {
-    DbEventInsert,
+    DbEventTemplate,
+    DbExpandedEvent,
+    DbExpandedEventTemplate,
+    DbExpandedProject,
     events as eventsTable,
     eventTags as eventTagsTable,
     projects as projectsTable,
@@ -21,59 +28,28 @@ import {
     type DbReminderInsert,
 } from "@db/schema";
 
-function checkDuplicateNameTask(
-    db: DbLike,
-    userId: number,
-    name: string,
-): TE.TaskEither<DuplicateNameError, void> {
-    return pipe(
-        TE.fromTask(() =>
-            db
-                .select()
-                .from(projectsTable)
-                .where(
-                    and(
-                        eq(projectsTable.userId, userId),
-                        eq(projectsTable.name, name),
-                    ),
-                ),
-        ),
-        TE.map((selected) => selected.length > 0),
-        TE.chain((isDuplicate) =>
-            isDuplicate ? TE.left(DuplicateNameError()) : TE.right(undefined),
-        ),
-    );
-}
+import { wrapWithTransaction } from "../utils/transaction";
+import { checkDuplicateProjectName } from "./checkDuplicateName";
 
 async function insertProject(
     db: DbLike,
-    userId: number,
-    data: DbProjectInsert,
+    toInsert: DbProjectInsert,
 ): Promise<DbProject> {
-    return (
-        await db
-            .insert(projectsTable)
-            .values({
-                userId,
-                name: data.name,
-                description: data.description,
-                startsAt: data.startsAt,
-                projectTemplateId: data.projectTemplateId,
-            } satisfies DbProjectInsert)
-            .returning()
-    )[0];
+    return (await db.insert(projectsTable).values(toInsert).returning())[0];
 }
 
 async function insertEvents(
     db: DbLike,
-    ets: DbEventInsert[],
+    projectId: number,
+    ets: DbEventTemplate[],
 ): Promise<DbEvent[]> {
-    return await db.insert(eventsTable).values(ets).returning();
+    const toInsert = ets.map((et) => ({ projectId, ...et }));
+    return await db.insert(eventsTable).values(toInsert).returning();
 }
 
 async function linkTags(
     db: DbLike,
-    etsMap: Map<number, EventTemplate>,
+    etsMap: Map<number, DbExpandedEventTemplate>,
     dbEvents: DbEvent[],
 ): Promise<void> {
     const eventTagsToInsert = dbEvents
@@ -82,13 +58,13 @@ async function linkTags(
             // `et` should never be undefined. Same for `event.eventTemplateId`.
             const et = etsMap.get(
                 event.eventTemplateId as number,
-            ) as EventTemplate;
+            ) as DbExpandedEventTemplate;
 
             const toInsert = et.tags.map(
                 (tag) =>
                     ({
                         eventId: event.id,
-                        tagId: decodeTagId(tag.id),
+                        tagId: tag.id,
                     }) satisfies DbEventTagInsert,
             );
 
@@ -101,7 +77,7 @@ async function linkTags(
 
 async function insertReminders(
     db: DbLike,
-    etsMap: Map<number, EventTemplate>,
+    etsMap: Map<number, DbExpandedEventTemplate>,
     dbEvents: DbEvent[],
 ) {
     const remindersToInsert = dbEvents
@@ -110,7 +86,7 @@ async function insertReminders(
             // `et` should never be undefined. Same for `event.eventTemplateId`.
             const et = etsMap.get(
                 event.eventTemplateId as number,
-            ) as EventTemplate;
+            ) as DbExpandedEventTemplate;
 
             const toInsert = et.reminders.map(
                 (rt) =>
@@ -120,7 +96,7 @@ async function insertReminders(
                         time: rt.time,
                         emailNotifications: rt.emailNotifications,
                         desktopNotifications: rt.desktopNotifications,
-                        reminderTemplateId: decodeReminderTemplateId(rt.id),
+                        reminderTemplateId: rt.id,
                     }) satisfies DbReminderInsert,
             );
 
@@ -134,101 +110,103 @@ async function insertReminders(
         .returning();
 }
 
-function constructEventsList(
-    dbEvents: DbEvent[],
-    dbReminders: DbReminder[],
-    etsMap: Map<number, EventTemplate>,
-): Event[] {
-    const eventDbRemindersMap = pipe(
-        dbReminders,
-        NEA.groupBy((dbReminder) => encodeEventId(dbReminder.eventId)),
+function constructExpandedEvents(
+    etsMap: Map<number, DbExpandedEventTemplate>,
+    events: DbEvent[],
+    allReminders: DbReminder[],
+): DbExpandedEvent[] {
+    // Group the reminders by event.
+    const eventRemindersMap = pipe(
+        allReminders,
+        NEA.groupBy((dbReminder) => String(dbReminder.eventId)),
     );
 
-    return dbEvents.map((dbEvent) => {
-        const { id: dbId, eventTemplateId, projectId, ...rest } = dbEvent;
-        const id = encodeEventId(dbId);
-
-        const reminders =
-            eventDbRemindersMap[id].map((dbReminder) => {
-                const {
-                    id: dbId,
-                    reminderTemplateId: dbReminderTemplateId,
-                    ...rest
-                } = dbReminder;
-                return {
-                    id: encodeReminderId(dbId),
-                    reminderTemplateId: dbReminderTemplateId
-                        ? encodeReminderTemplateId(dbReminderTemplateId)
-                        : null,
-                    ...rest,
-                } satisfies Reminder;
-            }) ?? [];
-
+    return events.map((event) => {
         // Safety: As before, since we constructed the event from the event template,
         // the ID and event template are guaranteed to be defined.
         const et = etsMap.get(
-            dbEvent.eventTemplateId as number,
-        ) as EventTemplate;
+            event.eventTemplateId as number,
+        ) as DbExpandedEventTemplate;
 
         return {
-            id,
-            eventTemplateId: eventTemplateId
-                ? encodeEventTemplateId(eventTemplateId)
-                : null,
-            projectId: encodeProjectId(projectId),
-            ...rest,
-            reminders,
+            ...event,
+            reminders: eventRemindersMap[String(event.id)],
             tags: et.tags,
-        } satisfies Event;
+        } satisfies DbExpandedEvent;
     });
 }
 
-function insertTask(
-    fDb: FunctionalDatabase,
-    userId: number,
-    data: CreateFormData,
-    ets: EventTemplate[],
-): TE.TaskEither<CreateError, Project> {
+function rawExpandedInsert(
+    db: DbLike,
+    toInsert: DbProjectInsert,
+    ets: DbExpandedEventTemplate[],
+): T.Task<DbExpandedProject> {
     // Map of event template ID: event template.
-    const etsMap = new Map(ets.map((et) => [decodeEventTemplateId(et.id), et]));
-
-    return fDb.do((db) =>
-        db.transaction(async (tx) => {
-            const dbProject = await insertProject(tx, userId, data);
-            const dbEvents = await insertEvents(tx, ets, dbProject.id);
-            await linkTags(tx, etsMap, dbEvents);
-            const dbReminders = await insertReminders(tx, etsMap, dbEvents);
-
-            const events = constructEventsList(dbEvents, dbReminders, etsMap);
-
-            // Construct the `Project`.
-            const { id, projectTemplateId, ...rest } = dbProject;
-            return {
-                id: encodeProjectId(dbProject.id),
-                projectTemplateId: data.projectTemplateId,
-                events,
-                ...rest,
-            } satisfies Project;
-        }),
+    const etsMap = new Map(ets.map((et) => [et.id, et]));
+    return pipe(
+        T.Do,
+        T.bind("project", () => () => insertProject(db, toInsert)),
+        T.bind(
+            "events",
+            ({ project }) =>
+                () =>
+                    insertEvents(db, project.id, ets),
+        ),
+        T.tap(
+            ({ events }) =>
+                () =>
+                    linkTags(db, etsMap, events),
+        ),
+        T.bind(
+            "reminders",
+            ({ events }) =>
+                () =>
+                    insertReminders(db, etsMap, events),
+        ),
+        T.bind("expandedEvents", ({ events, reminders }) =>
+            T.of(constructExpandedEvents(etsMap, events, reminders)),
+        ),
+        T.map(
+            ({ project, expandedEvents }) =>
+                ({
+                    ...project,
+                    events: expandedEvents,
+                }) satisfies DbExpandedProject,
+        ),
     );
 }
 
-export async function createProject(
-    userId: number,
-    data: CreateFormData,
-): Promise<CreateResult> {
-    const fDb = await getFuncDb();
-
-    const listProjectTemplatesTask = pipe(
-        () => listEventTemplates(userId, data.projectTemplateId),
-        TE.mapError((err) => err satisfies CreateError as CreateError),
+export function createProject(
+    db: DbLike,
+    toInsert: DbProjectInsert,
+): TE.TaskEither<
+    DuplicateNameError | AssertionError | DoesNotExistError,
+    DbExpandedProject
+> {
+    return pipe(
+        checkDuplicateProjectName(db, toInsert.userId, toInsert.name),
+        TE.chainW(() =>
+            toInsert.projectTemplateId
+                ? // Creating with a template.
+                pipe(
+                    listEventTemplates(
+                        db,
+                        toInsert.userId,
+                        toInsert.projectTemplateId,
+                    ),
+                    TE.chain((ets) =>
+                        wrapWithTransaction(db, (tx) =>
+                            TE.fromTask(rawExpandedInsert(tx, toInsert, ets)),
+                        ),
+                    ),
+                )
+                : // Creating without a template, so no events.
+                TE.fromTask(() =>
+                    insertProject(db, toInsert).then((proj) => ({
+                        events: [],
+                        ...proj,
+                    })),
+                ),
+        ),
     );
-
-    const task = pipe(
-        checkDuplicateNameTask(fDb, userId, data.name),
-        TE.chain(() => listProjectTemplatesTask),
-        TE.chain((ets) => insertTask(fDb, userId, data, ets)),
-    );
-
-    return await task();
 }
