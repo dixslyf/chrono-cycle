@@ -1,41 +1,36 @@
 "use server";
 
-import { UserSession } from "@/server/common/auth/sessions";
-import { ValidationError } from "@/server/common/errors";
-import { wrapServerAction } from "@/server/features/decorators";
 import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/lib/function";
+import * as TE from "fp-ts/TaskEither";
 
-import {
-    DeleteEventTemplateData,
-    deleteEventTemplatesDataSchema,
-    DeleteEventTemplatesResult,
-} from "./data";
-import { deleteEventTemplates } from "./lib";
+import { UserSession } from "@common/data/userSession";
+import { RestoreAssertionError } from "@common/errors";
+
+import { wrapServerAction } from "@features/utils/decorators";
+import { validate } from "@features/utils/validation";
+
+import { bridge } from "./bridge";
+import { Failure, Payload, payloadSchema, Result } from "./data";
 
 async function deleteEventTemplatesImpl(
     userSession: UserSession,
-    _previousState: DeleteEventTemplatesResult | null,
-    data: DeleteEventTemplateData,
-): Promise<DeleteEventTemplatesResult> {
+    _previousState: Result | null,
+    payload: Payload,
+): Promise<E.Either<RestoreAssertionError<Failure>, void>> {
     // Validate form schema.
-    const parseResult = deleteEventTemplatesDataSchema.safeParse(data);
-    if (!parseResult.success) {
-        const formattedZodErrors = parseResult.error.format();
-        return E.left(
-            ValidationError({
-                eventTemplateIds:
-                    formattedZodErrors.eventTemplateIds?._errors || [],
-            }),
-        );
-    }
-
-    return await deleteEventTemplates(
-        userSession.user.id,
-        parseResult.data.eventTemplateIds,
+    const task = pipe(
+        TE.fromEither(validate(payloadSchema, payload)),
+        TE.chainW((payloadP) => bridge(userSession.user.id, payloadP)),
     );
+
+    return await task();
 }
 
-export const deleteEventTemplatesAction = wrapServerAction(
+export const deleteEventTemplatesAction: (
+    _previousState: Result | null,
+    payload: Payload,
+) => Promise<Result> = wrapServerAction(
     "deleteEventTemplates",
     deleteEventTemplatesImpl,
 );

@@ -1,26 +1,24 @@
+import * as E from "fp-ts/Either";
+import { z } from "zod";
+
 import {
     DoesNotExistError,
     InternalError,
     ValidationError,
-} from "@/server/common/errors";
-import { encodedIdSchema } from "@/server/common/identifiers";
-import * as E from "fp-ts/Either";
-import { z } from "zod";
+} from "@common/errors";
 
-export const deleteEventTemplatesDataSchema = z.object({
+import { encodedIdSchema } from "@lib/identifiers";
+
+export const payloadSchema = z.object({
     eventTemplateIds: z.array(encodedIdSchema),
 });
 
-export type DeleteEventTemplateData = z.output<
-    typeof deleteEventTemplatesDataSchema
->;
+export type Payload = z.input<typeof payloadSchema>;
+export type ParsedPayload = z.output<typeof payloadSchema>;
 
-export type DeleteEventTemplatesError =
+export type Failure =
     | ValidationError<"eventTemplateIds">
     | DoesNotExistError
     | InternalError;
 
-export type DeleteEventTemplatesResult = E.Either<
-    DeleteEventTemplatesError,
-    void
->;
+export type Result = E.Either<Failure, void>;
