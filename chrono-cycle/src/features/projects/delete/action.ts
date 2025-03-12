@@ -1,37 +1,34 @@
 "use server";
 
-import { UserSession } from "@/server/common/auth/sessions";
-import { ValidationError } from "@/server/common/errors";
-import { wrapServerAction } from "@/server/features/decorators";
 import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/lib/function";
+import * as TE from "fp-ts/TaskEither";
 
-import {
-    DeleteProjectData,
-    deleteProjectDataSchema,
-    DeleteProjectResult,
-} from "./data";
-import { deleteProject } from "./lib";
+import { UserSession } from "@common/data/userSession";
+import { RestoreAssertionError } from "@common/errors";
+
+import { wrapServerAction } from "@features/utils/decorators";
+
+import { validate } from "../../utils/validation";
+import { bridge } from "./bridge";
+import { Failure, Payload, payloadSchema, Result } from "./data";
 
 async function deleteProjectImpl(
     userSession: UserSession,
-    _previousState: DeleteProjectResult | null,
-    data: DeleteProjectData,
-): Promise<DeleteProjectResult> {
+    _previousState: Result | null,
+    payload: Payload,
+): Promise<E.Either<RestoreAssertionError<Failure>, void>> {
     // Validate form schema.
-    const parseResult = deleteProjectDataSchema.safeParse(data);
-    if (!parseResult.success) {
-        const formattedZodErrors = parseResult.error.format();
-        return E.left(
-            ValidationError({
-                projectId: formattedZodErrors.projectId?._errors || [],
-            }),
-        );
-    }
+    const task = pipe(
+        TE.fromEither(validate(payloadSchema, payload)),
+        TE.chainW((payloadP) => bridge(userSession.user.id, payloadP)),
+    );
 
-    return await deleteProject(userSession.user.id, parseResult.data.projectId);
+    return await task();
 }
 
-export const deleteProjectAction = wrapServerAction(
-    "deleteProject",
-    deleteProjectImpl,
-);
+export const deleteProjectAction: (
+    _previousState: Result | null,
+    payload: Payload,
+) => Promise<Result> = wrapServerAction("deleteProject", deleteProjectImpl);
+
