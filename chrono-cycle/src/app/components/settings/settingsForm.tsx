@@ -147,10 +147,11 @@ function SettingsForm({ initialSettings }: { initialSettings: UserSettings }) {
                         type="submit"
                         disabled={!form.isDirty()}
                         loading={isSubmitting}
-                        className={`transition-colors duration-200 ease-linear ${!form.isDirty() || isSubmitting
+                        className={`transition-colors duration-200 ease-linear ${
+                            !form.isDirty() || isSubmitting
                                 ? "bg-gray-400 cursor-default text-palette3"
                                 : "bg-palette2 hover:bg-palette1"
-                            }`}
+                        }`}
                     >
                         Save Changes
                     </Button>
