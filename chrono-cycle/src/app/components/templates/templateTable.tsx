@@ -8,7 +8,7 @@ import { useCallback, useState } from "react";
 
 import { notifyError } from "@/app/utils/notifications";
 
-import { ProjectTemplateOverview } from "@/common/data/domain";
+import { ProjectTemplate, ProjectTemplateOverview } from "@/common/data/domain";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 
@@ -42,7 +42,7 @@ export function TemplateTable({
 
     // State for storing the clicked project template.
     const [clickedProjectTemplateData, setClickedProjectTemplateData] =
-        useState<ProjectTemplateOverview | null>(null);
+        useState<ProjectTemplate | null>(null);
 
     // Entries for the table.
     const records = entries.map(
