@@ -26,6 +26,6 @@ export function toUserSession(dbUserSession: {
 }
 
 export function toUserSettings(dbUserSettings: DbUserSettings): UserSettings {
-    const { userId, ...rest } = dbUserSettings;
+    const { userId: _userId, ...rest } = dbUserSettings;
     return rest;
 }

@@ -6,7 +6,7 @@ import {
     createUpdateSchema,
 } from "drizzle-zod";
 
-import eventTemplates from "./eventTemplates";
+import { eventTemplates } from "./eventTemplates";
 
 export const reminderTemplates = pgTable("reminder_templates", {
     id: serial("id").primaryKey().unique(),
@@ -32,5 +32,3 @@ export const reminderTemplateInsertSchema =
     createInsertSchema(reminderTemplates);
 export const reminderTemplateUpdateSchema =
     createUpdateSchema(reminderTemplates);
-
-export default reminderTemplates;

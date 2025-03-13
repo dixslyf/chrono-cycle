@@ -6,7 +6,7 @@ import {
     createUpdateSchema,
 } from "drizzle-zod";
 
-import users from "./users";
+import { users } from "./users";
 
 export const sessions = pgTable("sessions", {
     id: text("id").primaryKey(),
@@ -25,5 +25,3 @@ export type DbSessionInsert = InferInsertModel<typeof sessions>;
 export const sessionSelectSchema = createSelectSchema(sessions);
 export const sessionInsertSchema = createInsertSchema(sessions);
 export const sessionUpdateSchema = createUpdateSchema(sessions);
-
-export default sessions;

@@ -14,9 +14,9 @@ import {
     createUpdateSchema,
 } from "drizzle-zod";
 
-import eventTemplates from "./eventTemplates";
-import eventTypeEnum from "./eventType";
-import projects from "./projects";
+import { eventTemplates } from "./eventTemplates";
+import { eventTypeEnum } from "./eventType";
+import { projects } from "./projects";
 import { DbReminder, DbReminderInsert } from "./reminders";
 import { DbTag, DbTagInsert } from "./tags";
 
@@ -70,5 +70,3 @@ export type DbExpandedEventInsert = {
 export const eventSelectSchema = createSelectSchema(events);
 export const eventInsertSchema = createInsertSchema(events);
 export const eventUpdateSchema = createUpdateSchema(events);
-
-export default events;

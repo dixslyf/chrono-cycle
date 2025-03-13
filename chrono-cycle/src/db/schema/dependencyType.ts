@@ -4,4 +4,3 @@ export const dependencyTypeEnum = pgEnum("dependency_type", [
     "strict",
     "flexible",
 ]);
-export default dependencyTypeEnum;

@@ -6,7 +6,7 @@ import {
     createUpdateSchema,
 } from "drizzle-zod";
 
-import users from "./users";
+import { users } from "./users";
 
 export const tags = pgTable(
     "tags",
@@ -26,5 +26,3 @@ export type DbTagInsert = InferInsertModel<typeof tags>;
 export const tagSelectSchema = createSelectSchema(tags);
 export const tagInsertSchema = createInsertSchema(tags);
 export const tagUpdateSchema = createUpdateSchema(tags);
-
-export default tags;

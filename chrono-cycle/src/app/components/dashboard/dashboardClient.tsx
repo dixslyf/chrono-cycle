@@ -25,12 +25,12 @@ function DashboardClient({ months, initialMonth, days, year }: DashboardProps) {
 
     // TODO
     // should change this in the backend
-    const [projects, setProjects] = useState<Project[]>([
+    const [projects, _setProjects] = useState<Project[]>([
         { id: "project-1", name: "Gardening Tasks" },
         { id: "project-2", name: "Harvesting Schedule" },
     ]);
 
-    const [events, setEvents] = useState<Event[]>([
+    const [events, _setEvents] = useState<Event[]>([
         {
             id: "event-1",
             projectId: "project-1",

@@ -32,5 +32,3 @@ export type DbExpandedUserInsert = DbUserInsert & {
 export const userSelectSchema = createSelectSchema(users);
 export const userInsertSchema = createInsertSchema(users);
 export const userUpdateSchema = createUpdateSchema(users);
-
-export default users;

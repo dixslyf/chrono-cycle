@@ -15,7 +15,7 @@ import {
 } from "drizzle-zod";
 
 import { DbExpandedEvent, DbExpandedEventInsert } from "./events";
-import projectTemplates from "./projectTemplates";
+import { projectTemplates } from "./projectTemplates";
 
 export const projects = pgTable(
     "projects",
@@ -61,5 +61,3 @@ export type DbExpandedProjectInsert = {
 export const projectSelectSchema = createSelectSchema(projects);
 export const projectInsertSchema = createInsertSchema(projects);
 export const projectUpdateSchema = createUpdateSchema(projects);
-
-export default projects;

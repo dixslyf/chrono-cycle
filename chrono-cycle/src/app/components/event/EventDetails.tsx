@@ -79,7 +79,7 @@ function DisplayEventDetails({ event }: DisplayEventDetailsProps) {
                 </Text>
 
                 {event.reminders.length > 0 ? (
-                    event.reminders.map((reminder: Reminder, index) => (
+                    event.reminders.map((reminder: Reminder, _index) => (
                         <Paper key={reminder.id} p="sm" withBorder>
                             <Stack gap="xs">
                                 <Group justify="apart">

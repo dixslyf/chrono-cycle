@@ -6,8 +6,8 @@ import {
     createUpdateSchema,
 } from "drizzle-zod";
 
-import eventTemplates from "./eventTemplates";
-import tags from "./tags";
+import { eventTemplates } from "./eventTemplates";
+import { tags } from "./tags";
 
 export const eventTemplateTags = pgTable(
     "event_template_tags",
@@ -33,5 +33,3 @@ export const eventTemplateTagInsertSchema =
     createInsertSchema(eventTemplateTags);
 export const eventTemplateTagUpdateSchema =
     createUpdateSchema(eventTemplateTags);
-
-export default eventTemplateTags;

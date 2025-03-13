@@ -6,8 +6,8 @@ import {
     createUpdateSchema,
 } from "drizzle-zod";
 
-import dependencyTypeEnum from "./dependencyType";
-import events from "./events";
+import { dependencyTypeEnum } from "./dependencyType";
+import { events } from "./events";
 
 export const eventDependencies = pgTable(
     "event_dependencies",
@@ -35,5 +35,3 @@ export const eventDependencyInsertSchema =
     createInsertSchema(eventDependencies);
 export const eventDependencyUpdateSchema =
     createUpdateSchema(eventDependencies);
-
-export default eventDependencies;

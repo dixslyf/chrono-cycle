@@ -6,8 +6,8 @@ import {
     createUpdateSchema,
 } from "drizzle-zod";
 
-import events from "./events";
-import tags from "./tags";
+import { events } from "./events";
+import { tags } from "./tags";
 
 export const eventTags = pgTable(
     "event_tags",
@@ -28,5 +28,3 @@ export type DbEventTagInsert = InferInsertModel<typeof eventTags>;
 export const eventTagSelectSchema = createSelectSchema(eventTags);
 export const eventTagInsertSchema = createInsertSchema(eventTags);
 export const eventTagUpdateSchema = createUpdateSchema(eventTags);
-
-export default eventTags;

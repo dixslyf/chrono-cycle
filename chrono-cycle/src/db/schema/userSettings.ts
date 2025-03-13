@@ -6,7 +6,7 @@ import {
     createUpdateSchema,
 } from "drizzle-zod";
 
-import users from "./users";
+import { users } from "./users";
 
 export const startDayOfWeekEnum = pgEnum("start_day_of_week", [
     "Monday",
@@ -44,5 +44,3 @@ export type DbUserSettingsUpdate = Pick<DbUserSettings, "userId"> &
 export const userSettingsSelectSchema = createSelectSchema(userSettings);
 export const userSettingsInsertSchema = createInsertSchema(userSettings);
 export const userSettingsUpdateSchema = createUpdateSchema(userSettings);
-
-export default userSettings;
