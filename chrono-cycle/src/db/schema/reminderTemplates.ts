@@ -25,10 +25,13 @@ export type DbReminderTemplate = InferSelectModel<typeof reminderTemplates>;
 export type DbReminderTemplateInsert = InferInsertModel<
     typeof reminderTemplates
 >;
+export type DbReminderTemplateUpdate = Pick<DbReminderTemplate, "id"> &
+    Partial<Omit<DbReminderTemplateInsert, "id" | "eventTemplateId">>;
 
 export const reminderTemplateSelectSchema =
     createSelectSchema(reminderTemplates);
 export const reminderTemplateInsertSchema =
     createInsertSchema(reminderTemplates);
-export const reminderTemplateUpdateSchema =
-    createUpdateSchema(reminderTemplates);
+export const reminderTemplateUpdateSchema = createUpdateSchema(
+    reminderTemplates,
+).required({ id: true });

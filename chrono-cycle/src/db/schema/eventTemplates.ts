@@ -12,14 +12,18 @@ import {
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+import { z } from "zod";
 
 import { eventTypeEnum } from "./eventType";
 import { projectTemplates } from "./projectTemplates";
 import {
     DbReminderTemplate,
     DbReminderTemplateInsert,
+    DbReminderTemplateUpdate,
+    reminderTemplateInsertSchema,
+    reminderTemplateUpdateSchema,
 } from "./reminderTemplates";
-import { DbTag, DbTagInsert } from "./tags";
+import { DbTag, DbTagInsert, tagInsertSchema } from "./tags";
 
 export const eventTemplates = pgTable("event_templates", {
     id: serial("id").primaryKey().unique(),
@@ -42,6 +46,13 @@ export const eventTemplates = pgTable("event_templates", {
 
 export type DbEventTemplate = InferSelectModel<typeof eventTemplates>;
 export type DbEventTemplateInsert = InferInsertModel<typeof eventTemplates>;
+export type DbEventTemplateUpdate = Pick<DbEventTemplate, "id"> &
+    Partial<
+        Omit<
+            DbEventTemplateInsert,
+            "id" | "eventType" | "projectTemplateId" | "updatedAt"
+        >
+    >;
 
 export type DbExpandedEventTemplate = {
     reminders: DbReminderTemplate[];
@@ -53,6 +64,22 @@ export type DbExpandedEventTemplateInsert = {
     tags: DbTagInsert[];
 } & DbEventTemplateInsert;
 
+export type DbExpandedEventTemplateUpdate = DbEventTemplateUpdate & {
+    remindersDelete: number[];
+    remindersUpdate: DbReminderTemplateUpdate[];
+    remindersInsert: Omit<DbReminderTemplateInsert, "eventTemplateId">[];
+    tags: DbTagInsert[];
+};
+
 export const eventTemplateSelectSchema = createSelectSchema(eventTemplates);
 export const eventTemplateInsertSchema = createInsertSchema(eventTemplates);
-export const eventTemplateUpdateSchema = createUpdateSchema(eventTemplates);
+export const eventTemplateUpdateSchema = createUpdateSchema(
+    eventTemplates,
+).required({ id: true });
+export const expandedEventTemplateUpdateSchema = z.object({
+    ...eventTemplateUpdateSchema.shape,
+    remindersDelete: z.array(z.number()),
+    remindersUpdate: z.array(reminderTemplateUpdateSchema),
+    remindersInsert: z.array(reminderTemplateInsertSchema),
+    tags: z.array(tagInsertSchema),
+});
