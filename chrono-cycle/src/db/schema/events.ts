@@ -13,11 +13,18 @@ import {
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+import { z } from "zod";
 
 import { eventTemplates } from "./eventTemplates";
 import { eventTypeEnum } from "./eventType";
 import { projects } from "./projects";
-import { DbReminder, DbReminderInsert } from "./reminders";
+import {
+    DbReminder,
+    DbReminderInsert,
+    DbReminderUpdate,
+    reminderInsertSchema,
+    reminderUpdateSchema,
+} from "./reminders";
 import { DbTag, DbTagInsert } from "./tags";
 
 export const statusEnum = pgEnum("status", [
@@ -56,6 +63,13 @@ export const events = pgTable("events", {
 
 export type DbEvent = InferSelectModel<typeof events>;
 export type DbEventInsert = InferInsertModel<typeof events>;
+export type DbEventUpdate = Pick<DbEvent, "id"> &
+    Partial<
+        Omit<
+            DbEventInsert,
+            "id" | "eventType" | "projectId" | "updatedAt" | "eventTemplateId"
+        >
+    >;
 
 export type DbExpandedEvent = {
     reminders: DbReminder[];
@@ -67,6 +81,18 @@ export type DbExpandedEventInsert = {
     tags: DbTagInsert[];
 } & DbEvent;
 
+export type DbExpandedEventUpdate = DbEventUpdate & {
+    remindersDelete: number[];
+    remindersUpdate: DbReminderUpdate[];
+    remindersInsert: Omit<DbReminderInsert, "eventId">[];
+};
+
 export const eventSelectSchema = createSelectSchema(events);
 export const eventInsertSchema = createInsertSchema(events);
 export const eventUpdateSchema = createUpdateSchema(events);
+export const expandedEventUpdateSchema = z.object({
+    ...eventUpdateSchema.shape,
+    remindersDelete: z.array(z.number()),
+    remindersUpdate: z.array(reminderUpdateSchema),
+    remindersInsert: z.array(reminderInsertSchema),
+});
