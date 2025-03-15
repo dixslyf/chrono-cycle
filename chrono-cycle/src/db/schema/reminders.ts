@@ -28,7 +28,11 @@ export const reminders = pgTable("reminders", {
 
 export type DbReminder = InferSelectModel<typeof reminders>;
 export type DbReminderInsert = InferInsertModel<typeof reminders>;
+export type DbReminderUpdate = Pick<DbReminder, "id"> &
+    Partial<Omit<DbReminderInsert, "id" | "eventId" | "reminderTemplateId">>;
 
 export const reminderSelectSchema = createSelectSchema(reminders);
 export const reminderInsertSchema = createInsertSchema(reminders);
-export const reminderUpdateSchema = createUpdateSchema(reminders);
+export const reminderUpdateSchema = createUpdateSchema(reminders).required({
+    id: true,
+});

@@ -49,6 +49,13 @@ export const projects = pgTable(
 
 export type DbProject = InferSelectModel<typeof projects>;
 export type DbProjectInsert = InferInsertModel<typeof projects>;
+export type DbProjectUpdate = Pick<DbProject, "id"> &
+    Partial<
+        Omit<
+            DbProjectInsert,
+            "id" | "createdAt" | "updatedAt" | "projectTemplateId" | "userId"
+        >
+    >;
 
 export type DbExpandedProject = {
     events: DbExpandedEvent[];
