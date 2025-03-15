@@ -3,6 +3,8 @@
 import { Text } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
 
+import { areSameDay } from "@/app/utils/dates";
+
 import ProjectRow from "./projectRow";
 
 export interface Day {
@@ -35,6 +37,7 @@ interface TimelineProps {
     scrollToMonth?: string | null;
     onMonthChange?: (month: string) => void;
     onScrolled?: () => void;
+    onExtendDays?: (direction: "left" | "right") => void;
 }
 
 function Timeline({
@@ -44,6 +47,7 @@ function Timeline({
     projectStartDate,
     scrollToMonth,
     onMonthChange,
+    onExtendDays,
 }: TimelineProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const cellWidth = 96; // fixed width for each day
@@ -65,7 +69,6 @@ function Timeline({
     const [expandedProjects, setExpandedProjects] = useState<
         Record<string, boolean>
     >({});
-
     const toggleProject = (projectId: string) => {
         setExpandedProjects((prev) => ({
             ...prev,
@@ -89,28 +92,68 @@ function Timeline({
             );
             container.scrollLeft = scrollLeft;
         }
-    }, [days, cellWidth]);
+        // run only on mount
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-    // update the parent nav when scrolling
+    // adjust the scroll position when new days are prepended
+    const prevFirstDateRef = useRef<Date>(days[0]?.date || new Date());
+    const prevDaysLengthRef = useRef<number>(days.length);
     useEffect(() => {
         const container = containerRef.current;
-        if (!container || !onMonthChange) return;
+        if (!container) return;
+        // if the new days array is longer and the new first day is earlier than the previous first day
+        // then days were prepended
+        if (
+            days.length > prevDaysLengthRef.current &&
+            days[0].date.getTime() < prevFirstDateRef.current.getTime()
+        ) {
+            // calculate how many days were added before the previous first date
+            const diffDays = Math.round(
+                (prevFirstDateRef.current.getTime() - days[0].date.getTime()) /
+                    (24 * 3600 * 1000),
+            );
+            const offset = diffDays * cellWidth;
+            container.scrollLeft = container.scrollLeft + offset;
+        }
+        prevFirstDateRef.current = days[0].date;
+        prevDaysLengthRef.current = days.length;
+    }, [days, cellWidth]);
+
+    // update parent nav (month) and trigger infinite scroll when near container edges
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+        const threshold = 200;
 
         const handleScroll = () => {
             const scrollLeft = container.scrollLeft;
             const containerWidth = container.offsetWidth;
             const centerPosition = scrollLeft + containerWidth / 2;
             const index = Math.floor(centerPosition / cellWidth);
-            if (days[index]) {
+            if (days[index] && onMonthChange) {
                 const monthName = days[index].date.toLocaleDateString("en-US", {
                     month: "long",
                 });
                 onMonthChange(monthName);
             }
+            // trigger infinite scroll extension
+            if (onExtendDays) {
+                if (scrollLeft < threshold) {
+                    onExtendDays("left");
+                }
+                if (
+                    scrollLeft + containerWidth >
+                    container.scrollWidth - threshold
+                ) {
+                    onExtendDays("right");
+                }
+            }
         };
+
         container.addEventListener("scroll", handleScroll);
         return () => container.removeEventListener("scroll", handleScroll);
-    }, [days, cellWidth, onMonthChange]);
+    }, [days, cellWidth, onMonthChange, onExtendDays]);
 
     // scroll to a specific month when the scrollToMonth prop changes
     useEffect(() => {
@@ -159,12 +202,14 @@ function Timeline({
             className="overflow-x-auto w-full flex-1 h-full flex flex-col relative"
         >
             <div className="flex h-full flex-1 relative">
-                {days.map((day) => {
-                    const isToday =
-                        new Date().toDateString() === day.date.toDateString();
+                {days.map((day, i) => {
+                    // const isToday =
+                    //     new Date().toDateString() === day.date.toDateString();
+                    const isToday = areSameDay(new Date(), day.date);
                     return (
                         <div
-                            key={day.date.toISOString()}
+                            // key={day.date.toISOString()}
+                            key={`${day.date.toISOString()}-${i}`}
                             className="flex-none border p-2 text-center flex flex-col gap-2"
                             style={{ width: `${cellWidth}px` }}
                         >

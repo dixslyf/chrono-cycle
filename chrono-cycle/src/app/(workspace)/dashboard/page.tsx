@@ -1,5 +1,17 @@
 import DashboardClient from "@/app/components/dashboard/dashboardClient";
-import { Day } from "@/app/components/dashboard/timeline";
+import { generateDaysInRange } from "@/app/utils/dates";
+
+function getDynamicDateRange(
+    referenceDate: Date,
+    monthsBefore = 3,
+    monthsAfter = 3,
+) {
+    const start = new Date(referenceDate);
+    const end = new Date(referenceDate);
+    start.setMonth(start.getMonth() - monthsBefore);
+    end.setMonth(end.getMonth() + monthsAfter);
+    return { start, end };
+}
 
 const monthsData = [
     { value: "january", label: "January" },
@@ -16,38 +28,22 @@ const monthsData = [
     { value: "december", label: "December" },
 ];
 
-function generateYearDays(year: number): Day[] {
-    const days: Day[] = [];
-    const startDate = new Date(year, 0, 1);
-    const endDate = new Date(year, 11, 31);
-
-    const dateIterator = new Date(startDate);
-    while (dateIterator <= endDate) {
-        const dayOfWeek = dateIterator.toLocaleDateString("en-US", {
-            weekday: "short",
-        });
-        // label that uses the first letter of weekday + day number
-        const label = `${dayOfWeek[0]}${dateIterator.getDate()}`;
-        days.push({ date: new Date(dateIterator), label });
-        dateIterator.setDate(dateIterator.getDate() + 1);
-    }
-    return days;
-}
-
 export default function Dashboard() {
     const currentDate = new Date();
+    const { start, end } = getDynamicDateRange(currentDate, 3, 3);
+    const initialDays = generateDaysInRange(start, end);
+    const currentMonth = currentDate
+        .toLocaleDateString("en-US", { month: "long" })
+        .toLocaleLowerCase();
     const year = currentDate.getFullYear();
-    const currentMonthIndex = currentDate.getMonth();
-    const currentMonth = monthsData[currentMonthIndex].value;
-    const days = generateYearDays(year);
 
     return (
         <>
             <DashboardClient
-                months={monthsData}
+                initialDays={initialDays}
                 initialMonth={currentMonth}
-                days={days}
                 year={year}
+                months={monthsData}
             />
         </>
     );
