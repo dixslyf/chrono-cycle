@@ -36,6 +36,7 @@ interface TimelineProps {
     selectedMonth: string;
     scrollToMonth?: string | null;
     onMonthChange?: (month: string) => void;
+    onYearChange?: (year: number) => void;
     onScrolled?: () => void;
     onExtendDays?: (direction: "left" | "right") => void;
 }
@@ -47,6 +48,7 @@ function Timeline({
     projectStartDate,
     scrollToMonth,
     onMonthChange,
+    onYearChange,
     onExtendDays,
 }: TimelineProps) {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -96,7 +98,7 @@ function Timeline({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // adjust the scroll position when new days are prepended
+    // adjust the scroll position when days are prepended
     const prevFirstDateRef = useRef<Date>(days[0]?.date || new Date());
     const prevDaysLengthRef = useRef<number>(days.length);
     useEffect(() => {
@@ -120,7 +122,7 @@ function Timeline({
         prevDaysLengthRef.current = days.length;
     }, [days, cellWidth]);
 
-    // update parent nav (month) and trigger infinite scroll when near container edges
+    // update parent nav (month/year) and trigger infinite scroll when near container edges
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
@@ -131,11 +133,22 @@ function Timeline({
             const containerWidth = container.offsetWidth;
             const centerPosition = scrollLeft + containerWidth / 2;
             const index = Math.floor(centerPosition / cellWidth);
-            if (days[index] && onMonthChange) {
-                const monthName = days[index].date.toLocaleDateString("en-US", {
-                    month: "long",
-                });
-                onMonthChange(monthName);
+            if (days[index]) {
+                // const monthName = days[index].date.toLocaleDateString("en-US", {
+                //     month: "long",
+                // });
+                // onMonthChange(monthName);
+                if (onMonthChange) {
+                    const monthName = days[index].date.toLocaleDateString(
+                        "en-US",
+                        { month: "long" },
+                    );
+                    onMonthChange(monthName);
+                }
+                if (onYearChange) {
+                    const newYear = days[index].date.getFullYear();
+                    onYearChange(newYear);
+                }
             }
             // trigger infinite scroll extension
             if (onExtendDays) {
@@ -153,7 +166,7 @@ function Timeline({
 
         container.addEventListener("scroll", handleScroll);
         return () => container.removeEventListener("scroll", handleScroll);
-    }, [days, cellWidth, onMonthChange, onExtendDays]);
+    }, [days, cellWidth, onMonthChange, onExtendDays, onYearChange]);
 
     // scroll to a specific month when the scrollToMonth prop changes
     useEffect(() => {

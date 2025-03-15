@@ -22,6 +22,7 @@ function DashboardClient({
 }: DashboardProps) {
     const [days, setDays] = useState<Day[]>(initialDays);
     const [selectedMonth, setSelectedMonth] = useState(initialMonth);
+    const [currentYear, setCurrentYear] = useState(year);
     const [scrollToMonth, setScrollToMonth] = useState<string | null>(null);
     const [activeView, setActiveView] = useState<"timeline" | "calendar">(
         "timeline",
@@ -93,7 +94,7 @@ function DashboardClient({
                     months={months}
                     selectedMonth={selectedMonth}
                     onSelectMonth={(month) => handleSelectMonth(month, true)}
-                    year={year}
+                    year={currentYear}
                     activeView={activeView}
                     onViewChange={setActiveView}
                 />
@@ -107,6 +108,9 @@ function DashboardClient({
                         scrollToMonth={scrollToMonth}
                         onMonthChange={(month) => {
                             setSelectedMonth(month.toLowerCase());
+                        }}
+                        onYearChange={(year) => {
+                            setCurrentYear(year);
                         }}
                         onScrolled={() => setScrollToMonth(null)}
                         onExtendDays={extendDays}
