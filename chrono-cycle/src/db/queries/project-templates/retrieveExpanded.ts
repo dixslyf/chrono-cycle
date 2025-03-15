@@ -5,16 +5,20 @@ import * as TE from "fp-ts/TaskEither";
 import { AssertionError, DoesNotExistError } from "@/common/errors";
 
 import { DbLike } from "@/db";
+import { listEventTemplates } from "@/db/queries/event-templates/list";
 import {
-    DbProjectTemplate,
+    DbExpandedProjectTemplate,
     projectTemplates as projectTemplatesTable,
 } from "@/db/schema";
 
-export function retrieveProjectTemplate(
+export function retrieveExpandedProjectTemplate(
     db: DbLike,
     userId: number,
     projectTemplateId: number,
-): TE.TaskEither<AssertionError | DoesNotExistError, DbProjectTemplate> {
+): TE.TaskEither<
+    AssertionError | DoesNotExistError,
+    DbExpandedProjectTemplate
+> {
     return pipe(
         TE.fromTask(() =>
             db
@@ -44,5 +48,8 @@ export function retrieveProjectTemplate(
 
             return TE.right(selected[0]);
         }),
+        TE.bind("events", () =>
+            listEventTemplates(db, userId, projectTemplateId),
+        ),
     );
 }
