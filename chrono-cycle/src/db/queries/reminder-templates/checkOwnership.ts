@@ -9,7 +9,6 @@ import {
     eventTemplates as eventTemplatesTable,
     projectTemplates as projectTemplatesTable,
     reminderTemplates as reminderTemplatesTable,
-    users as usersTable,
 } from "@/db/schema";
 
 // Checks that the user owns the reminder templates.
@@ -19,18 +18,17 @@ export function checkUserOwnsReminderTemplates(
     rtIds: Set<number>,
 ): TE.TaskEither<DoesNotExistError | AssertionError, void> {
     const conditions = Array.from(rtIds).map((rtId) =>
-        and(eq(usersTable.id, userId), eq(reminderTemplatesTable.id, rtId)),
+        and(
+            eq(projectTemplatesTable.userId, userId),
+            eq(reminderTemplatesTable.id, rtId),
+        ),
     );
 
     return pipe(
         TE.fromTask(() =>
             db
                 .select()
-                .from(usersTable)
-                .innerJoin(
-                    projectTemplatesTable,
-                    eq(usersTable.id, projectTemplatesTable.userId),
-                )
+                .from(projectTemplatesTable)
                 .innerJoin(
                     eventTemplatesTable,
                     eq(
