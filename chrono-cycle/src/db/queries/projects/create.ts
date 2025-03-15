@@ -43,6 +43,10 @@ async function insertEvents(
     projectId: number,
     ets: DbEventTemplate[],
 ): Promise<DbEvent[]> {
+    if (ets.length === 0) {
+        return [];
+    }
+
     const toInsert = ets.map((et) => ({ projectId, ...et }));
     return await db.insert(eventsTable).values(toInsert).returning();
 }
@@ -52,6 +56,10 @@ async function linkTags(
     etsMap: Map<number, DbExpandedEventTemplate>,
     dbEvents: DbEvent[],
 ): Promise<void> {
+    if (dbEvents.length === 0 || etsMap.size === 0) {
+        return;
+    }
+
     const eventTagsToInsert = dbEvents
         .map((event) => {
             // Safety: Since we inserted the events based on the list of event templates,
@@ -79,7 +87,11 @@ async function insertReminders(
     db: DbLike,
     etsMap: Map<number, DbExpandedEventTemplate>,
     dbEvents: DbEvent[],
-) {
+): Promise<DbReminder[]> {
+    if (dbEvents.length === 0 || etsMap.size === 0) {
+        return [];
+    }
+
     const remindersToInsert = dbEvents
         .map((event) => {
             // Safety: Since we inserted the events based on the list of event templates,
@@ -188,25 +200,25 @@ export function createProject(
         TE.chainW(() =>
             toInsert.projectTemplateId
                 ? // Creating with a template.
-                  pipe(
-                      listEventTemplates(
-                          db,
-                          toInsert.userId,
-                          toInsert.projectTemplateId,
-                      ),
-                      TE.chain((ets) =>
-                          wrapWithTransaction(db, (tx) =>
-                              TE.fromTask(rawExpandedInsert(tx, toInsert, ets)),
-                          ),
-                      ),
-                  )
+                pipe(
+                    listEventTemplates(
+                        db,
+                        toInsert.userId,
+                        toInsert.projectTemplateId,
+                    ),
+                    TE.chain((ets) =>
+                        wrapWithTransaction(db, (tx) =>
+                            TE.fromTask(rawExpandedInsert(tx, toInsert, ets)),
+                        ),
+                    ),
+                )
                 : // Creating without a template, so no events.
-                  TE.fromTask(() =>
-                      insertProject(db, toInsert).then((proj) => ({
-                          events: [],
-                          ...proj,
-                      })),
-                  ),
+                TE.fromTask(() =>
+                    insertProject(db, toInsert).then((proj) => ({
+                        events: [],
+                        ...proj,
+                    })),
+                ),
         ),
     );
 }
