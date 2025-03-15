@@ -11,6 +11,8 @@ import {
     projectTemplates as projectTemplatesTable,
 } from "@/db/schema";
 
+import { listEventTemplates } from "../event-templates/list";
+
 export function retrieveProjectTemplate(
     db: DbLike,
     userId: number,
@@ -48,7 +50,6 @@ export function retrieveProjectTemplate(
     );
 }
 
-// TODO: Retrieve events.
 export function retrieveExpandedProjectTemplate(
     db: DbLike,
     userId: number,
@@ -86,6 +87,8 @@ export function retrieveExpandedProjectTemplate(
 
             return TE.right(selected[0]);
         }),
-        TE.map((dbPt) => ({ events: [], ...dbPt })),
+        TE.bind("events", () =>
+            listEventTemplates(db, userId, projectTemplateId),
+        ),
     );
 }
