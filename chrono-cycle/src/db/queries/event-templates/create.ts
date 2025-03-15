@@ -11,13 +11,12 @@ import { wrapWithTransaction } from "@/db/queries/utils/transaction";
 import {
     DbEventTemplate,
     DbEventTemplateInsert,
-    DbEventTemplateTag,
     DbExpandedEventTemplate,
     DbExpandedEventTemplateInsert,
-    DbTag,
     eventTemplates as eventTemplatesTable,
-    eventTemplateTags,
 } from "@/db/schema";
+
+import { linkTags } from "./linkTags";
 
 // Task to insert the event template.
 async function rawInsertEventTemplate(
@@ -27,27 +26,6 @@ async function rawInsertEventTemplate(
     return (
         await db.insert(eventTemplatesTable).values(toInsert).returning()
     )[0];
-}
-
-// Task to insert into the junction table linking tags and event templates.
-async function linkTags(
-    db: DbLike,
-    eventTemplateId: number,
-    tags: DbTag[],
-): Promise<DbEventTemplateTag[]> {
-    if (tags.length === 0) {
-        return [];
-    }
-
-    return await db
-        .insert(eventTemplateTags)
-        .values(
-            tags.map((tag) => ({
-                eventTemplateId,
-                tagId: tag.id,
-            })),
-        )
-        .returning();
 }
 
 // Does not wrap database operations in a transaction!

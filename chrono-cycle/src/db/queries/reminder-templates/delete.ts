@@ -11,6 +11,33 @@ import {
     reminderTemplates as reminderTemplatesTable,
 } from "@/db/schema";
 
+export function rawDeleteReminderTemplates(
+    db: DbLike,
+    ids: Set<number>,
+): TE.TaskEither<DoesNotExistError, void> {
+    return pipe(
+        TE.fromTask(() =>
+            db
+                .delete(reminderTemplates)
+                .where(
+                    or(
+                        ...Array.from(ids).map((id) =>
+                            eq(reminderTemplatesTable.id, id),
+                        ),
+                    ),
+                )
+                .returning(),
+        ),
+        TE.chain((deleted) => {
+            if (deleted.length !== ids.size) {
+                return TE.left(DoesNotExistError());
+            }
+
+            return TE.right(undefined);
+        }),
+    );
+}
+
 export function deleteReminderTemplates(
     db: DbLike,
     userId: number,
@@ -22,30 +49,13 @@ export function deleteReminderTemplates(
 
     return pipe(
         checkUserOwnsReminderTemplates(db, userId, ids),
-        TE.chain(() =>
-            TE.fromTask(() =>
-                db
-                    .delete(reminderTemplates)
-                    .where(
-                        or(
-                            ...Array.from(ids).map((id) =>
-                                eq(reminderTemplatesTable.id, id),
-                            ),
-                        ),
-                    )
-                    .returning(),
-            ),
-        ),
-        TE.chain((deleted) =>
-            // `checkUserOwnsReminderTemplates()` should have already ensured
-            // that we can safely delete.
-            deleted.length !== ids.size
-                ? TE.left(
-                      AssertionError(
-                          "Unexpected number of deleted reminder templates",
-                      ),
+        TE.chainW(() => rawDeleteReminderTemplates(db, ids)),
+        TE.mapError((err) =>
+            err._errorKind === "DoesNotExistError"
+                ? AssertionError(
+                      "Unexpected number of deleted reminder templates",
                   )
-                : TE.right(undefined),
+                : err,
         ),
     );
 }
