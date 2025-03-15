@@ -1,6 +1,7 @@
 "use client";
 
 import { Group, Modal, Stack, useModalsStack } from "@mantine/core";
+import { sequenceT } from "fp-ts/Apply";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { DataTable } from "mantine-datatable";
@@ -8,9 +9,16 @@ import { useCallback, useState } from "react";
 
 import { notifyError } from "@/app/utils/notifications";
 
-import { ProjectTemplate, ProjectTemplateOverview } from "@/common/data/domain";
+import {
+    ProjectOverview,
+    ProjectTemplate,
+    ProjectTemplateOverview,
+} from "@/common/data/domain";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
+import { listProjectsAction } from "@/features/projects/list/action";
+
+import { listProjects } from "@/db/queries/projects/list";
 
 import { CreateEventTemplateButton } from "./createEventButton";
 import { DeleteTemplateButton } from "./deleteTemplateButton";
@@ -41,8 +49,10 @@ export function TemplateTable({
     );
 
     // State for storing the clicked project template.
-    const [clickedProjectTemplateData, setClickedProjectTemplateData] =
-        useState<ProjectTemplate | null>(null);
+    const [clickedData, setClickedData] = useState<{
+        projectTemplate: ProjectTemplate;
+        projects: ProjectOverview[];
+    } | null>(null);
 
     // Entries for the table.
     const records = entries.map(
@@ -57,11 +67,14 @@ export function TemplateTable({
 
     // Retrieve data for a clicked project template.
     async function retrieveProjectTemplateData(projectTemplateId: string) {
-        const result = await retrieveProjectTemplateAction({
-            projectTemplateId,
-        });
+        // Retrieve the template data and its projects.
+        const [ptResult, projectsResult] = await Promise.all([
+            retrieveProjectTemplateAction({ projectTemplateId }),
+            listProjectsAction({ projectTemplateId }),
+        ]);
+
         pipe(
-            result,
+            sequenceT(E.Apply)(ptResult, projectsResult),
             E.match(
                 (_err) => {
                     modalStack.close("project-template-details");
@@ -69,7 +82,8 @@ export function TemplateTable({
                         message: "Failed to retrieve project template data.",
                     });
                 },
-                (data) => setClickedProjectTemplateData(data),
+                ([projectTemplate, projects]) =>
+                    setClickedData({ projectTemplate, projects }),
             ),
         );
     }
@@ -86,25 +100,26 @@ export function TemplateTable({
                 >
                     <Stack>
                         {/* Template details */}
-                        {clickedProjectTemplateData ? (
+                        {clickedData ? (
                             <>
                                 <TemplateDetails
                                     projectTemplateData={
-                                        clickedProjectTemplateData
+                                        clickedData.projectTemplate
                                     }
+                                    projects={clickedData.projects}
                                 />
 
                                 {/* Delete and create event buttons */}
                                 <Group justify="flex-end">
                                     <DeleteTemplateButton
                                         projectTemplateId={
-                                            clickedProjectTemplateData.id
+                                            clickedData.projectTemplate.id
                                         }
                                         onSuccess={closeModal}
                                     />
                                     <CreateEventTemplateButton
                                         projectTemplateId={
-                                            clickedProjectTemplateData.id
+                                            clickedData.projectTemplate.id
                                         }
                                         modalStack={modalStack}
                                     />

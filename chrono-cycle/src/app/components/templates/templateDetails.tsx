@@ -2,7 +2,9 @@
 
 import { Skeleton, Stack, Text } from "@mantine/core";
 
-import { ProjectTemplate } from "@/common/data/domain";
+import { ProjectOverview, ProjectTemplate } from "@/common/data/domain";
+
+import { ProjectsTable } from "./projectsTable";
 
 export function TemplateDetailsSkeleton(): React.ReactNode {
     return (
@@ -17,8 +19,10 @@ export function TemplateDetailsSkeleton(): React.ReactNode {
 
 export function TemplateDetails({
     projectTemplateData: templateData,
+    projects,
 }: {
     projectTemplateData: ProjectTemplate;
+    projects: ProjectOverview[];
 }): React.ReactNode {
     return (
         <Stack>
@@ -46,6 +50,7 @@ export function TemplateDetails({
                 </Text>
                 {templateData.updatedAt.toString()}
             </Text>
+            <ProjectsTable entries={projects} />
         </Stack>
     );
 }
