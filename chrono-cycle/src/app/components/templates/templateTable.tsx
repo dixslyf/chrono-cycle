@@ -40,6 +40,7 @@ export function TemplateTable({
     const modalStack = useModalsStack([
         "project-template-details",
         "add-event",
+        "create-project",
     ]);
 
     const { close: modalStackClose } = modalStack;
@@ -103,6 +104,7 @@ export function TemplateTable({
                         {clickedData ? (
                             <>
                                 <TemplateDetails
+                                    modalStack={modalStack}
                                     projectTemplateData={
                                         clickedData.projectTemplate
                                     }

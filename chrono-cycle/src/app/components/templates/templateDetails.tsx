@@ -1,9 +1,10 @@
 "use client";
 
-import { Skeleton, Stack, Text } from "@mantine/core";
+import { Group, Skeleton, Stack, Text, useModalsStack } from "@mantine/core";
 
 import { ProjectOverview, ProjectTemplate } from "@/common/data/domain";
 
+import { CreateProjectButton } from "./createProjectButton";
 import { ProjectsTable } from "./projectsTable";
 
 export function TemplateDetailsSkeleton(): React.ReactNode {
@@ -17,12 +18,14 @@ export function TemplateDetailsSkeleton(): React.ReactNode {
     );
 }
 
-export function TemplateDetails({
+export function TemplateDetails<T extends string>({
     projectTemplateData: templateData,
     projects,
+    modalStack,
 }: {
     projectTemplateData: ProjectTemplate;
     projects: ProjectOverview[];
+    modalStack: ReturnType<typeof useModalsStack<"create-project" | T>>;
 }): React.ReactNode {
     return (
         <Stack>
@@ -50,7 +53,15 @@ export function TemplateDetails({
                 </Text>
                 {templateData.updatedAt.toString()}
             </Text>
-            <ProjectsTable entries={projects} />
+            <Stack>
+                <ProjectsTable entries={projects} />
+                <Group justify="flex-end">
+                    <CreateProjectButton
+                        projectTemplateId={templateData.id}
+                        modalStack={modalStack}
+                    />
+                </Group>
+            </Stack>
         </Stack>
     );
 }
