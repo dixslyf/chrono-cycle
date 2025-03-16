@@ -9,7 +9,7 @@ import {
     decodeReminderTemplateId,
 } from "@/lib/identifiers";
 
-import getDb from "@/db";
+import { getDb } from "@/db";
 import { updateEventTemplate } from "@/db/queries/event-templates/update";
 
 import { ParsedPayload } from "./data";

@@ -6,7 +6,7 @@ import { AssertionError, DoesNotExistError } from "@/common/errors";
 
 import { decodeProjectTemplateId } from "@/lib/identifiers";
 
-import getDb from "@/db";
+import { getDb } from "@/db";
 import { retrieveExpandedProjectTemplate } from "@/db/queries/project-templates/retrieveExpanded";
 
 import { ParsedPayload } from "./data";

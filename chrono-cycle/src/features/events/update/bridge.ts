@@ -6,7 +6,7 @@ import { AssertionError, DoesNotExistError } from "@/common/errors";
 
 import { decodeProjectId, decodeReminderId } from "@/lib/identifiers";
 
-import getDb from "@/db";
+import { getDb } from "@/db";
 import { updateEvent } from "@/db/queries/events/update";
 
 import { ParsedPayload } from "./data";

@@ -9,7 +9,7 @@ import { DoesNotExistError, DuplicateNameError } from "@/common/errors";
 
 import { decodeProjectTemplateId } from "@/lib/identifiers";
 
-import getDb from "@/db";
+import { getDb } from "@/db";
 import { updateProjectTemplate } from "@/db/queries/project-templates/update";
 
 import { ParsedPayload } from "./data";

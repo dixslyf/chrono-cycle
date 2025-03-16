@@ -13,7 +13,7 @@ import { cookies } from "next/headers";
 import { toUserSession, UserSession } from "@/common/data/userSession";
 import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import getDb from "@/db";
+import { getDb } from "@/db";
 import { deleteSession } from "@/db/queries/auth/deleteSession";
 import { retrieveUserSession } from "@/db/queries/auth/retrieveUserSession";
 

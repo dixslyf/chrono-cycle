@@ -6,7 +6,7 @@ import { AssertionError, DuplicateNameError } from "@/common/errors";
 
 import { hashPassword } from "@/lib/auth/passwords";
 
-import getDb, { DbLike } from "@/db";
+import { DbLike, getDb } from "@/db";
 import {
     checkDuplicateEmail,
     checkDuplicateUsername,

@@ -5,7 +5,7 @@ import { ProjectOverview, toProjectOverview } from "@/common/data/domain";
 
 import { decodeProjectTemplateId } from "@/lib/identifiers";
 
-import getDb from "@/db";
+import { getDb } from "@/db";
 import { listProjects } from "@/db/queries/projects/list";
 
 import { ParsedPayload } from "./data";

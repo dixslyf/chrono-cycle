@@ -6,7 +6,7 @@ import { DoesNotExistError, DuplicateNameError } from "@/common/errors";
 
 import { decodeProjectId } from "@/lib/identifiers";
 
-import getDb from "@/db";
+import { getDb } from "@/db";
 import { updateProject } from "@/db/queries/projects/update";
 
 import { ParsedPayload } from "./data";
