@@ -1,0 +1,14 @@
+diff --git a/node_modules/@relmify/jest-fp-ts/dist/index.js b/node_modules/@relmify/jest-fp-ts/dist/index.js
+index 6d0a2f7..efb3224 100644
+--- a/node_modules/@relmify/jest-fp-ts/dist/index.js
++++ b/node_modules/@relmify/jest-fp-ts/dist/index.js
+@@ -52,5 +52,8 @@ var toStrictEqualBoth_1 = require("./theseMatchers/toStrictEqualBoth");
+ Object.defineProperty(exports, "toStrictEqualBoth", { enumerable: true, get: function () { return toStrictEqualBoth_1.toStrictEqualBoth; } });
+ var toSubsetEqualBoth_1 = require("./theseMatchers/toSubsetEqualBoth");
+ Object.defineProperty(exports, "toSubsetEqualBoth", { enumerable: true, get: function () { return toSubsetEqualBoth_1.toSubsetEqualBoth; } });
+-expect.extend(matchers);
++(async () => {
++    const { expect } = await import("vitest");
++    expect.extend(matchers);
++})();
+ //# sourceMappingURL=index.js.map
