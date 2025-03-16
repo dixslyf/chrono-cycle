@@ -4,6 +4,8 @@ import { Paper } from "@mantine/core";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import React from "react";
 
+import { areSameDay } from "@/app/utils/dates";
+
 import EventBar from "./eventBar";
 import { Day, Event, Project } from "./timeline";
 
@@ -34,19 +36,56 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
     topOffset,
     headerHeight,
 }) => {
-    // Always start at the project start date.
-    const projectStartIndex = days.findIndex(
-        (d) => d.date.getTime() === projectStartDate.getTime(),
+    // find the index for the project start date
+    const projectStartIndex = days.findIndex((d) =>
+        areSameDay(d.date, projectStartDate),
     );
+    if (projectStartIndex === -1) return null;
 
     // For the end index, determine the farthest day among the events in this project.
-    const eventEndIndexes = events.map((event) => {
-        const endDate = new Date(projectStartDate);
-        endDate.setDate(
-            endDate.getDate() + event.offsetDays + event.duration - 1,
+    // const eventEndIndexes = events.map((event) => {
+    //     const endDate = new Date(projectStartDate);
+    //     endDate.setDate(
+    //         endDate.getDate() + event.offsetDays + event.duration - 1,
+    //     );
+    //     return days.findIndex((d) => d.date.getTime() === endDate.getTime());
+    // });
+    const eventEndIndexes = events
+        .map((event) => {
+            const endDate = new Date(projectStartDate);
+            endDate.setDate(
+                endDate.getDate() + event.offsetDays + event.duration - 1,
+            );
+            return days.findIndex((d) => areSameDay(d.date, endDate));
+        })
+        .filter((index) => index !== -1);
+
+    if (eventEndIndexes.length === 0) {
+        return (
+            <div className="relative w-full" style={{ top: `${topOffset}px` }}>
+                <Paper
+                    withBorder
+                    p={0}
+                    className="absolute bg-gray-100 shadow-md rounded-md flex items-center justify-center text-sm font-bold text-gray-800 cursor-pointer"
+                    style={{
+                        left: `${projectStartIndex * cellWidth}px`,
+                        width: `${cellWidth}px`,
+                        height: `${headerHeight}px`,
+                        lineHeight: `${headerHeight}px`,
+                    }}
+                    onClick={() => toggleProject(project.id)}
+                >
+                    {project.name}
+                    {expanded ? (
+                        <ChevronUp size={16} className="ml-1" />
+                    ) : (
+                        <ChevronDown size={16} className="ml-1" />
+                    )}
+                </Paper>
+            </div>
         );
-        return days.findIndex((d) => d.date.getTime() === endDate.getTime());
-    });
+    }
+
     const maxEndIndex = Math.max(...eventEndIndexes);
 
     // Calculate horizontal positioning using the project start index.
@@ -94,12 +133,11 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
                             eventStartDate.getDate() + event.duration - 1,
                         );
 
-                        const eventStartIndex = days.findIndex(
-                            (d) =>
-                                d.date.getTime() === eventStartDate.getTime(),
+                        const eventStartIndex = days.findIndex((d) =>
+                            areSameDay(d.date, eventStartDate),
                         );
-                        const eventEndIndex = days.findIndex(
-                            (d) => d.date.getTime() === eventEndDate.getTime(),
+                        const eventEndIndex = days.findIndex((d) =>
+                            areSameDay(d.date, eventEndDate),
                         );
                         if (eventStartIndex === -1 || eventEndIndex === -1)
                             return null;

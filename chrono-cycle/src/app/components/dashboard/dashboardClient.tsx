@@ -2,20 +2,27 @@
 
 import { useState } from "react";
 
+import { generateDaysInRange } from "@/app/utils/dates";
+
 import DashNav from "./dashNav";
 import Timeline, { Day, Event, Project } from "./timeline";
 
-// should change this
-
 interface DashboardProps {
-    months: { value: string; label: string }[];
+    initialDays: Day[];
     initialMonth: string;
-    days: Day[];
     year: number;
+    months: { value: string; label: string }[];
 }
 
-function DashboardClient({ months, initialMonth, days, year }: DashboardProps) {
+function DashboardClient({
+    initialDays,
+    initialMonth,
+    year,
+    months,
+}: DashboardProps) {
+    const [days, setDays] = useState<Day[]>(initialDays);
     const [selectedMonth, setSelectedMonth] = useState(initialMonth);
+    const [currentYear, setCurrentYear] = useState(year);
     const [scrollToMonth, setScrollToMonth] = useState<string | null>(null);
     const [activeView, setActiveView] = useState<"timeline" | "calendar">(
         "timeline",
@@ -53,6 +60,25 @@ function DashboardClient({ months, initialMonth, days, year }: DashboardProps) {
         },
     ]);
 
+    // extend the days array when the user scrolls
+    const extendDays = (direction: "left" | "right") => {
+        if (direction === "left") {
+            const firstDate = days[0].date;
+            const newStart = new Date(firstDate);
+            newStart.setMonth(newStart.getMonth() - 1);
+            const newEnd = new Date(firstDate.getTime() - 24 * 3600 * 1000); // day before current first date
+            const newDays = generateDaysInRange(newStart, newEnd);
+            setDays((prevDays) => [...newDays, ...prevDays]);
+        } else if (direction === "right") {
+            const lastDate = days[days.length - 1].date;
+            const newEnd = new Date(lastDate);
+            newEnd.setMonth(newEnd.getMonth() + 1);
+            const newStart = new Date(lastDate.getTime() + 24 * 3600 * 1000); // day after current last date
+            const newDays = generateDaysInRange(newStart, newEnd);
+            setDays((prevDays) => [...prevDays, ...newDays]);
+        }
+    };
+
     // update the month from the nav from scrolling
     const handleSelectMonth = (month: string, scroll: boolean = false) => {
         // setScrollToMonth(month);
@@ -68,7 +94,7 @@ function DashboardClient({ months, initialMonth, days, year }: DashboardProps) {
                     months={months}
                     selectedMonth={selectedMonth}
                     onSelectMonth={(month) => handleSelectMonth(month, true)}
-                    year={year}
+                    year={currentYear}
                     activeView={activeView}
                     onViewChange={setActiveView}
                 />
@@ -83,7 +109,11 @@ function DashboardClient({ months, initialMonth, days, year }: DashboardProps) {
                         onMonthChange={(month) => {
                             setSelectedMonth(month.toLowerCase());
                         }}
+                        onYearChange={(year) => {
+                            setCurrentYear(year);
+                        }}
                         onScrolled={() => setScrollToMonth(null)}
+                        onExtendDays={extendDays}
                     />
                 ) : (
                     <div className="flex flex-1 items-center justify-center">
