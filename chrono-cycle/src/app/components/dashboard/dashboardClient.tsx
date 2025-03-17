@@ -1,11 +1,19 @@
 "use client";
 
+import { LoadingOverlay } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
 import { useState } from "react";
 
 import { generateDaysInRange } from "@/app/utils/dates";
 
+import { Project } from "@/common/data/domain";
+
+import { listAllProjectsAction } from "@/features/projects/listAll/action";
+
 import DashNav from "./dashNav";
-import Timeline, { Day, Event, Project } from "./timeline";
+import Timeline, { Day } from "./timeline";
 
 interface DashboardProps {
     initialDays: Day[];
@@ -20,6 +28,22 @@ function DashboardClient({
     year,
     months,
 }: DashboardProps) {
+    const projectsQuery = useQuery({
+        queryKey: ["list-all-projects"],
+        queryFn: async (): Promise<Project[]> => {
+            const result = await listAllProjectsAction();
+            return pipe(
+                result,
+                E.getOrElseW((err) => {
+                    throw err;
+                }),
+            );
+        },
+        meta: {
+            errorMessage: "Failed to retrieve project data.",
+        },
+    });
+
     const [days, setDays] = useState<Day[]>(initialDays);
     const [selectedMonth, setSelectedMonth] = useState(initialMonth);
     const [currentYear, setCurrentYear] = useState(year);
@@ -27,38 +51,6 @@ function DashboardClient({
     const [activeView, setActiveView] = useState<"timeline" | "calendar">(
         "timeline",
     );
-
-    const projectStartDate = new Date(2025, 2, 7); // March 7 2025
-
-    // TODO
-    // should change this in the backend
-    const [projects, _setProjects] = useState<Project[]>([
-        { id: "project-1", name: "Gardening Tasks" },
-        { id: "project-2", name: "Harvesting Schedule" },
-    ]);
-
-    const [events, _setEvents] = useState<Event[]>([
-        {
-            id: "event-1",
-            projectId: "project-1",
-            name: "Plant Seeds",
-            offsetDays: 5,
-            duration: 6,
-            eventType: "task",
-            eventTemplateId: "template-1",
-            status: "not started",
-        },
-        {
-            id: "event-2",
-            projectId: "project-2",
-            name: "Harvest Apple",
-            offsetDays: 8,
-            duration: 7,
-            eventType: "activity",
-            eventTemplateId: "template-2",
-            status: "in progress",
-        },
-    ]);
 
     // extend the days array when the user scrolls
     const extendDays = (direction: "left" | "right") => {
@@ -88,7 +80,12 @@ function DashboardClient({
     };
 
     return (
-        <>
+        <div className="flex flex-col flex-1 relative">
+            <LoadingOverlay
+                visible={projectsQuery.isLoading}
+                zIndex={1000}
+                overlayProps={{ blur: 2 }}
+            />
             <div className="flex flex-col flex-1 h-full">
                 <DashNav
                     months={months}
@@ -101,9 +98,7 @@ function DashboardClient({
                 {activeView === "timeline" ? (
                     <Timeline
                         days={days}
-                        events={events}
-                        projects={projects}
-                        projectStartDate={projectStartDate}
+                        projects={projectsQuery.data ?? []}
                         selectedMonth={selectedMonth}
                         scrollToMonth={scrollToMonth}
                         onMonthChange={(month) => {
@@ -121,7 +116,7 @@ function DashboardClient({
                     </div>
                 )}
             </div>
-        </>
+        </div>
     );
 }
 

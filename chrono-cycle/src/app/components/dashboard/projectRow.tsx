@@ -6,14 +6,14 @@ import React from "react";
 
 import { areSameDay } from "@/app/utils/dates";
 
+import { Project } from "@/common/data/domain";
+
 import EventBar from "./eventBar";
-import { Day, Event, Project } from "./timeline";
+import { Day } from "./timeline";
 
 interface ProjectRowProps {
     project: Project;
-    events: Event[];
     days: Day[];
-    projectStartDate: Date;
     cellWidth: number;
     eventHeight: number;
     rowSpacing: number;
@@ -25,9 +25,7 @@ interface ProjectRowProps {
 
 const ProjectRow: React.FC<ProjectRowProps> = ({
     project,
-    events,
     days,
-    projectStartDate,
     cellWidth,
     eventHeight,
     rowSpacing,
@@ -38,7 +36,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
 }) => {
     // find the index for the project start date
     const projectStartIndex = days.findIndex((d) =>
-        areSameDay(d.date, projectStartDate),
+        areSameDay(d.date, project.startsAt),
     );
     if (projectStartIndex === -1) return null;
 
@@ -50,9 +48,9 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
     //     );
     //     return days.findIndex((d) => d.date.getTime() === endDate.getTime());
     // });
-    const eventEndIndexes = events
+    const eventEndIndexes = project.events
         .map((event) => {
-            const endDate = new Date(projectStartDate);
+            const endDate = new Date(project.startsAt);
             endDate.setDate(
                 endDate.getDate() + event.offsetDays + event.duration - 1,
             );
@@ -122,9 +120,9 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
             {/* Render each event under the header if expanded */}
             {expanded && (
                 <div className="relative w-full">
-                    {events.map((event, eventIndex) => {
+                    {project.events.map((event, eventIndex) => {
                         // Calculate start and end dates for the event.
-                        const eventStartDate = new Date(projectStartDate);
+                        const eventStartDate = new Date(project.startsAt);
                         eventStartDate.setDate(
                             eventStartDate.getDate() + event.offsetDays,
                         );

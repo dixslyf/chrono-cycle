@@ -3,6 +3,7 @@
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
 import * as TE from "fp-ts/TaskEither";
+import { revalidatePath } from "next/cache";
 
 import { Project } from "@/common/data/domain";
 import { UserSession } from "@/common/data/userSession";
@@ -22,6 +23,7 @@ async function createProjectActionImpl(
     const task = pipe(
         TE.fromEither(validate(payloadSchema, payload)),
         TE.chainW((payloadP) => bridge(userSession.user.id, payloadP)),
+        TE.tapIO(() => () => revalidatePath("/dashboard")),
     );
 
     return await task();

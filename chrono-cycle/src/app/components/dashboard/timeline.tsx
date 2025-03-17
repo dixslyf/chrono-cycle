@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { areSameDay } from "@/app/utils/dates";
 
+import { Event, Project } from "@/common/data/domain";
+
 import ProjectRow from "./projectRow";
 
 export interface Day {
@@ -12,27 +14,9 @@ export interface Day {
     label: string;
 }
 
-export interface Event {
-    id: string;
-    projectId: string;
-    name: string;
-    offsetDays: number;
-    duration: number;
-    eventType: "task" | "activity";
-    eventTemplateId: string | null;
-    status: "none" | "not started" | "in progress" | "completed";
-}
-
-export interface Project {
-    id: string;
-    name: string;
-}
-
 interface TimelineProps {
     days: Day[];
-    events: Event[];
     projects: Project[];
-    projectStartDate: Date;
     selectedMonth: string;
     scrollToMonth?: string | null;
     onMonthChange?: (month: string) => void;
@@ -43,9 +27,7 @@ interface TimelineProps {
 
 function Timeline({
     days,
-    events,
     projects,
-    projectStartDate,
     scrollToMonth,
     onMonthChange,
     onYearChange,
@@ -56,6 +38,8 @@ function Timeline({
     const headerHeight = 24; // height for project header
     const eventHeight = 32; // might be able to change this later on
     const rowSpacing = 4; // space between row
+
+    const events = projects.map((p) => p.events).flat();
 
     // Group event based on project ID
     const eventMap = new Map<string, Event[]>();
@@ -272,9 +256,7 @@ function Timeline({
                             <ProjectRow
                                 key={project.id}
                                 project={project}
-                                events={projectEvents}
                                 days={days}
-                                projectStartDate={projectStartDate}
                                 cellWidth={cellWidth}
                                 eventHeight={eventHeight}
                                 rowSpacing={rowSpacing}

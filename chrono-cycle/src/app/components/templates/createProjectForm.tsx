@@ -80,6 +80,11 @@ export function CreateProjectForm({
                 queryKey: ["retrieve-project-template-data"],
             });
 
+            // Also re-fetch the projects data for the dashboard.
+            queryClient.invalidateQueries({
+                queryKey: ["list-all-projects"],
+            });
+
             notifySuccess({
                 message: "Successfully created project.",
             });
