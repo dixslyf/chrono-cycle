@@ -6,7 +6,7 @@ import {
     toProjectTemplateOverview,
 } from "@/common/data/domain";
 
-import getDb from "@/db";
+import { getDb } from "@/db";
 import { listProjectTemplatesForUser } from "@/db/queries/project-templates/list";
 
 export function bridge(

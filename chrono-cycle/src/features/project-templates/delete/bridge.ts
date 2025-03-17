@@ -5,7 +5,7 @@ import { DoesNotExistError } from "@/common/errors";
 
 import { decodeProjectTemplateId } from "@/lib/identifiers";
 
-import getDb from "@/db";
+import { getDb } from "@/db";
 import { deleteProjectTemplate } from "@/db/queries/project-templates/delete";
 
 import { ParsedPayload } from "./data";

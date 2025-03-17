@@ -5,7 +5,7 @@ import { AssertionError, DoesNotExistError } from "@/common/errors";
 
 import { decodeReminderTemplateId } from "@/lib/identifiers";
 
-import getDb from "@/db";
+import { getDb } from "@/db";
 import { deleteReminderTemplates } from "@/db/queries/reminder-templates/delete";
 
 import { ParsedPayload } from "./data";

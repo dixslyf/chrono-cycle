@@ -5,7 +5,7 @@ import { AssertionError, DoesNotExistError } from "@/common/errors";
 
 import { decodeEventTemplateId } from "@/lib/identifiers";
 
-import getDb from "@/db";
+import { getDb } from "@/db";
 import { deleteEventTemplates } from "@/db/queries/event-templates/delete";
 
 import { ParsedPayload } from "./data";

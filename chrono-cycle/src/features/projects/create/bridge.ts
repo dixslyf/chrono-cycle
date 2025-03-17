@@ -10,7 +10,7 @@ import {
 
 import { decodeProjectTemplateId } from "@/lib/identifiers";
 
-import getDb from "@/db";
+import { getDb } from "@/db";
 import { createProject } from "@/db/queries/projects/create";
 
 import { ParsedPayload } from "./data";

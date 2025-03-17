@@ -4,7 +4,7 @@ import * as TE from "fp-ts/TaskEither";
 import { toUserSettings, UserSettings } from "@/common/data/userSession";
 import { AssertionError, DoesNotExistError } from "@/common/errors";
 
-import getDb from "@/db";
+import { getDb } from "@/db";
 import { updateUserSettings } from "@/db/queries/settings/update";
 
 import { ParsedPayload } from "./data";

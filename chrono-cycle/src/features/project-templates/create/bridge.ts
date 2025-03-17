@@ -7,7 +7,7 @@ import {
 } from "@/common/data/domain";
 import { DuplicateNameError } from "@/common/errors";
 
-import getDb from "@/db";
+import { getDb } from "@/db";
 import { createProjectTemplate } from "@/db/queries/project-templates/create";
 import { DbProjectTemplateInsert } from "@/db/schema";
 

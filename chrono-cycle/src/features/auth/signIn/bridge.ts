@@ -17,7 +17,7 @@ import {
     setSessionTokenCookie,
 } from "@/lib/auth/sessions";
 
-import getDb, { DbLike } from "@/db";
+import { DbLike, getDb } from "@/db";
 import { createSession } from "@/db/queries/auth/createSession";
 import { retrieveUserByUsername } from "@/db/queries/auth/retrieveUser";
 import { DbUser } from "@/db/schema";
