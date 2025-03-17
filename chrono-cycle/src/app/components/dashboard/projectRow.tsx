@@ -6,7 +6,7 @@ import React from "react";
 
 import { areSameDay } from "@/app/utils/dates";
 
-import { Project } from "@/common/data/domain";
+import { Event, Project } from "@/common/data/domain";
 
 import EventBar from "./eventBar";
 import { Day } from "./timeline";
@@ -21,6 +21,7 @@ interface ProjectRowProps {
     toggleProject: (projectId: string) => void;
     topOffset: number; // computed vertical offset for this row
     headerHeight: number; // height for the header (e.g., 24px)
+    onEventClick: (event: Event) => void;
 }
 
 const ProjectRow: React.FC<ProjectRowProps> = ({
@@ -33,6 +34,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
     toggleProject: toggleProject,
     topOffset,
     headerHeight,
+    onEventClick,
 }) => {
     // find the index for the project start date
     const projectStartIndex = days.findIndex((d) =>
@@ -148,12 +150,13 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
                         return (
                             <EventBar
                                 key={event.id}
-                                name={event.name}
+                                event={event}
                                 startIndex={eventStartIndex}
                                 endIndex={eventEndIndex}
                                 color="bg-blue-500"
                                 cellWidth={cellWidth}
                                 topOffset={eventTopOffset}
+                                onEventClick={onEventClick}
                             />
                         );
                     })}
