@@ -27,9 +27,5 @@ async function createProjectActionImpl(
     return await task();
 }
 
-export const createProjectAction: (
-    payload: Payload,
-) => Promise<Result> = wrapServerAction(
-    "createProject",
-    createProjectActionImpl,
-);
+export const createProjectAction: (payload: Payload) => Promise<Result> =
+    wrapServerAction("createProject", createProjectActionImpl);

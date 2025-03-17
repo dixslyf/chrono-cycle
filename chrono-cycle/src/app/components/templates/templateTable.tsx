@@ -13,7 +13,6 @@ import {
     ProjectTemplate,
     ProjectTemplateOverview,
 } from "@/common/data/domain";
-import { InternalError } from "@/common/errors";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 import { listProjectsAction } from "@/features/projects/list/action";

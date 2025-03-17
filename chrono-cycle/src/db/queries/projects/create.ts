@@ -200,25 +200,25 @@ export function createProject(
         TE.chainW(() =>
             toInsert.projectTemplateId
                 ? // Creating with a template.
-                pipe(
-                    listEventTemplates(
-                        db,
-                        toInsert.userId,
-                        toInsert.projectTemplateId,
-                    ),
-                    TE.chain((ets) =>
-                        wrapWithTransaction(db, (tx) =>
-                            TE.fromTask(rawExpandedInsert(tx, toInsert, ets)),
-                        ),
-                    ),
-                )
+                  pipe(
+                      listEventTemplates(
+                          db,
+                          toInsert.userId,
+                          toInsert.projectTemplateId,
+                      ),
+                      TE.chain((ets) =>
+                          wrapWithTransaction(db, (tx) =>
+                              TE.fromTask(rawExpandedInsert(tx, toInsert, ets)),
+                          ),
+                      ),
+                  )
                 : // Creating without a template, so no events.
-                TE.fromTask(() =>
-                    insertProject(db, toInsert).then((proj) => ({
-                        events: [],
-                        ...proj,
-                    })),
-                ),
+                  TE.fromTask(() =>
+                      insertProject(db, toInsert).then((proj) => ({
+                          events: [],
+                          ...proj,
+                      })),
+                  ),
         ),
     );
 }
