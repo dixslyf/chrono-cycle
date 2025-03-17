@@ -28,7 +28,7 @@ const monthsData = [
     { value: "december", label: "December" },
 ];
 
-export default function Dashboard() {
+export default async function Dashboard() {
     const currentDate = new Date();
     const { start, end } = getDynamicDateRange(currentDate, 3, 3);
     const initialDays = generateDaysInRange(start, end);
@@ -36,15 +36,12 @@ export default function Dashboard() {
         .toLocaleDateString("en-US", { month: "long" })
         .toLocaleLowerCase();
     const year = currentDate.getFullYear();
-
     return (
-        <>
-            <DashboardClient
-                initialDays={initialDays}
-                initialMonth={currentMonth}
-                year={year}
-                months={monthsData}
-            />
-        </>
+        <DashboardClient
+            initialDays={initialDays}
+            initialMonth={currentMonth}
+            year={year}
+            months={monthsData}
+        />
     );
 }
