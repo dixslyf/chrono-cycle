@@ -19,11 +19,11 @@ export function TemplateDetailsSkeleton(): React.ReactNode {
 }
 
 export function TemplateDetails<T extends string>({
-    projectTemplateData: templateData,
+    projectTemplate,
     projects,
     modalStack,
 }: {
-    projectTemplateData: ProjectTemplate;
+    projectTemplate: ProjectTemplate;
     projects: ProjectOverview[];
     modalStack: ReturnType<typeof useModalsStack<"create-project" | T>>;
 }): React.ReactNode {
@@ -33,31 +33,31 @@ export function TemplateDetails<T extends string>({
                 <Text span fw={700}>
                     Event Name:{" "}
                 </Text>
-                {templateData.name}
+                {projectTemplate.name}
             </Text>
             <Text>
                 <Text span fw={700}>
                     Description:{" "}
                 </Text>
-                {templateData.description}
+                {projectTemplate.description}
             </Text>
             <Text>
                 <Text span fw={700}>
                     Created at:{" "}
                 </Text>
-                {templateData.createdAt.toString()}
+                {projectTemplate.createdAt.toString()}
             </Text>
             <Text>
                 <Text span fw={700}>
                     Updated at:{" "}
                 </Text>
-                {templateData.updatedAt.toString()}
+                {projectTemplate.updatedAt.toString()}
             </Text>
             <Stack>
                 <ProjectsTable entries={projects} />
                 <Group justify="flex-end">
                     <CreateProjectButton
-                        projectTemplateId={templateData.id}
+                        projectTemplateId={projectTemplate.id}
                         modalStack={modalStack}
                     />
                 </Group>
