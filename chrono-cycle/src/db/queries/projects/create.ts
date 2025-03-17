@@ -47,7 +47,10 @@ async function insertEvents(
         return [];
     }
 
-    const toInsert = ets.map((et) => ({ projectId, ...et }));
+    const toInsert = ets.map((et) => {
+        const { id: eventTemplateId, updatedAt, ...rest } = et;
+        return { projectId, eventTemplateId, ...rest };
+    });
     return await db.insert(eventsTable).values(toInsert).returning();
 }
 
@@ -80,6 +83,9 @@ async function linkTags(
         })
         .flat();
 
+    if (eventTagsToInsert.length === 0) {
+        return;
+    }
     await db.insert(eventTagsTable).values(eventTagsToInsert);
 }
 
@@ -116,6 +122,10 @@ async function insertReminders(
         })
         .flat();
 
+    if (remindersToInsert.length === 0) {
+        return [];
+    }
+
     return await db
         .insert(remindersTable)
         .values(remindersToInsert)
@@ -140,9 +150,10 @@ function constructExpandedEvents(
             event.eventTemplateId as number,
         ) as DbExpandedEventTemplate;
 
+        const reminders = eventRemindersMap[String(event.id)] ?? [];
         return {
             ...event,
-            reminders: eventRemindersMap[String(event.id)],
+            reminders,
             tags: et.tags,
         } satisfies DbExpandedEvent;
     });
