@@ -1,8 +1,11 @@
 "use client";
 
-import { Skeleton, Stack, Text } from "@mantine/core";
+import { Group, Skeleton, Stack, Text, useModalsStack } from "@mantine/core";
 
-import { ProjectTemplate } from "@/common/data/domain";
+import { ProjectOverview, ProjectTemplate } from "@/common/data/domain";
+
+import { CreateProjectButton } from "./createProjectButton";
+import { ProjectsTable } from "./projectsTable";
 
 export function TemplateDetailsSkeleton(): React.ReactNode {
     return (
@@ -15,10 +18,14 @@ export function TemplateDetailsSkeleton(): React.ReactNode {
     );
 }
 
-export function TemplateDetails({
-    projectTemplateData: templateData,
+export function TemplateDetails<T extends string>({
+    projectTemplate,
+    projects,
+    modalStack,
 }: {
-    projectTemplateData: ProjectTemplate;
+    projectTemplate: ProjectTemplate;
+    projects: ProjectOverview[];
+    modalStack: ReturnType<typeof useModalsStack<"create-project" | T>>;
 }): React.ReactNode {
     return (
         <Stack>
@@ -26,26 +33,35 @@ export function TemplateDetails({
                 <Text span fw={700}>
                     Event Name:{" "}
                 </Text>
-                {templateData.name}
+                {projectTemplate.name}
             </Text>
             <Text>
                 <Text span fw={700}>
                     Description:{" "}
                 </Text>
-                {templateData.description}
+                {projectTemplate.description}
             </Text>
             <Text>
                 <Text span fw={700}>
                     Created at:{" "}
                 </Text>
-                {templateData.createdAt.toString()}
+                {projectTemplate.createdAt.toString()}
             </Text>
             <Text>
                 <Text span fw={700}>
                     Updated at:{" "}
                 </Text>
-                {templateData.updatedAt.toString()}
+                {projectTemplate.updatedAt.toString()}
             </Text>
+            <Stack>
+                <ProjectsTable entries={projects} />
+                <Group justify="flex-end">
+                    <CreateProjectButton
+                        projectTemplateId={projectTemplate.id}
+                        modalStack={modalStack}
+                    />
+                </Group>
+            </Stack>
         </Stack>
     );
 }

@@ -1,16 +1,21 @@
 "use client";
 
 import { Group, Modal, Stack, useModalsStack } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
+import { sequenceT } from "fp-ts/Apply";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { DataTable } from "mantine-datatable";
 import { useCallback, useState } from "react";
 
-import { notifyError } from "@/app/utils/notifications";
-
-import { ProjectTemplate, ProjectTemplateOverview } from "@/common/data/domain";
+import {
+    ProjectOverview,
+    ProjectTemplate,
+    ProjectTemplateOverview,
+} from "@/common/data/domain";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
+import { listProjectsAction } from "@/features/projects/list/action";
 
 import { CreateEventTemplateButton } from "./createEventButton";
 import { DeleteTemplateButton } from "./deleteTemplateButton";
@@ -23,27 +28,16 @@ const columns = [
     { accessor: "updatedAt", title: "Updated at" },
 ];
 
+type ClickedData = {
+    projectTemplate: ProjectTemplate;
+    projects: ProjectOverview[];
+};
+
 export function TemplateTable({
     entries,
 }: {
     entries: ProjectTemplateOverview[];
 }): React.ReactNode {
-    // For keeping track of modals.
-    const modalStack = useModalsStack([
-        "project-template-details",
-        "add-event",
-    ]);
-
-    const { close: modalStackClose } = modalStack;
-    const closeModal = useCallback(
-        () => modalStackClose("project-template-details"),
-        [modalStackClose],
-    );
-
-    // State for storing the clicked project template.
-    const [clickedProjectTemplateData, setClickedProjectTemplateData] =
-        useState<ProjectTemplate | null>(null);
-
     // Entries for the table.
     const records = entries.map(
         ({ id, name, description, createdAt, updatedAt }) => ({
@@ -55,24 +49,55 @@ export function TemplateTable({
         }),
     );
 
-    // Retrieve data for a clicked project template.
-    async function retrieveProjectTemplateData(projectTemplateId: string) {
-        const result = await retrieveProjectTemplateAction({
-            projectTemplateId,
-        });
-        pipe(
-            result,
-            E.match(
-                (_err) => {
-                    modalStack.close("project-template-details");
-                    notifyError({
-                        message: "Failed to retrieve project template data.",
-                    });
-                },
-                (data) => setClickedProjectTemplateData(data),
-            ),
-        );
-    }
+    // For keeping track of modals.
+    const modalStack = useModalsStack([
+        "project-template-details",
+        "add-event",
+        "create-project",
+    ]);
+
+    const { close: modalStackClose } = modalStack;
+    const closeModal = useCallback(
+        () => modalStackClose("project-template-details"),
+        [modalStackClose],
+    );
+
+    // State for storing the clicked project template.
+    const [clickedId, setClickedId] = useState<string | null>(null);
+
+    // Query for retrieving project template data.
+    const retrieveQuery = useQuery({
+        queryKey: ["retrieve-project-template-data", clickedId],
+        queryFn: async (): Promise<ClickedData> => {
+            // Safety: This query is only called when clicked ID is set.
+            const projectTemplateId = clickedId as string;
+
+            // Retrieve the template data and its projects.
+            const [ptResult, projectsResult] = await Promise.all([
+                retrieveProjectTemplateAction({ projectTemplateId }),
+                listProjectsAction({ projectTemplateId }),
+            ]);
+
+            return pipe(
+                sequenceT(E.Apply)(ptResult, projectsResult),
+                E.match(
+                    (err) => {
+                        // To trigger error notification from Tanstack query.
+                        throw err;
+                    },
+                    ([projectTemplate, projects]) => ({
+                        projectTemplate,
+                        projects,
+                    }),
+                ),
+            );
+        },
+        enabled: Boolean(clickedId),
+        meta: {
+            errorMessage: "Failed to retrieve project template data.",
+            onError: () => closeModal(),
+        },
+    });
 
     return (
         <>
@@ -86,25 +111,29 @@ export function TemplateTable({
                 >
                     <Stack>
                         {/* Template details */}
-                        {clickedProjectTemplateData ? (
+                        {retrieveQuery.data ? (
                             <>
                                 <TemplateDetails
-                                    projectTemplateData={
-                                        clickedProjectTemplateData
+                                    modalStack={modalStack}
+                                    projectTemplate={
+                                        retrieveQuery.data.projectTemplate
                                     }
+                                    projects={retrieveQuery.data.projects}
                                 />
 
                                 {/* Delete and create event buttons */}
                                 <Group justify="flex-end">
                                     <DeleteTemplateButton
                                         projectTemplateId={
-                                            clickedProjectTemplateData.id
+                                            retrieveQuery.data.projectTemplate
+                                                .id
                                         }
                                         onSuccess={closeModal}
                                     />
                                     <CreateEventTemplateButton
                                         projectTemplateId={
-                                            clickedProjectTemplateData.id
+                                            retrieveQuery.data.projectTemplate
+                                                .id
                                         }
                                         modalStack={modalStack}
                                     />
@@ -127,7 +156,7 @@ export function TemplateTable({
                 noRecordsText="No project templates"
                 onRowClick={async ({ record: { id } }) => {
                     modalStack.open("project-template-details");
-                    await retrieveProjectTemplateData(id);
+                    setClickedId(id);
                 }}
             />
         </>

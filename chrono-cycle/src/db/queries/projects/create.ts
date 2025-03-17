@@ -43,7 +43,14 @@ async function insertEvents(
     projectId: number,
     ets: DbEventTemplate[],
 ): Promise<DbEvent[]> {
-    const toInsert = ets.map((et) => ({ projectId, ...et }));
+    if (ets.length === 0) {
+        return [];
+    }
+
+    const toInsert = ets.map((et) => {
+        const { id: eventTemplateId, updatedAt, ...rest } = et;
+        return { projectId, eventTemplateId, ...rest };
+    });
     return await db.insert(eventsTable).values(toInsert).returning();
 }
 
@@ -52,6 +59,10 @@ async function linkTags(
     etsMap: Map<number, DbExpandedEventTemplate>,
     dbEvents: DbEvent[],
 ): Promise<void> {
+    if (dbEvents.length === 0 || etsMap.size === 0) {
+        return;
+    }
+
     const eventTagsToInsert = dbEvents
         .map((event) => {
             // Safety: Since we inserted the events based on the list of event templates,
@@ -72,6 +83,9 @@ async function linkTags(
         })
         .flat();
 
+    if (eventTagsToInsert.length === 0) {
+        return;
+    }
     await db.insert(eventTagsTable).values(eventTagsToInsert);
 }
 
@@ -79,7 +93,11 @@ async function insertReminders(
     db: DbLike,
     etsMap: Map<number, DbExpandedEventTemplate>,
     dbEvents: DbEvent[],
-) {
+): Promise<DbReminder[]> {
+    if (dbEvents.length === 0 || etsMap.size === 0) {
+        return [];
+    }
+
     const remindersToInsert = dbEvents
         .map((event) => {
             // Safety: Since we inserted the events based on the list of event templates,
@@ -103,6 +121,10 @@ async function insertReminders(
             return toInsert;
         })
         .flat();
+
+    if (remindersToInsert.length === 0) {
+        return [];
+    }
 
     return await db
         .insert(remindersTable)
@@ -128,9 +150,10 @@ function constructExpandedEvents(
             event.eventTemplateId as number,
         ) as DbExpandedEventTemplate;
 
+        const reminders = eventRemindersMap[String(event.id)] ?? [];
         return {
             ...event,
-            reminders: eventRemindersMap[String(event.id)],
+            reminders,
             tags: et.tags,
         } satisfies DbExpandedEvent;
     });

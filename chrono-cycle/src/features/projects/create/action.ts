@@ -16,24 +16,16 @@ import { Failure, Payload, payloadSchema, Result } from "./data";
 
 async function createProjectActionImpl(
     userSession: UserSession,
-    _prevState: Result | null,
     payload: Payload,
 ): Promise<E.Either<RestoreAssertionError<Failure>, Project>> {
     // Validate form schema.
     const task = pipe(
         TE.fromEither(validate(payloadSchema, payload)),
         TE.chainW((payloadP) => bridge(userSession.user.id, payloadP)),
-        // TODO: What path to revalidate?
-        // revalidatePath("/templates");
     );
 
     return await task();
 }
 
-export const createProjectAction: (
-    _prevState: Result | null,
-    payload: Payload,
-) => Promise<Result> = wrapServerAction(
-    "createProject",
-    createProjectActionImpl,
-);
+export const createProjectAction: (payload: Payload) => Promise<Result> =
+    wrapServerAction("createProject", createProjectActionImpl);
