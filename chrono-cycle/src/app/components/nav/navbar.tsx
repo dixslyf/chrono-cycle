@@ -1,17 +1,16 @@
 // main navbar
 "use client";
 
-import {
-    MenuContent,
-    MenuItem,
-    MenuRoot,
-    MenuTrigger,
-    Text,
-} from "@chakra-ui/react";
-import { Bell, LogOut, User, UserPen } from "lucide-react";
-import Link from "next/link";
+import { ActionIcon, Box, Text } from "@mantine/core";
+import { Bell, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useActionState, useCallback, useEffect, useState } from "react";
+import {
+    useActionState,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 
 import { signOutAction } from "@/features/auth/signOut/action";
 
@@ -24,6 +23,7 @@ const Navbar = () => {
     const [isNotiOpen, setIsNotiOpen] = useState<boolean>(false); // handles notification dropdown
     const [notifications, _setNotifications] = useState<number>(3);
     const pathname = usePathname();
+    const formRef = useRef<HTMLFormElement>(null);
 
     // Server-side action for logging out.
     const [_signoutState, signoutFormAction, _signoutPending] = useActionState(
@@ -46,6 +46,13 @@ const Navbar = () => {
         setIsNotiOpen(!isNotiOpen);
     };
 
+    // handle log out
+    const handleSignout = () => {
+        if (formRef.current) {
+            formRef.current.requestSubmit();
+        }
+    };
+
     return (
         <>
             {/* top nav bar */}
@@ -61,57 +68,33 @@ const Navbar = () => {
                 </div>
 
                 {/* Notifications & User Profile */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 justify-center">
                     {/* notification here */}
-                    <button onClick={toggleNoti} className="relative">
-                        <Bell className="w-8 h-8" />
+                    <Box className="relative flex justify-center">
+                        <ActionIcon
+                            onClick={toggleNoti}
+                            variant="transparent"
+                            className="text-palette3"
+                        >
+                            <Bell className="w-8 h-8" />
+                        </ActionIcon>
                         {notifications > 0 && (
-                            <span className="absolute -top-1 -right-1 bg-red-500 text-palette3 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                            <Text className="absolute -top-1 -right-1 bg-red-500 text-palette3 text-sm font-bold rounded-full w-5 h-5 flex items-center justify-center">
                                 {notifications}
-                            </span>
+                            </Text>
                         )}
-                    </button>
+                    </Box>
 
-                    <div className="relative">
-                        <MenuRoot>
-                            <MenuTrigger asChild>
-                                <button className="focus:outline-none">
-                                    <User className="w-8 h-8" />
-                                </button>
-                            </MenuTrigger>
-                            <MenuContent className="absolute right-0 bg-palette3 p-0 rounded-lg">
-                                <Text className="text-palette3 flex gap-2 bg-palette2 p-2 font-semibold text-lg">
-                                    <User />
-                                    User
-                                </Text>
-                                <MenuItem
-                                    asChild
-                                    value="profile"
-                                    className="text-palette5 text-lg hover:bg-[#00000030] transition-colors duration-200 ease-linear"
-                                >
-                                    <Link href="/profile">
-                                        <UserPen />
-                                        Profile
-                                    </Link>
-                                </MenuItem>
-                                <MenuItem
-                                    asChild
-                                    value="logout"
-                                    className="text-palette5 text-lg hover:bg-[#00000030] transition-colors duration-200 ease-linear"
-                                >
-                                    <form action={signoutFormAction}>
-                                        <button
-                                            type="submit"
-                                            className="flex gap-2 focus:outline-none"
-                                        >
-                                            <LogOut />
-                                            Logout
-                                        </button>
-                                    </form>
-                                </MenuItem>
-                            </MenuContent>
-                        </MenuRoot>
-                    </div>
+                    <form ref={formRef} action={signoutFormAction}>
+                        <ActionIcon
+                            onClick={handleSignout}
+                            variant="transparent"
+                            className="text-palette3"
+                            type="button"
+                        >
+                            <LogOut className="w-8 h-8" />
+                        </ActionIcon>
+                    </form>
                 </div>
             </nav>
 
