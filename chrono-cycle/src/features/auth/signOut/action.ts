@@ -11,7 +11,7 @@ import { RestoreAssertionError } from "@/common/errors";
 import { wrapServerAction } from "@/features/utils/decorators";
 
 import { bridge } from "./bridge";
-import { Failure } from "./data";
+import { Failure, Result } from "./data";
 
 async function signOutActionImpl(
     userSession: UserSession,
@@ -24,4 +24,7 @@ async function signOutActionImpl(
     return await task();
 }
 
-export const signOutAction = wrapServerAction("signOut", signOutActionImpl);
+export const signOutAction: () => Promise<Result> = wrapServerAction(
+    "signOut",
+    signOutActionImpl,
+);

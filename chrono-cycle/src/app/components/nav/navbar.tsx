@@ -5,10 +5,10 @@ import { ActionIcon, Box, Text } from "@mantine/core";
 import { Bell, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 import {
+    startTransition,
     useActionState,
     useCallback,
     useEffect,
-    useRef,
     useState,
 } from "react";
 
@@ -23,10 +23,9 @@ const Navbar = () => {
     const [isNotiOpen, setIsNotiOpen] = useState<boolean>(false); // handles notification dropdown
     const [notifications, _setNotifications] = useState<number>(3);
     const pathname = usePathname();
-    const formRef = useRef<HTMLFormElement>(null);
 
     // Server-side action for logging out.
-    const [_signoutState, signoutFormAction, _signoutPending] = useActionState(
+    const [_signoutState, signOut, _signoutPending] = useActionState(
         signOutAction,
         null,
     );
@@ -44,13 +43,6 @@ const Navbar = () => {
     // toggle notification dropdown
     const toggleNoti = () => {
         setIsNotiOpen(!isNotiOpen);
-    };
-
-    // handle log out
-    const handleSignout = () => {
-        if (formRef.current) {
-            formRef.current.requestSubmit();
-        }
     };
 
     return (
@@ -85,16 +77,14 @@ const Navbar = () => {
                         )}
                     </Box>
 
-                    <form ref={formRef} action={signoutFormAction}>
-                        <ActionIcon
-                            onClick={handleSignout}
-                            variant="transparent"
-                            className="text-palette3"
-                            type="button"
-                        >
-                            <LogOut className="w-8 h-8" />
-                        </ActionIcon>
-                    </form>
+                    <ActionIcon
+                        onClick={() => startTransition(signOut)}
+                        variant="transparent"
+                        className="text-palette3"
+                        type="button"
+                    >
+                        <LogOut className="w-8 h-8" />
+                    </ActionIcon>
                 </div>
             </nav>
 
