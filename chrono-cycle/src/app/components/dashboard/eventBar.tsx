@@ -1,21 +1,25 @@
 "use client";
 
+import { Event } from "@/common/data/domain";
+
 interface EventBarProps {
-    name: string;
+    event: Event;
     startIndex: number;
     endIndex: number;
     cellWidth: number;
     color: string;
     topOffset: number;
+    onEventClick: (event: Event) => void;
 }
 
 function EventBar({
-    name,
+    event,
     startIndex,
     endIndex,
     color,
     cellWidth,
     topOffset,
+    onEventClick,
 }: EventBarProps) {
     const leftOffset = startIndex * cellWidth;
     const width = (endIndex - startIndex + 1) * cellWidth;
@@ -29,8 +33,9 @@ function EventBar({
                 height: "24px",
                 top: `${topOffset}px`,
             }}
+            onClick={() => onEventClick(event)}
         >
-            {name}
+            {event.name}
         </div>
     );
 }

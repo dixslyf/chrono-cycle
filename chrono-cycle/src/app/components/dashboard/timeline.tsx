@@ -1,8 +1,10 @@
 "use client";
 
-import { Text } from "@mantine/core";
+import { Modal, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useRef, useState } from "react";
 
+import EventDetails from "@/app/components/event/EventDetails";
 import { areSameDay } from "@/app/utils/dates";
 
 import { Event, Project } from "@/common/data/domain";
@@ -192,12 +194,24 @@ function Timeline({
     // each row's height is the header height plus additionnal height for expanded events.
     let cumulativeOffset = 0;
 
+    // States for showing event details in a modal window.
+    const [clickedEvent, setClickedEvent] = useState<Event | null>(null);
+    const [modalOpened, { open: openModal, close: closeModal }] =
+        useDisclosure(false);
+
     // each day is one column wide, so number of columns should be days.length
     return (
         <div
             ref={containerRef}
             className="overflow-x-auto w-full flex-1 h-full flex flex-col relative"
         >
+            <Modal
+                opened={modalOpened}
+                onClose={closeModal}
+                title="Event Details"
+            >
+                {clickedEvent && <EventDetails event={clickedEvent} />}
+            </Modal>
             <div className="flex h-full flex-1 relative">
                 {days.map((day, i) => {
                     // const isToday =
@@ -264,6 +278,10 @@ function Timeline({
                                 toggleProject={toggleProject}
                                 topOffset={topOffset}
                                 headerHeight={headerHeight}
+                                onEventClick={(event) => {
+                                    setClickedEvent(event);
+                                    openModal();
+                                }}
                             />
                         );
                     })}
