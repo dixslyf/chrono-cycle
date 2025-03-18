@@ -42,7 +42,7 @@ async function devDb(): Promise<PgliteDatabase> {
 async function prodDb(): Promise<NodePgDatabase> {
     console.log("Using production database");
 
-    if (!process.env.DB_URL) {
+    if (!process.env.DATABASE_URL) {
         throw new Error(
             "Failed to determine database URL in production environment!",
         );
@@ -54,7 +54,7 @@ async function prodDb(): Promise<NodePgDatabase> {
 
     const db = drizzle(
         new Pool({
-            connectionString: process.env.DB_URL,
+            connectionString: process.env.DATABASE_URL,
         }),
     );
 
