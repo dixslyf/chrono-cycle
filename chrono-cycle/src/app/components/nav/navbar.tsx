@@ -1,7 +1,7 @@
 // main navbar
 "use client";
 
-import { ActionIcon, Box, Text } from "@mantine/core";
+import { ActionIcon, Box, Group, Text } from "@mantine/core";
 import { Bell, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 import {
@@ -22,6 +22,7 @@ const Navbar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false); // handles sidebar
     const [isNotiOpen, setIsNotiOpen] = useState<boolean>(false); // handles notification dropdown
     const [notifications, _setNotifications] = useState<number>(3);
+    const [uname, _setUname] = useState<string>("User"); // need to retrieve user name from backend then set it here
     const pathname = usePathname();
 
     // Server-side action for logging out.
@@ -60,32 +61,49 @@ const Navbar = () => {
                 </div>
 
                 {/* Notifications & User Profile */}
-                <div className="flex items-center gap-4 justify-center">
+                <Group gap="lg">
                     {/* notification here */}
-                    <Box className="relative flex justify-center">
+                    <Box className="relative flex justify-center group">
+                        {/* rounded hover */}
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] rounded-full bg-gray-400 opacity-0 group-hover:opacity-20 transition-opacity z-0" />
                         <ActionIcon
                             onClick={toggleNoti}
                             variant="transparent"
-                            className="text-palette3"
+                            className="text-palette3 z-10"
+                            unstyled
                         >
                             <Bell className="w-8 h-8" />
                         </ActionIcon>
                         {notifications > 0 && (
-                            <Text className="absolute -top-1 -right-1 bg-red-500 text-palette3 text-sm font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                            <Text className="absolute -top-1 -right-1 bg-red-500 text-palette3 text-sm font-bold rounded-full w-5 h-5 flex items-center justify-center z-20">
                                 {notifications}
                             </Text>
                         )}
                     </Box>
 
-                    <ActionIcon
-                        onClick={() => startTransition(signOut)}
-                        variant="transparent"
-                        className="text-palette3"
-                        type="button"
-                    >
-                        <LogOut className="w-8 h-8" />
-                    </ActionIcon>
-                </div>
+                    {/* <Box className="flex gap-2"> */}
+                    <Group gap="md" justify="center" p={0}>
+                        <Text className="text-xl font-semibold text-palette3">
+                            {uname}
+                        </Text>
+
+                        <Box className="relative group flex justify-center">
+                            {/* rounded hover */}
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] rounded-full bg-gray-400 opacity-0 group-hover:opacity-20 transition-opacity z-0" />
+                            <ActionIcon
+                                component="button"
+                                onClick={() => startTransition(signOut)}
+                                variant="transparent"
+                                className="text-palette3 z-10"
+                                type="button"
+                                unstyled
+                            >
+                                <LogOut className="w-8 h-8" />
+                            </ActionIcon>
+                        </Box>
+                    </Group>
+                    {/* </Box> */}
+                </Group>
             </nav>
 
             {/* sidebar component */}
