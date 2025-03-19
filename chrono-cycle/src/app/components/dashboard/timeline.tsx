@@ -203,7 +203,7 @@ function Timeline({
     return (
         <div
             ref={containerRef}
-            className="overflow-x-auto w-full flex-1 h-full flex flex-col relative"
+            className="overflow-x-auto w-full flex-1 h-full flex flex-col relative z-0"
         >
             <Modal
                 opened={modalOpened}
