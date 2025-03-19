@@ -1,118 +1,16 @@
-// main navbar
-"use client";
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
+import { ReactNode } from "react";
 
-import { ActionIcon, Box, Group, Text } from "@mantine/core";
-import { Bell, LogOut } from "lucide-react";
-import { usePathname } from "next/navigation";
-import {
-    startTransition,
-    useActionState,
-    useCallback,
-    useEffect,
-    useState,
-} from "react";
+import { retrieveUserInfoAction } from "@/features/auth/retrieveUserInfo/action";
 
-import { signOutAction } from "@/features/auth/signOut/action";
+import NavbarClient from "./navbarClient";
 
-import Logo from "./logo";
-import HamburgerMenu from "./menu";
-import Sidebar from "./sidebar";
-
-const Navbar = () => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false); // handles sidebar
-    const [isNotiOpen, setIsNotiOpen] = useState<boolean>(false); // handles notification dropdown
-    const [notifications, _setNotifications] = useState<number>(3);
-    const [uname, _setUname] = useState<string>("User"); // need to retrieve user name from backend then set it here
-    const pathname = usePathname();
-
-    // Server-side action for logging out.
-    const [_signoutState, signOut, _signoutPending] = useActionState(
-        signOutAction,
-        null,
+export async function Navbar(): Promise<ReactNode> {
+    const userInfoResult = await retrieveUserInfoAction();
+    const usernameResult = pipe(
+        userInfoResult,
+        E.map((userInfo) => userInfo.username),
     );
-
-    // useCallback used to prevent unnecessary re-renders
-    const toggleSidebar = useCallback(() => {
-        setIsSidebarOpen((prev) => !prev);
-    }, []);
-
-    // close sidebar when the route changes
-    useEffect(() => {
-        setIsSidebarOpen(false);
-    }, [pathname]);
-
-    // toggle notification dropdown
-    const toggleNoti = () => {
-        setIsNotiOpen(!isNotiOpen);
-    };
-
-    return (
-        <>
-            {/* top nav bar */}
-            <nav className="bg-palette1 text-palette3 p-4 flex items-center justify-between">
-                {/* Hamburger menu & Logo */}
-                <div
-                    onClick={toggleSidebar}
-                    className="flex items-center gap-4"
-                >
-                    {/* <IconLogo isOpen={isSidebarOpen} /> */}
-                    <HamburgerMenu isOpen={isSidebarOpen} />
-                    <Logo className="text-palette3 h-14 w-auto" />
-                </div>
-
-                {/* Notifications & User Profile */}
-                <Group gap="lg">
-                    {/* notification here */}
-                    <Box className="relative flex justify-center group">
-                        {/* rounded hover */}
-                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] rounded-full bg-gray-400 opacity-0 group-hover:opacity-20 transition-opacity z-0" />
-                        <ActionIcon
-                            onClick={toggleNoti}
-                            variant="transparent"
-                            className="text-palette3 z-10"
-                            unstyled
-                        >
-                            <Bell className="w-8 h-8" />
-                        </ActionIcon>
-                        {notifications > 0 && (
-                            <Text className="absolute -top-1 -right-1 bg-red-500 text-palette3 text-sm font-bold rounded-full w-5 h-5 flex items-center justify-center z-20">
-                                {notifications}
-                            </Text>
-                        )}
-                    </Box>
-
-                    {/* <Box className="flex gap-2"> */}
-                    <Group gap="md" justify="center" p={0}>
-                        <Text className="text-xl font-semibold text-palette3">
-                            {uname}
-                        </Text>
-
-                        <Box className="relative group flex justify-center">
-                            {/* rounded hover */}
-                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] rounded-full bg-gray-400 opacity-0 group-hover:opacity-20 transition-opacity z-0" />
-                            <ActionIcon
-                                component="button"
-                                onClick={() => startTransition(signOut)}
-                                variant="transparent"
-                                className="text-palette3 z-10"
-                                type="button"
-                                unstyled
-                            >
-                                <LogOut className="w-8 h-8" />
-                            </ActionIcon>
-                        </Box>
-                    </Group>
-                    {/* </Box> */}
-                </Group>
-            </nav>
-
-            {/* sidebar component */}
-            <Sidebar
-                isSidebarOpen={isSidebarOpen}
-                toggleSidebar={toggleSidebar}
-            />
-        </>
-    );
-};
-
-export default Navbar;
+    return <NavbarClient usernameResult={usernameResult} />;
+}
