@@ -27,7 +27,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
     return (
         <>
             <nav
-                className={`fixed top-0 left-0 h-full w-[20%] p-4 bg-palette1 text-palette3 transform transition-transform duration-300 ease-in-out ${
+                className={`fixed top-0 left-0 h-full w-[20%] p-4 bg-palette1 text-palette3 transform transition-transform duration-300 ease-in-out z-10 ${
                     isSidebarOpen ? "translate-x-0 z-20" : "-translate-x-full"
                 }`}
             >
