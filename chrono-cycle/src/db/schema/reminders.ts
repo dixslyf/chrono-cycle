@@ -1,5 +1,11 @@
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import { boolean, integer, pgTable, serial, time } from "drizzle-orm/pg-core";
+import {
+    boolean,
+    integer,
+    pgTable,
+    serial,
+    timestamp,
+} from "drizzle-orm/pg-core";
 import {
     createInsertSchema,
     createSelectSchema,
@@ -14,8 +20,7 @@ export const reminders = pgTable("reminders", {
     eventId: integer("event_id")
         .notNull()
         .references(() => events.id, { onDelete: "cascade" }),
-    daysBeforeEvent: integer("days_before_event").notNull(),
-    time: time("time", { withTimezone: true }).notNull(),
+    triggerTime: timestamp("trigger_time", { withTimezone: true }).notNull(),
     emailNotifications: boolean("email_notifications").default(true).notNull(),
     desktopNotifications: boolean("desktop_notifications")
         .default(true)
