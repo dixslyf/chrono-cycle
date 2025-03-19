@@ -1,3 +1,5 @@
+import * as A from "fp-ts/Array";
+import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import * as NEA from "fp-ts/NonEmptyArray";
 import * as T from "fp-ts/Task";
@@ -7,7 +9,10 @@ import {
     AssertionError,
     DoesNotExistError,
     DuplicateNameError,
+    MalformedTimeStringError,
 } from "@/common/errors";
+
+import { extractTimeStringComponents } from "@/lib/reminders";
 
 import { DbLike } from "@/db";
 import { listEventTemplates } from "@/db/queries/event-templates/list";
@@ -40,7 +45,7 @@ async function insertProject(
 
 async function insertEvents(
     db: DbLike,
-    projectId: number,
+    project: DbProject,
     ets: DbEventTemplate[],
 ): Promise<DbEvent[]> {
     if (ets.length === 0) {
@@ -48,8 +53,15 @@ async function insertEvents(
     }
 
     const toInsert = ets.map((et) => {
-        const { id: eventTemplateId, updatedAt, ...rest } = et;
-        return { projectId, eventTemplateId, ...rest };
+        const { id: eventTemplateId, updatedAt: _, offsetDays, ...rest } = et;
+        const startDate = new Date(project.startsAt.getTime());
+        startDate.setDate(startDate.getDate() + offsetDays);
+        return {
+            projectId: project.id,
+            eventTemplateId,
+            startDate,
+            ...rest,
+        };
     });
     return await db.insert(eventsTable).values(toInsert).returning();
 }
@@ -89,13 +101,13 @@ async function linkTags(
     await db.insert(eventTagsTable).values(eventTagsToInsert);
 }
 
-async function insertReminders(
+function insertReminders(
     db: DbLike,
     etsMap: Map<number, DbExpandedEventTemplate>,
     dbEvents: DbEvent[],
-): Promise<DbReminder[]> {
+): TE.TaskEither<MalformedTimeStringError, DbReminder[]> {
     if (dbEvents.length === 0 || etsMap.size === 0) {
-        return [];
+        return TE.right([]);
     }
 
     const remindersToInsert = dbEvents
@@ -106,30 +118,51 @@ async function insertReminders(
                 event.eventTemplateId as number,
             ) as DbExpandedEventTemplate;
 
-            const toInsert = et.reminders.map(
-                (rt) =>
-                    ({
-                        eventId: event.id,
-                        daysBeforeEvent: rt.daysBeforeEvent,
-                        time: rt.time,
-                        emailNotifications: rt.emailNotifications,
-                        desktopNotifications: rt.desktopNotifications,
-                        reminderTemplateId: rt.id,
-                    }) satisfies DbReminderInsert,
-            );
+            const toInsert = et.reminders.map((rt) => {
+                const triggerTime = new Date(event.startDate.getTime());
+                triggerTime.setDate(triggerTime.getDate() - rt.daysBeforeEvent);
+
+                // Parse the time and set it on the trigger date.
+                const timeCompsResult = extractTimeStringComponents(rt.time);
+                return pipe(
+                    timeCompsResult,
+                    E.match(
+                        (err) => E.left(err),
+                        (timeComps) => {
+                            triggerTime.setHours(
+                                timeComps.hours,
+                                timeComps.minutes,
+                            );
+                            return E.right({
+                                eventId: event.id,
+                                triggerTime,
+                                emailNotifications: rt.emailNotifications,
+                                desktopNotifications: rt.desktopNotifications,
+                                reminderTemplateId: rt.id,
+                            } satisfies DbReminderInsert);
+                        },
+                    ),
+                );
+            });
 
             return toInsert;
         })
         .flat();
 
     if (remindersToInsert.length === 0) {
-        return [];
+        return TE.right([]);
     }
 
-    return await db
-        .insert(remindersTable)
-        .values(remindersToInsert)
-        .returning();
+    return pipe(
+        remindersToInsert,
+        A.sequence(E.Applicative),
+        TE.fromEither,
+        TE.chain((reminders) =>
+            TE.fromTask(() =>
+                db.insert(remindersTable).values(reminders).returning(),
+            ),
+        ),
+    );
 }
 
 function constructExpandedEvents(
@@ -163,7 +196,7 @@ function rawExpandedInsert(
     db: DbLike,
     toInsert: DbProjectInsert,
     ets: DbExpandedEventTemplate[],
-): T.Task<DbExpandedProject> {
+): TE.TaskEither<MalformedTimeStringError, DbExpandedProject> {
     // Map of event template ID: event template.
     const etsMap = new Map(ets.map((et) => [et.id, et]));
     return pipe(
@@ -173,23 +206,21 @@ function rawExpandedInsert(
             "events",
             ({ project }) =>
                 () =>
-                    insertEvents(db, project.id, ets),
+                    insertEvents(db, project, ets),
         ),
         T.tap(
             ({ events }) =>
                 () =>
                     linkTags(db, etsMap, events),
         ),
-        T.bind(
-            "reminders",
-            ({ events }) =>
-                () =>
-                    insertReminders(db, etsMap, events),
+        TE.fromTask,
+        TE.bind("reminders", ({ events }) =>
+            insertReminders(db, etsMap, events),
         ),
-        T.bind("expandedEvents", ({ events, reminders }) =>
-            T.of(constructExpandedEvents(etsMap, events, reminders)),
+        TE.bind("expandedEvents", ({ events, reminders }) =>
+            TE.right(constructExpandedEvents(etsMap, events, reminders)),
         ),
-        T.map(
+        TE.map(
             ({ project, expandedEvents }) =>
                 ({
                     ...project,
@@ -203,7 +234,10 @@ export function createProject(
     db: DbLike,
     toInsert: DbProjectInsert,
 ): TE.TaskEither<
-    DuplicateNameError | AssertionError | DoesNotExistError,
+    | DuplicateNameError
+    | AssertionError
+    | DoesNotExistError
+    | MalformedTimeStringError,
     DbExpandedProject
 > {
     return pipe(
@@ -217,9 +251,9 @@ export function createProject(
                           toInsert.userId,
                           toInsert.projectTemplateId,
                       ),
-                      TE.chain((ets) =>
+                      TE.chainW((ets) =>
                           wrapWithTransaction(db, (tx) =>
-                              TE.fromTask(rawExpandedInsert(tx, toInsert, ets)),
+                              rawExpandedInsert(tx, toInsert, ets),
                           ),
                       ),
                   )
