@@ -126,7 +126,11 @@ const eslintConfig = [
                         },
                         {
                             from: ["db"],
-                            allow: ["db", ["common", { base: "errors" }]],
+                            allow: [
+                                "db",
+                                ["common", { base: "errors" }],
+                                ["lib", { base: "reminders" }],
+                            ],
                         },
                         {
                             from: ["tests"],
