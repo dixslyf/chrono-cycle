@@ -17,8 +17,7 @@ type DbFatEvent = {
     tagId: number | null;
     tagName: string | null;
     rId: number | null;
-    rDaysBeforeEvent: number | null;
-    rTime: string | null;
+    rTriggerTime: Date | null;
     rEmailNotifications: boolean | null;
     rDesktopNotifications: boolean | null;
     rRtId: number | null;
@@ -44,8 +43,7 @@ function retrieveFatEvents(
 
                         // Reminder attributes
                         rId: reminders.id,
-                        rDaysBeforeEvent: reminders.daysBeforeEvent,
-                        rTime: reminders.time,
+                        rTriggerTime: reminders.triggerTime,
                         rEmailNotifications: reminders.emailNotifications,
                         rDesktopNotifications: reminders.desktopNotifications,
                         rRtId: reminders.reminderTemplateId,
@@ -97,14 +95,13 @@ function processFatEvents(rows: DbFatEvent[]): DbExpandedEvent[] {
 
             for (const row of group) {
                 if (row.rId && !reminderMap.has(row.rId)) {
-                    // Encountered new reminder .
+                    // Encountered new reminder.
 
                     // Safety: reminder attributes are guaranteed to be non-null since rtId is non-null.
                     reminderMap.set(row.rId, {
                         id: row.rId,
                         eventId: Number(eventIdStr),
-                        daysBeforeEvent: row.rDaysBeforeEvent as number,
-                        time: row.rTime as string,
+                        triggerTime: row.rTriggerTime as Date,
                         emailNotifications: row.rEmailNotifications as boolean,
                         desktopNotifications:
                             row.rDesktopNotifications as boolean,
@@ -130,7 +127,7 @@ function processFatEvents(rows: DbFatEvent[]): DbExpandedEvent[] {
             return {
                 id: Number(eventIdStr),
                 name: dbEvent.name,
-                offsetDays: dbEvent.offsetDays,
+                startDate: dbEvent.startDate,
                 duration: dbEvent.duration,
                 note: dbEvent.note,
                 eventType: dbEvent.eventType,
