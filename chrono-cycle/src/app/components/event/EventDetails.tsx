@@ -18,14 +18,6 @@ interface DisplayEventDetailsProps {
 }
 
 function DisplayEventDetails({ event }: DisplayEventDetailsProps) {
-    // Format time from "HH:MM" to "HH:MM AM/PM"
-    const formatTime = (time: string) => {
-        const [hours, minutes] = time.split(":").map(Number);
-        const period = hours >= 12 ? "PM" : "AM";
-        const formattedHours = hours % 12 || 12;
-        return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${period}`;
-    };
-
     return (
         <Paper p="md" radius="md" withBorder>
             {/* Basic Information Section */}
@@ -41,8 +33,8 @@ function DisplayEventDetails({ event }: DisplayEventDetailsProps) {
                     </Stack>
 
                     <Stack gap="xs" style={{ flex: 1 }}>
-                        <Text fw={500}>Offset days</Text>
-                        <Text>{event.offsetDays}</Text>
+                        <Text fw={500}>Start date</Text>
+                        <Text>{event.startDate.toString()}</Text>
                     </Stack>
                 </Group>
 
@@ -84,18 +76,13 @@ function DisplayEventDetails({ event }: DisplayEventDetailsProps) {
                             <Stack gap="xs">
                                 <Group justify="apart">
                                     <Stack gap={0}>
-                                        <Text fw={500}>Days before event</Text>
-                                        <Text>{reminder.daysBeforeEvent}</Text>
-                                    </Stack>
-
-                                    <Stack gap={0}>
-                                        <Text fw={500}>Time</Text>
                                         <Group gap="xs">
                                             <Clock size={16} />
-                                            <Text>
-                                                {formatTime(reminder.time)}
-                                            </Text>
+                                            <Text fw={500}>Trigger time</Text>
                                         </Group>
+                                        <Text>
+                                            {reminder.triggerTime.toString()}
+                                        </Text>
                                     </Stack>
                                 </Group>
 
