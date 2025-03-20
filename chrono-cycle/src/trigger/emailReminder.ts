@@ -3,7 +3,7 @@ import { task, wait } from "@trigger.dev/sdk/v3";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { toEvent } from "@/common/data/domain";
+import { Event, toEvent } from "@/common/data/domain";
 
 import { decodeEventId } from "@/lib/identifiers";
 
@@ -18,7 +18,7 @@ export type EmailReminderPayload = {
 
 export type EmailReminderOutput = {
     reminderId: string;
-    eventId: string;
+    event: Event;
 };
 
 export type EmailReminderRunHandle = RunHandleFromTypes<
