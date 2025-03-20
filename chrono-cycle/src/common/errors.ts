@@ -2,6 +2,15 @@ export type BaseError = {
     _errorKind: string;
 };
 
+export function isBaseError(obj: unknown): obj is BaseError {
+    return (
+        typeof obj === "object" &&
+        obj !== null &&
+        "_errorKind" in obj &&
+        typeof obj._errorKind === "string"
+    );
+}
+
 export type DoesNotExistError = {
     _errorKind: "DoesNotExistError";
 };

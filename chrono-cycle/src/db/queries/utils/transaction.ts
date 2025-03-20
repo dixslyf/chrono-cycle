@@ -1,11 +1,11 @@
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { BaseError } from "@/common/errors";
+import { BaseError, isBaseError } from "@/common/errors";
 
 import { DbLike, DbTransaction } from "@/db";
 
-export function wrapWithTransaction<E extends BaseError, R>(
+export function wrapWithTransaction<E extends BaseError | Array<BaseError>, R>(
     db: DbLike,
     taskEitherF: (tx: DbTransaction) => TE.TaskEither<E, R>,
 ): TE.TaskEither<E, R> {
@@ -22,11 +22,10 @@ export function wrapWithTransaction<E extends BaseError, R>(
                 return await insertTask();
             }),
         (err) => {
-            // Ensure only things that extend `BaseError` get returned.
+            // Ensure only things that extend or contain `BaseError` get returned.
             if (
-                typeof err === "object" &&
-                err !== null &&
-                "_errorKind" in err
+                isBaseError(err) ||
+                (Array.isArray(err) && err.every(isBaseError))
             ) {
                 return err as E;
             }
