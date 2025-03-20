@@ -1,6 +1,7 @@
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
     boolean,
+    date,
     integer,
     pgEnum,
     pgTable,
@@ -40,7 +41,7 @@ export const events = pgTable("events", {
         .notNull()
         .references(() => projects.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    offsetDays: integer("offset_days").notNull(),
+    startDate: date("start_date", { mode: "date" }).notNull(),
     duration: integer("duration").notNull(),
     note: text("note").notNull().default(""),
     eventType: eventTypeEnum("event_type").notNull(),

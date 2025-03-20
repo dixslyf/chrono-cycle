@@ -16,7 +16,7 @@ import { expandedEventUpdateSchema, reminderInsertSchema } from "@/db/schema";
 export const payloadSchema = z.object({
     id: encodedIdSchema,
     name: expandedEventUpdateSchema.shape.name,
-    offsetDays: expandedEventUpdateSchema.shape.offsetDays,
+    startDate: z.string().date().pipe(z.coerce.date()),
     duration: expandedEventUpdateSchema.shape.duration,
     note: expandedEventUpdateSchema.shape.note,
     eventType: expandedEventUpdateSchema.shape.eventType,
@@ -26,8 +26,10 @@ export const payloadSchema = z.object({
     remindersDelete: z.array(encodedIdSchema),
     remindersInsert: z.array(
         z.object({
-            daysBeforeEvent: reminderInsertSchema.shape.daysBeforeEvent,
-            time: reminderInsertSchema.shape.time,
+            triggerTime: z
+                .string()
+                .datetime({ offset: true, local: false })
+                .pipe(z.coerce.date()),
             emailNotifications: reminderInsertSchema.shape.emailNotifications,
             desktopNotifications:
                 reminderInsertSchema.shape.desktopNotifications,
@@ -48,7 +50,7 @@ export type Failure =
     | ValidationError<
           | "id"
           | "name"
-          | "offsetDays"
+          | "startDate"
           | "duration"
           | "note"
           | "eventType"

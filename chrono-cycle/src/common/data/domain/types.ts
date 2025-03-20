@@ -53,7 +53,7 @@ export type Event = {
     id: string; // Encoded ID.
     projectId: string; // Encoded ID.
     name: string;
-    offsetDays: number;
+    startDate: Date;
     duration: number;
     note: string;
     eventType: "task" | "activity";
@@ -69,8 +69,7 @@ export type Event = {
 export type Reminder = {
     id: string; // Encoded ID.
     eventId: string; // Encoded ID.
-    daysBeforeEvent: number;
-    time: string;
+    triggerTime: Date;
     emailNotifications: boolean;
     desktopNotifications: boolean;
     reminderTemplateId: string | null; // Encoded ID.

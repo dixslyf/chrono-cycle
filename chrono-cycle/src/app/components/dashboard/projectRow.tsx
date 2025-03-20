@@ -52,10 +52,8 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
     // });
     const eventEndIndexes = project.events
         .map((event) => {
-            const endDate = new Date(project.startsAt);
-            endDate.setDate(
-                endDate.getDate() + event.offsetDays + event.duration - 1,
-            );
+            const endDate = new Date(event.startDate);
+            endDate.setDate(endDate.getDate() + event.duration - 1);
             return days.findIndex((d) => areSameDay(d.date, endDate));
         })
         .filter((index) => index !== -1);
@@ -124,10 +122,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
                 <div className="relative w-full">
                     {project.events.map((event, eventIndex) => {
                         // Calculate start and end dates for the event.
-                        const eventStartDate = new Date(project.startsAt);
-                        eventStartDate.setDate(
-                            eventStartDate.getDate() + event.offsetDays,
-                        );
+                        const eventStartDate = event.startDate;
                         const eventEndDate = new Date(eventStartDate);
                         eventEndDate.setDate(
                             eventStartDate.getDate() + event.duration - 1,

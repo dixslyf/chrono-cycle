@@ -88,3 +88,11 @@ export type DuplicateReminderError = {
 export function DuplicateReminderError(): DuplicateReminderError {
     return { _errorKind: "DuplicateReminderError" };
 }
+
+export type MalformedTimeStringError = {
+    _errorKind: "MalformedTimeStringError";
+};
+
+export function MalformedTimeStringError(): MalformedTimeStringError {
+    return { _errorKind: "MalformedTimeStringError" };
+}

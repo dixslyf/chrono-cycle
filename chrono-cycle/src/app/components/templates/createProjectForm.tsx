@@ -30,6 +30,10 @@ function getCreateErrorMessage(error: Failure) {
             () => "Project template does not exist",
         )
         .with(
+            { _errorKind: "MalformedTimeStringError" },
+            () => "One or more reminder templates have a malformed time.",
+        )
+        .with(
             { _errorKind: "InternalError" },
             () => "An internal error occurred",
         )

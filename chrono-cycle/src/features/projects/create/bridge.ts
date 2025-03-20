@@ -6,6 +6,7 @@ import {
     AssertionError,
     DoesNotExistError,
     DuplicateNameError,
+    MalformedTimeStringError,
 } from "@/common/errors";
 
 import { decodeProjectTemplateId } from "@/lib/identifiers";
@@ -19,7 +20,10 @@ export function bridge(
     userId: number,
     payloadP: ParsedPayload,
 ): TE.TaskEither<
-    DuplicateNameError | AssertionError | DoesNotExistError,
+    | DuplicateNameError
+    | AssertionError
+    | DoesNotExistError
+    | MalformedTimeStringError,
     Project
 > {
     return pipe(
