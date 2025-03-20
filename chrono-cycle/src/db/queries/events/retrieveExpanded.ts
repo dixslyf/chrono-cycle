@@ -167,9 +167,7 @@ export function retrieveExpandedEvent(
     eventId: number,
 ): TE.TaskEither<AssertionError | DoesNotExistError, DbExpandedEvent> {
     return pipe(
-        TE.fromTask(() =>
-            retrieveExpandedEvents(db, eq(events.projectId, eventId)),
-        ),
+        TE.fromTask(() => retrieveExpandedEvents(db, eq(events.id, eventId))),
         TE.chain((events) => {
             if (events.length < 1) {
                 return TE.left(
