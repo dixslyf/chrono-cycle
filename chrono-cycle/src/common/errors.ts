@@ -96,3 +96,16 @@ export type MalformedTimeStringError = {
 export function MalformedTimeStringError(): MalformedTimeStringError {
     return { _errorKind: "MalformedTimeStringError" };
 }
+
+export type ScheduleReminderError = {
+    _errorKind: "ScheduleError";
+    reminderId: string;
+    context?: string;
+};
+
+export function ScheduleReminderError(
+    reminderId: string,
+    context?: string,
+): ScheduleReminderError {
+    return { _errorKind: "ScheduleError", reminderId, context };
+}
