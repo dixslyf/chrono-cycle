@@ -106,15 +106,18 @@ export function MalformedTimeStringError(): MalformedTimeStringError {
     return { _errorKind: "MalformedTimeStringError" };
 }
 
+export type ScheduleReminderIssue = {
+    reminderId: string;
+    context?: string | undefined;
+};
+
 export type ScheduleReminderError = {
     _errorKind: "ScheduleError";
-    reminderId: string;
-    context?: string;
+    issues: ScheduleReminderIssue[];
 };
 
 export function ScheduleReminderError(
-    reminderId: string,
-    context?: string,
+    issues: ScheduleReminderIssue[],
 ): ScheduleReminderError {
-    return { _errorKind: "ScheduleError", reminderId, context };
+    return { _errorKind: "ScheduleError", issues };
 }

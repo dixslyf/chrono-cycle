@@ -30,7 +30,7 @@ export type Failure =
     | DuplicateNameError
     | DoesNotExistError
     | MalformedTimeStringError
-    | ScheduleReminderError[]
+    | ScheduleReminderError
     | InternalError;
 
 export type Result = E.Either<Failure, Project>;

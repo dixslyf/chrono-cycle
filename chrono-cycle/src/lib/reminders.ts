@@ -13,6 +13,7 @@ import { Project, Reminder } from "@/common/data/domain";
 import {
     MalformedTimeStringError,
     ScheduleReminderError,
+    ScheduleReminderIssue,
 } from "@/common/errors";
 
 export type TimeComponents = {
@@ -40,7 +41,7 @@ export function extractTimeStringComponents(
 
 export function scheduleReminder(
     reminder: Reminder,
-): TE.TaskEither<ScheduleReminderError, EmailReminderRunHandle> {
+): TE.TaskEither<ScheduleReminderIssue, EmailReminderRunHandle> {
     return TE.tryCatch(
         () =>
             tasks.trigger<typeof emailReminderTask>("email-reminder", {
@@ -49,16 +50,16 @@ export function scheduleReminder(
                 triggerTime: reminder.triggerTime,
             }),
         (err) =>
-            ScheduleReminderError(
-                reminder.id,
-                err instanceof Error ? err.message : undefined,
-            ),
+            ({
+                reminderId: reminder.id,
+                context: err instanceof Error ? err.message : undefined,
+            }) satisfies ScheduleReminderIssue,
     );
 }
 
 export function scheduleReminders(
     project: Project,
-): TE.TaskEither<ScheduleReminderError[], EmailReminderRunHandle[]> {
+): TE.TaskEither<ScheduleReminderError, EmailReminderRunHandle[]> {
     return pipe(
         // Try scheduling the reminders.
         project.events
@@ -71,14 +72,14 @@ export function scheduleReminders(
         TE.fromTask,
         // Check for failures. If there is a failure, then cancel the successful ones
         // and return the errors.
-        TE.chain(({ left: failures, right: handles }) =>
-            failures.length > 0
+        TE.chain(({ left: issues, right: handles }) =>
+            issues.length > 0
                 ? pipe(
                       handles,
                       A.traverse(T.ApplicativePar)(
                           (handle) => () => runs.cancel(handle.id),
                       ),
-                      () => TE.left(failures),
+                      () => TE.left(ScheduleReminderError(issues)),
                   )
                 : TE.right(handles),
         ),

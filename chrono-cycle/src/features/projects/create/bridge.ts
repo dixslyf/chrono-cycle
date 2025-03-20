@@ -27,7 +27,7 @@ export function bridge(
     | AssertionError
     | DoesNotExistError
     | MalformedTimeStringError
-    | ScheduleReminderError[],
+    | ScheduleReminderError,
     Project
 > {
     return pipe(
