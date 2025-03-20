@@ -28,7 +28,7 @@ export type EmailReminderRunHandle = RunHandleFromTypes<
 export const emailReminderTask = task({
     id: "email-reminder",
     maxDuration: 300, // Stop executing after 300 secs (5 mins) of compute.
-    run: async (payload: EmailReminderPayload, { _ctx }) => {
+    run: async (payload: EmailReminderPayload, { ctx: _ctx }) => {
         await wait.until({ date: payload.triggerTime });
 
         const { reminderId, eventId } = payload;
