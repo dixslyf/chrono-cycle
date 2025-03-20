@@ -6,8 +6,8 @@ import {
     AssertionError,
     DoesNotExistError,
     DuplicateNameError,
+    InternalError,
     MalformedTimeStringError,
-    ScheduleReminderError,
 } from "@/common/errors";
 
 import { decodeProjectTemplateId } from "@/lib/identifiers";
@@ -27,7 +27,7 @@ export function bridge(
     | AssertionError
     | DoesNotExistError
     | MalformedTimeStringError
-    | ScheduleReminderError,
+    | InternalError,
     Project
 > {
     return pipe(
@@ -50,6 +50,11 @@ export function bridge(
                     ),
                     TE.bindW("reminderHandles", ({ project }) =>
                         scheduleReminders(project),
+                    ),
+                    TE.mapError((err) =>
+                        err._errorKind === "ScheduleReminderError"
+                            ? InternalError("Failed to schedule reminders")
+                            : err,
                     ),
                     TE.map(({ project }) => project),
                 ),
