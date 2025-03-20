@@ -65,7 +65,13 @@ export function scheduleReminders(
         project.events
             .map((event) => event.reminders)
             .flat()
-            .filter((reminder) => reminder.emailNotifications)
+            // Filter to those with email notifications and whose trigger is later
+            // the current date and time.
+            .filter(
+                (reminder) =>
+                    reminder.emailNotifications &&
+                    reminder.triggerTime >= new Date(),
+            )
             .map((reminder) => scheduleReminder(reminder)),
         A.sequence(T.ApplicativePar), // Convert to Task<Either<ScheduleReminderError, EmailReminderRunhandle>[]>
         T.map(A.partitionMap(identity)), // Separate the failures from the successes
