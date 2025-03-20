@@ -2,6 +2,7 @@
 
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import { MantineProvider } from "@mantine/core";
+import { DatesProvider } from "@mantine/dates";
 import {
     QueryCache,
     QueryClient,
@@ -44,7 +45,16 @@ export default function RootProvider({
         <QueryClientProvider client={queryClient}>
             <MantineProvider>
                 <ChakraProvider value={defaultSystem}>
-                    <ThemeProvider>{children}</ThemeProvider>
+                    <ThemeProvider>
+                        <DatesProvider
+                            settings={{
+                                // FIXME: For now, we assume the timezone is Singapore's.
+                                timezone: "Asia/Singapore",
+                            }}
+                        >
+                            {children}
+                        </DatesProvider>
+                    </ThemeProvider>
                 </ChakraProvider>
             </MantineProvider>
         </QueryClientProvider>
