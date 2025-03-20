@@ -103,12 +103,12 @@ export type ScheduleReminderIssue = {
 };
 
 export type ScheduleReminderError = {
-    _errorKind: "ScheduleError";
+    _errorKind: "ScheduleReminderError";
     issues: ScheduleReminderIssue[];
 };
 
 export function ScheduleReminderError(
     issues: ScheduleReminderIssue[],
 ): ScheduleReminderError {
-    return { _errorKind: "ScheduleError", issues };
+    return { _errorKind: "ScheduleReminderError", issues };
 }
