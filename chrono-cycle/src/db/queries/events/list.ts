@@ -17,6 +17,8 @@ export function listEvents(
     return pipe(
         // Check that the project exists.
         retrieveProject(db, userId, projectId),
-        TE.chain(() => retrieveExpandedEventsByProjectId(db, projectId)),
+        TE.chain(() =>
+            TE.fromTask(() => retrieveExpandedEventsByProjectId(db, projectId)),
+        ),
     );
 }

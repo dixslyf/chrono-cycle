@@ -47,36 +47,29 @@ const fatColumns = {
     rRtId: reminders.reminderTemplateId,
 };
 
-function retrieveFatEvents<
+async function retrieveFatEvents<
     Where extends
         | ((aliases: typeof fatColumns) => SQL | undefined)
         | SQL
         | undefined,
->(
-    db: DbLike,
-    where: Where,
-): TE.TaskEither<AssertionError | DoesNotExistError, DbFatEvent[]> {
-    return pipe(
-        TE.fromTask(() =>
-            db
-                .select(fatColumns)
-                .from(events)
+>(db: DbLike, where: Where): Promise<DbFatEvent[]> {
+    return await db
+        .select(fatColumns)
+        .from(events)
 
-                // Find the user.
-                .innerJoin(projects, eq(events.projectId, projects.id))
-                .innerJoin(users, eq(projects.userId, users.id))
+        // Find the user.
+        .innerJoin(projects, eq(events.projectId, projects.id))
+        .innerJoin(users, eq(projects.userId, users.id))
 
-                // Join with tag tables.
-                // Must be a left join since we want to get the event even if it doesn't have any tags.
-                .leftJoin(eventTags, eq(events.id, eventTags.eventId))
-                .leftJoin(tags, eq(eventTags.tagId, tags.id))
+        // Join with tag tables.
+        // Must be a left join since we want to get the event even if it doesn't have any tags.
+        .leftJoin(eventTags, eq(events.id, eventTags.eventId))
+        .leftJoin(tags, eq(eventTags.tagId, tags.id))
 
-                // Join with reminder table.
-                // Must be a left join since we want to get the event even if it doesn't have any reminders.
-                .leftJoin(reminders, eq(reminders.eventId, events.id))
-                .where(where),
-        ),
-    );
+        // Join with reminder table.
+        // Must be a left join since we want to get the event even if it doesn't have any reminders.
+        .leftJoin(reminders, eq(reminders.eventId, events.id))
+        .where(where);
 }
 
 // Process the rows returned by the `retrieveFatEvents()`.
@@ -152,26 +145,21 @@ function processFatEvents(rows: DbFatEvent[]): DbExpandedEvent[] {
     return Object.values(eventMap);
 }
 
-export function retrieveExpandedEvents<
+export async function retrieveExpandedEvents<
     Where extends
         | ((aliases: typeof fatColumns) => SQL | undefined)
         | SQL
         | undefined,
->(
-    db: DbLike,
-    where: Where,
-): TE.TaskEither<AssertionError | DoesNotExistError, DbExpandedEvent[]> {
-    return pipe(
-        retrieveFatEvents(db, where),
-        TE.map((rows) => processFatEvents(rows)),
-    );
+>(db: DbLike, where: Where): Promise<DbExpandedEvent[]> {
+    const fatEvents = await retrieveFatEvents(db, where);
+    return processFatEvents(fatEvents);
 }
 
-export function retrieveExpandedEventsByProjectId(
+export async function retrieveExpandedEventsByProjectId(
     db: DbLike,
     projectId: number,
-): TE.TaskEither<AssertionError | DoesNotExistError, DbExpandedEvent[]> {
-    return retrieveExpandedEvents(db, eq(events.projectId, projectId));
+): Promise<DbExpandedEvent[]> {
+    return await retrieveExpandedEvents(db, eq(events.projectId, projectId));
 }
 
 export function retrieveExpandedEvent(
@@ -179,12 +167,14 @@ export function retrieveExpandedEvent(
     eventId: number,
 ): TE.TaskEither<AssertionError | DoesNotExistError, DbExpandedEvent> {
     return pipe(
-        retrieveExpandedEvents(db, eq(events.projectId, eventId)),
+        TE.fromTask(() =>
+            retrieveExpandedEvents(db, eq(events.projectId, eventId)),
+        ),
         TE.chain((events) => {
-            // `retrieveExpandedEvents()` should already return `DoesNotExistError`
-            // if there are no matching events.
             if (events.length < 1) {
-                return TE.left(AssertionError("Unexpected no matching events"));
+                return TE.left(
+                    DoesNotExistError() as DoesNotExistError | AssertionError,
+                );
             }
 
             if (events.length > 1) {
