@@ -12,7 +12,7 @@ import { sessionIdFromToken } from "@/lib/auth/sessions";
 
 import * as dbMod from "@/db";
 import * as schema from "@/db/schema";
-import { sessions, users } from "@/db/schema";
+import { sessions, users, userSettings } from "@/db/schema";
 
 // Mock `getDb()`.
 vi.mock(import("@/db"), async (importOriginal) => {
@@ -79,6 +79,15 @@ beforeEach(async () => {
         id: sessionId,
         userId: 1,
         expiresAt: new Date("2025-03-01"),
+    });
+
+    // Insert fake user setting.
+    await testDb.insert(userSettings).values({
+        userId: 1,
+        startDayOfWeek: "Monday",
+        dateFormat: "DD/MM/YYYY",
+        enableDesktopNotifications: false,
+        enableEmailNotifications: false,
     });
 });
 
