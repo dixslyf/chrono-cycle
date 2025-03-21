@@ -3,6 +3,7 @@
 import {
     Box,
     Group,
+    ScrollArea,
     Skeleton,
     Stack,
     Text,
@@ -13,7 +14,7 @@ import { X } from "lucide-react";
 import { ProjectTemplate } from "@/common/data/domain";
 
 import { DeleteTemplateButton } from "./deleteTemplateButton";
-import { EventsTable } from "./eventTable";
+import { EventsTable } from "./eventTemplatesTable";
 
 export function TemplateDetailsSkeleton(): React.ReactNode {
     return (
@@ -44,17 +45,19 @@ export function TemplateDetails<T extends string>({
         <Group className="w-full h-full gap-0 items-stretch">
             {/* name & desc & table */}
             <Stack className="w-2/3 py-8 px-12 h-full overflow-y-auto" gap="xl">
-                <Text className="text-3xl font-bold">
+                <Text className="text-3xl font-bold h-1/8">
                     {projectTemplate.name}
                 </Text>
-                <Text className="h-64 border border-gray-400 rounded-xl p-4">
+                <Text className="h-2/5 border border-gray-400 rounded-xl p-4">
                     {projectTemplate.description}
                 </Text>
-                <EventsTable
-                    projectTemplateId={projectTemplate.id}
-                    eventTemplates={projectTemplate.events}
-                    modalStack={modalStack}
-                />
+                <ScrollArea type="auto" className="h-2/5">
+                    <EventsTable
+                        projectTemplateId={projectTemplate.id}
+                        eventTemplates={projectTemplate.events}
+                        modalStack={modalStack}
+                    />
+                </ScrollArea>
             </Stack>
             {/* create & update timestamp & close button */}
             <Stack
