@@ -55,7 +55,7 @@ export function DeleteTemplateButton({
             }
         >
             <Trash className="mr-2" />
-            Delete
+            Delete Template
         </Button>
     );
 }
