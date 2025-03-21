@@ -37,7 +37,11 @@ export function CreateEventTemplateButton<T extends string>({
                     onSuccess={closeModal}
                 />
             </Modal>
-            <Button variant="filled" onClick={openModal}>
+            <Button
+                variant="transparent"
+                className="text-palette5 w-full hover:text-palette5"
+                onClick={openModal}
+            >
                 <CalendarPlus className="mr-2" /> Add Event
             </Button>
         </>

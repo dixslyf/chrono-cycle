@@ -1,7 +1,9 @@
 "use client";
 
-import { DataTable } from "mantine-datatable";
+import { Table, useModalsStack } from "@mantine/core";
 import React from "react";
+
+import { CreateEventTemplateButton } from "./createEventButton";
 
 // placeholder eventOverview
 interface EventOverview {
@@ -11,13 +13,6 @@ interface EventOverview {
     type: string;
     duration: number | null;
 }
-
-const columns = [
-    { accessor: "name", title: "Name" },
-    { accessor: "offsetDays", title: "Offset Days" },
-    { accessor: "type", title: "Type" },
-    { accessor: "duration", title: "Duration" },
-];
 
 const placeholderEvents: EventOverview[] = [
     {
@@ -36,31 +31,58 @@ const placeholderEvents: EventOverview[] = [
     },
 ];
 
-export function EventsTable(): React.ReactNode {
-    const records = placeholderEvents.map(
-        ({ id, name, offsetDays, type, duration }) => ({
-            id,
-            name,
-            offsetDays: offsetDays.toString(),
-            type,
-            // Only display duration if the event type is "activity"
-            duration:
-                type === "activity"
-                    ? duration
-                        ? duration.toString()
-                        : "-"
-                    : "-",
-        }),
-    );
+interface EventsTableProps<T extends string> {
+    projectTemplateId: string;
+    modalStack: ReturnType<typeof useModalsStack<T | "add-event">>;
+    events?: EventOverview[];
+}
+
+export function EventsTable<T extends string>({
+    projectTemplateId,
+    modalStack,
+    events,
+}: EventsTableProps<T>): React.ReactNode {
+    // passed events or fallback or fallback to placeholderEvents for now
+    const eventList = events ?? placeholderEvents;
 
     return (
-        <DataTable
-            highlightOnHover
-            withTableBorder
-            columns={columns}
-            records={records}
-            minHeight={150}
-            noRecordsText="No events"
-        />
+        <Table className="border-gray-400 rounded-xl">
+            <Table.Thead>
+                <Table.Tr>
+                    <Table.Th className="font-semibold">Name</Table.Th>
+                    <Table.Th className="font-semibold">Offset Days</Table.Th>
+                    <Table.Th className="font-semibold">Type</Table.Th>
+                    <Table.Th className="font-semibold">Duration</Table.Th>
+                </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+                {eventList.map(({ id, name, offsetDays, type, duration }) => (
+                    <Table.Tr key={id}>
+                        <Table.Td>{name}</Table.Td>
+                        <Table.Td>{offsetDays.toString()}</Table.Td>
+                        <Table.Td>{type}</Table.Td>
+                        <Table.Td>
+                            {type === "activity"
+                                ? duration !== null
+                                    ? duration.toString()
+                                    : "-"
+                                : "-"}
+                        </Table.Td>
+                    </Table.Tr>
+                ))}
+                {/* Always display this add event row */}
+                <Table.Tr>
+                    <Table.Td
+                        className="text-center hover:bg-gray-100 pt-2"
+                        colSpan={4}
+                    >
+                        <CreateEventTemplateButton
+                            projectTemplateId={projectTemplateId}
+                            modalStack={modalStack}
+                        />
+                    </Table.Td>
+                </Table.Tr>
+            </Table.Tbody>
+        </Table>
     );
 }

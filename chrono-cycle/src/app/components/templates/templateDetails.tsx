@@ -10,9 +10,8 @@ import {
 } from "@mantine/core";
 import { X } from "lucide-react";
 
-import { ProjectOverview, ProjectTemplate } from "@/common/data/domain";
+import { ProjectTemplate } from "@/common/data/domain";
 
-import { CreateEventTemplateButton } from "./createEventButton";
 import { DeleteTemplateButton } from "./deleteTemplateButton";
 import { EventsTable } from "./eventTable";
 
@@ -29,12 +28,10 @@ export function TemplateDetailsSkeleton(): React.ReactNode {
 
 export function TemplateDetails<T extends string>({
     projectTemplate,
-    // projects,
     modalStack,
     onClose,
 }: {
     projectTemplate: ProjectTemplate;
-    // projects: ProjectOverview[];
     modalStack: ReturnType<
         typeof useModalsStack<
             "project-template-details" | "create-project" | "add-event" | T
@@ -43,6 +40,7 @@ export function TemplateDetails<T extends string>({
     onClose: () => void;
 }): React.ReactNode {
     return (
+        // This part will eventually change to form. Data will be the value for inputs
         <Group className="w-full h-full gap-0 items-stretch">
             {/* name & desc & table */}
             <Stack className="w-2/3 py-8 px-12 h-full overflow-y-auto" gap="xl">
@@ -52,13 +50,10 @@ export function TemplateDetails<T extends string>({
                 <Text className="h-64 border border-gray-400 rounded-xl p-4">
                     {projectTemplate.description}
                 </Text>
-                <EventsTable />
-                <Group justify="flex-end">
-                    <CreateEventTemplateButton
-                        projectTemplateId={projectTemplate.id}
-                        modalStack={modalStack}
-                    />
-                </Group>
+                <EventsTable
+                    projectTemplateId={projectTemplate.id}
+                    modalStack={modalStack}
+                />
             </Stack>
             {/* create & update timestamp & close button */}
             <Stack

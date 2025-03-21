@@ -1,6 +1,6 @@
 "use client";
 
-import { Group, Modal, Stack, useModalsStack } from "@mantine/core";
+import { Modal, Stack, useModalsStack } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { sequenceT } from "fp-ts/Apply";
 import * as E from "fp-ts/Either";
@@ -17,8 +17,6 @@ import {
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 import { listProjectsAction } from "@/features/projects/list/action";
 
-// import { CreateEventTemplateButton } from "./createEventButton";
-import { DeleteTemplateButton } from "./deleteTemplateButton";
 import { TemplateDetails, TemplateDetailsSkeleton } from "./templateDetails";
 
 const columns = [
@@ -111,11 +109,6 @@ export function TemplateTable({
                 <Modal.Root size="100%" centered {...modalProps}>
                     <Modal.Overlay />
                     <Modal.Content className="h-full w-full rounded-xl flex flex-col">
-                        {/* <Modal.Header>
-                            <Modal.Title>Project Template Details</Modal.Title>
-                            <Modal.CloseButton />
-                        </Modal.Header> */}
-                        {/* <hr /> */}
                         <Modal.Body className="p-0 flex-1 flex flex-col overflow-hidden">
                             <Stack className="flex-1">
                                 {/* Template details */}
