@@ -52,6 +52,7 @@ export function TemplateDetails<T extends string>({
                 </Text>
                 <EventsTable
                     projectTemplateId={projectTemplate.id}
+                    eventTemplates={projectTemplate.events}
                     modalStack={modalStack}
                 />
             </Stack>

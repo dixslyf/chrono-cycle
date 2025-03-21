@@ -3,48 +3,21 @@
 import { Table, useModalsStack } from "@mantine/core";
 import React from "react";
 
+import { EventTemplate } from "@/common/data/domain";
+
 import { CreateEventTemplateButton } from "./createEventButton";
-
-// placeholder eventOverview
-interface EventOverview {
-    id: string;
-    name: string;
-    offsetDays: number;
-    type: string;
-    duration: number | null;
-}
-
-const placeholderEvents: EventOverview[] = [
-    {
-        id: "1",
-        name: "Sample Activity",
-        offsetDays: 0,
-        type: "activity",
-        duration: 5,
-    },
-    {
-        id: "2",
-        name: "Sample Event",
-        offsetDays: 3,
-        type: "task",
-        duration: null,
-    },
-];
 
 interface EventsTableProps<T extends string> {
     projectTemplateId: string;
     modalStack: ReturnType<typeof useModalsStack<T | "add-event">>;
-    events?: EventOverview[];
+    eventTemplates: EventTemplate[];
 }
 
 export function EventsTable<T extends string>({
     projectTemplateId,
     modalStack,
-    events,
+    eventTemplates,
 }: EventsTableProps<T>): React.ReactNode {
-    // passed events or fallback or fallback to placeholderEvents for now
-    const eventList = events ?? placeholderEvents;
-
     return (
         <Table className="border-gray-400 rounded-xl">
             <Table.Thead>
@@ -56,20 +29,22 @@ export function EventsTable<T extends string>({
                 </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-                {eventList.map(({ id, name, offsetDays, type, duration }) => (
-                    <Table.Tr key={id}>
-                        <Table.Td>{name}</Table.Td>
-                        <Table.Td>{offsetDays.toString()}</Table.Td>
-                        <Table.Td>{type}</Table.Td>
-                        <Table.Td>
-                            {type === "activity"
-                                ? duration !== null
-                                    ? duration.toString()
-                                    : "-"
-                                : "-"}
-                        </Table.Td>
-                    </Table.Tr>
-                ))}
+                {eventTemplates.map(
+                    ({ id, name, offsetDays, eventType, duration }) => (
+                        <Table.Tr key={id}>
+                            <Table.Td>{name}</Table.Td>
+                            <Table.Td>{offsetDays}</Table.Td>
+                            <Table.Td>{eventType}</Table.Td>
+                            <Table.Td>
+                                {eventType === "activity"
+                                    ? duration !== null
+                                        ? duration.toString()
+                                        : "-"
+                                    : "-"}
+                            </Table.Td>
+                        </Table.Tr>
+                    ),
+                )}
                 {/* Always display this add event row */}
                 <Table.Tr>
                     <Table.Td
