@@ -28,6 +28,7 @@ type DbFatEvent = {
     rEmailNotifications: boolean | null;
     rDesktopNotifications: boolean | null;
     rRtId: number | null;
+    rTriggerRunId: string | null;
 } & DbEvent;
 
 const fatColumns = {
@@ -45,6 +46,7 @@ const fatColumns = {
     rEmailNotifications: reminders.emailNotifications,
     rDesktopNotifications: reminders.desktopNotifications,
     rRtId: reminders.reminderTemplateId,
+    rTriggerRunId: reminders.triggerRunId,
 };
 
 async function retrieveFatEvents<
@@ -105,6 +107,7 @@ function processFatEvents(rows: DbFatEvent[]): DbExpandedEvent[] {
                         desktopNotifications:
                             row.rDesktopNotifications as boolean,
                         reminderTemplateId: row.rRtId,
+                        triggerRunId: row.rTriggerRunId,
                     });
                 }
 
