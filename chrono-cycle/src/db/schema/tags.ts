@@ -1,5 +1,12 @@
-import { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import { integer, pgTable, serial, text, unique } from "drizzle-orm/pg-core";
+import { InferInsertModel, InferSelectModel, sql } from "drizzle-orm";
+import {
+    check,
+    integer,
+    pgTable,
+    serial,
+    text,
+    unique,
+} from "drizzle-orm/pg-core";
 import {
     createInsertSchema,
     createSelectSchema,
@@ -17,12 +24,21 @@ export const tags = pgTable(
             .references(() => users.id, { onDelete: "cascade" }),
         name: text("name").notNull(),
     },
-    (t) => [unique("tags_unique_user_id_name").on(t.userId, t.name)],
+    (t) => [
+        unique("tags_unique_user_id_name").on(t.userId, t.name),
+        check("tags_nonempty_name", sql`TRIM(${t.name}) <> ''`),
+    ],
 );
 
 export type DbTag = InferSelectModel<typeof tags>;
 export type DbTagInsert = InferInsertModel<typeof tags>;
 
 export const tagSelectSchema = createSelectSchema(tags);
-export const tagInsertSchema = createInsertSchema(tags);
-export const tagUpdateSchema = createUpdateSchema(tags);
+
+export const tagInsertSchema = createInsertSchema(tags, {
+    name: (schema) => schema.nonempty(),
+});
+
+export const tagUpdateSchema = createUpdateSchema(tags, {
+    name: (schema) => schema.nonempty(),
+});
