@@ -92,7 +92,9 @@ function EmailReminder({
                             Dear <strong>{user.username}</strong>,
                         </p>
                         <p>This is a reminder for your upcoming event:</p>
-                        <h2>{event.name}</h2>
+                        <p>
+                            <strong>Event name:</strong> {event.name}
+                        </p>
                         <p>
                             <strong>Type:</strong>{" "}
                             {pipe(
@@ -114,20 +116,22 @@ function EmailReminder({
                                 {event.duration > 1 ? "days" : "day"}
                             </p>
                         )}
-                        {event.eventType === "task" &&
-                            event.status !== "none" && (
-                                <p>
-                                    <strong>Current Status:</strong>{" "}
-                                    {pipe(
-                                        event.status.toLowerCase(),
-                                        (status) =>
-                                            status.charAt(0).toUpperCase() +
-                                            status.slice(1),
-                                    )}
-                                </p>
-                            )}
+                        {event.eventType === "task" && (
+                            <p>
+                                <strong>Current Status:</strong>{" "}
+                                {pipe(
+                                    event.status.toLowerCase(),
+                                    (status) =>
+                                        status.charAt(0).toUpperCase() +
+                                        status.slice(1),
+                                )}
+                            </p>
+                        )}
                         <p>
-                            <strong>Note:</strong> {event.note}
+                            <strong>Note:</strong>{" "}
+                            {event.note.trim() === ""
+                                ? "None"
+                                : event.note.trim()}
                         </p>
                     </div>
                     <div className="footer">
@@ -142,23 +146,21 @@ function EmailReminder({
 export function generateEmailPlainText(user: User, event: Event): string {
     return `
     Event Reminder
-    
+
     Dear ${user.username},
 
     This is a reminder for your upcoming event:
-    
+
     Event Name: ${event.name}
-    
+
     Event Type: ${event.eventType.charAt(0).toUpperCase() + event.eventType.slice(1)}
-    
+
     Date: ${dayjs(event.startDate).format("dddd, MMMM D, YYYY")}
-    
-    ${event.eventType === "activity" ? `Duration: ${event.duration} ${event.duration > 1 ? "days" : "day"}` : ""}
-    
-    ${event.eventType === "task" && event.status !== "none" ? `Current Status: ${event.status.charAt(0).toUpperCase() + event.status.slice(1)}` : ""}
-    
-    Note: ${event.note}
-    
+
+    ${(event.eventType === "activity" ? `Duration: ${event.duration} ${event.duration > 1 ? "days" : "day"}` : "") + "\n"}
+    ${(event.eventType === "task" && event.status !== "none" ? `Current Status: ${event.status.charAt(0).toUpperCase() + event.status.slice(1)}` : "") + "\n"}
+    Note: ${event.note.trim() === "" ? "None" : event.note.trim()}
+
     -------------------------------------
     © 2025 ChronoCycle. All rights reserved.
     `;
