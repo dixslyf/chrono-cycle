@@ -1,5 +1,6 @@
-import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel, sql } from "drizzle-orm";
 import {
+    check,
     date,
     integer,
     pgTable,
@@ -44,7 +45,14 @@ export const projects = pgTable(
             { onDelete: "set null" },
         ),
     },
-    (t) => [unique("projects_unique_user_id_name").on(t.userId, t.name)],
+    (t) => [
+        unique("projects_unique_user_id_name").on(t.userId, t.name),
+        check("projects_nonempty_name", sql`TRIM(${t.name}) <> ''`),
+        check(
+            "projects_nonempty_description",
+            sql`TRIM(${t.description}) <> ''`,
+        ),
+    ],
 );
 
 export type DbProject = InferSelectModel<typeof projects>;
@@ -66,5 +74,11 @@ export type DbExpandedProjectInsert = {
 } & DbProjectInsert;
 
 export const projectSelectSchema = createSelectSchema(projects);
-export const projectInsertSchema = createInsertSchema(projects);
-export const projectUpdateSchema = createUpdateSchema(projects);
+export const projectInsertSchema = createInsertSchema(projects, {
+    name: (schema) => schema.nonempty(),
+    description: (schema) => schema.nonempty(),
+});
+export const projectUpdateSchema = createUpdateSchema(projects, {
+    name: (schema) => schema.nonempty(),
+    description: (schema) => schema.nonempty(),
+});
