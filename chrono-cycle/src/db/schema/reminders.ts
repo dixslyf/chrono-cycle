@@ -4,6 +4,7 @@ import {
     integer,
     pgTable,
     serial,
+    text,
     timestamp,
 } from "drizzle-orm/pg-core";
 import {
@@ -29,6 +30,7 @@ export const reminders = pgTable("reminders", {
         () => reminderTemplates.id,
         { onDelete: "set null" },
     ),
+    triggerRunId: text("trigger_run_id"),
 });
 
 export type DbReminder = InferSelectModel<typeof reminders>;
