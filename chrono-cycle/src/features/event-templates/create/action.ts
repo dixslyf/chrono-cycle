@@ -16,7 +16,6 @@ import { Failure, Payload, payloadSchema, Result } from "./data";
 
 async function createEventTemplateActionImpl(
     userSession: UserSession,
-    _prevState: Result | null,
     payload: Payload,
 ): Promise<E.Either<RestoreAssertionError<Failure>, EventTemplate>> {
     // Validate form schema.
@@ -30,10 +29,6 @@ async function createEventTemplateActionImpl(
     return await task();
 }
 
-export const createEventTemplateAction: (
-    _prevState: Result | null,
-    payload: Payload,
-) => Promise<Result> = wrapServerAction(
-    "createEventTemplate",
-    createEventTemplateActionImpl,
-);
+export const createEventTemplateAction: (payload: Payload) => Promise<Result> =
+    wrapServerAction("createEventTemplate", createEventTemplateActionImpl);
+
