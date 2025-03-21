@@ -31,4 +31,3 @@ async function createEventTemplateActionImpl(
 
 export const createEventTemplateAction: (payload: Payload) => Promise<Result> =
     wrapServerAction("createEventTemplate", createEventTemplateActionImpl);
-
