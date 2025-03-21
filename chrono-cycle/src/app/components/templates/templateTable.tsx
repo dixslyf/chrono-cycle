@@ -17,7 +17,7 @@ import {
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 import { listProjectsAction } from "@/features/projects/list/action";
 
-import { CreateEventTemplateButton } from "./createEventButton";
+// import { CreateEventTemplateButton } from "./createEventButton";
 import { DeleteTemplateButton } from "./deleteTemplateButton";
 import { TemplateDetails, TemplateDetailsSkeleton } from "./templateDetails";
 
@@ -130,13 +130,13 @@ export function TemplateTable({
                                         }
                                         onSuccess={closeModal}
                                     />
-                                    <CreateEventTemplateButton
+                                    {/* <CreateEventTemplateButton
                                         projectTemplateId={
                                             retrieveQuery.data.projectTemplate
                                                 .id
                                         }
                                         modalStack={modalStack}
-                                    />
+                                    /> */}
                                 </Group>
                             </>
                         ) : (

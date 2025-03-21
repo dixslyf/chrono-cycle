@@ -4,6 +4,7 @@ import { Group, Skeleton, Stack, Text, useModalsStack } from "@mantine/core";
 
 import { ProjectOverview, ProjectTemplate } from "@/common/data/domain";
 
+import { CreateEventTemplateButton } from "./createEventButton";
 import { CreateProjectButton } from "./createProjectButton";
 import { EventsTable } from "./eventTable";
 
@@ -27,7 +28,9 @@ export function TemplateDetails<T extends string>({
 }: {
     projectTemplate: ProjectTemplate;
     projects: ProjectOverview[];
-    modalStack: ReturnType<typeof useModalsStack<"create-project" | T>>;
+    modalStack: ReturnType<
+        typeof useModalsStack<"create-project" | "add-event" | T>
+    >;
 }): React.ReactNode {
     return (
         <Stack>
@@ -59,7 +62,11 @@ export function TemplateDetails<T extends string>({
                 {/* <ProjectsTable entries={projects} /> */}
                 <EventsTable />
                 <Group justify="flex-end">
-                    <CreateProjectButton
+                    {/* <CreateProjectButton
+                        projectTemplateId={projectTemplate.id}
+                        modalStack={modalStack}
+                    /> */}
+                    <CreateEventTemplateButton
                         projectTemplateId={projectTemplate.id}
                         modalStack={modalStack}
                     />
