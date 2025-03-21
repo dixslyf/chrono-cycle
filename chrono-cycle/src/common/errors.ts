@@ -112,3 +112,16 @@ export function ScheduleReminderError(
 ): ScheduleReminderError {
     return { _errorKind: "ScheduleReminderError", issues };
 }
+
+export type CancelReminderError = {
+    _errorKind: "CancelReminderError";
+    handleId: string;
+    context?: string | undefined;
+};
+
+export function CancelReminderError(
+    handleId: string,
+    context?: string | undefined,
+): CancelReminderError {
+    return { _errorKind: "CancelReminderError", handleId, context };
+}
