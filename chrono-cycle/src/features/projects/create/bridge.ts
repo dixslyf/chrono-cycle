@@ -1,3 +1,4 @@
+import * as A from "fp-ts/Array";
 import { pipe } from "fp-ts/lib/function";
 import * as TE from "fp-ts/TaskEither";
 
@@ -11,10 +12,11 @@ import {
 } from "@/common/errors";
 
 import { decodeProjectTemplateId } from "@/lib/identifiers";
-import { scheduleReminders } from "@/lib/reminders";
+import { scheduleRemindersForProject } from "@/lib/reminders";
 
 import { getDb } from "@/db";
 import { createProject } from "@/db/queries/projects/create";
+import { updateReminder } from "@/db/queries/reminders/update";
 import { wrapWithTransaction } from "@/db/queries/utils/transaction";
 
 import { ParsedPayload } from "./data";
@@ -45,18 +47,34 @@ export function bridge(
                             ...rest,
                         });
                     }),
-                    TE.bind("project", ({ dbProj }) =>
-                        TE.right(toProject(dbProj)),
+                    // Schedule the reminders.
+                    TE.bindW("scheduledDbReminders", ({ dbProj }) =>
+                        scheduleRemindersForProject(dbProj),
                     ),
-                    TE.bindW("reminderHandles", ({ project }) =>
-                        scheduleReminders(project),
+                    // Save the scheduled reminder handles to the database.
+                    TE.tap(({ scheduledDbReminders }) =>
+                        pipe(
+                            scheduledDbReminders,
+                            A.traverse(TE.ApplicativePar)(
+                                (scheduledDbReminder) =>
+                                    updateReminder(tx, {
+                                        id: scheduledDbReminder.reminder.id,
+                                        triggerRunId:
+                                            scheduledDbReminder.handle.id,
+                                    }),
+                            ),
+                        ),
                     ),
+                    // Map reminder errors to `InternalError` since the client shouldn't
+                    // need to know about it.
                     TE.mapError((err) =>
                         err._errorKind === "ScheduleReminderError"
                             ? InternalError("Failed to schedule reminders")
-                            : err,
+                            : err._errorKind === "CancelReminderError"
+                              ? InternalError("Failed to cancel reminders")
+                              : err,
                     ),
-                    TE.map(({ project }) => project),
+                    TE.map(({ dbProj }) => toProject(dbProj)),
                 ),
             ),
         ),
