@@ -3,7 +3,7 @@
 import {
     Button,
     Group,
-    NativeSelect,
+    Select,
     SimpleGrid,
     Stack,
     Switch,
@@ -78,7 +78,7 @@ function SettingsForm({ initialSettings }: { initialSettings: UserSettings }) {
                         <Text className="text-xl font-semibold">
                             Start Day of Week:
                         </Text>
-                        <NativeSelect
+                        <Select
                             data={["Monday", "Sunday"]}
                             {...form.getInputProps("startDayOfWeek")}
                         />
@@ -88,7 +88,7 @@ function SettingsForm({ initialSettings }: { initialSettings: UserSettings }) {
                         <Text className="text-xl font-semibold">
                             Date Format:
                         </Text>
-                        <NativeSelect
+                        <Select
                             data={["MM/DD/YYYY", "DD/MM/YYYY", "YYYY/MM/DD"]}
                             {...form.getInputProps("dateFormat")}
                         />
