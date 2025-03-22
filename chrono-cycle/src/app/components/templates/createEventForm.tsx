@@ -6,8 +6,8 @@ import {
     Checkbox,
     Fieldset,
     Group,
-    NativeSelect,
     NumberInput,
+    Select,
     Stack,
     TagsInput,
     Textarea,
@@ -114,13 +114,14 @@ export function CreateEventTemplateForm({
                     {...form.getInputProps("offsetDays")}
                 />
                 <Group>
-                    <NativeSelect
+                    <Select
                         name="eventType"
                         label="Event type"
                         data={[
                             { label: "Task", value: "task" },
                             { label: "Activity", value: "activity" },
                         ]}
+                        placeholder="Event type"
                         description="The type of event (task or activity)"
                         error="Invalid event type"
                         disabled={createPending}
