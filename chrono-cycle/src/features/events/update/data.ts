@@ -6,6 +6,7 @@ import {
     DoesNotExistError,
     DuplicateNameError,
     InternalError,
+    InvalidEventStatusError,
     ValidationError,
 } from "@/common/errors";
 
@@ -19,7 +20,6 @@ export const payloadSchema = z.object({
     startDate: z.string().date().pipe(z.coerce.date()),
     duration: expandedEventUpdateSchema.shape.duration,
     note: expandedEventUpdateSchema.shape.note,
-    eventType: expandedEventUpdateSchema.shape.eventType,
     autoReschedule: expandedEventUpdateSchema.shape.autoReschedule,
     status: expandedEventUpdateSchema.shape.status,
     notificationsEnabled: expandedEventUpdateSchema.shape.notificationsEnabled,
@@ -53,7 +53,6 @@ export type Failure =
           | "startDate"
           | "duration"
           | "note"
-          | "eventType"
           | "autoReschedule"
           | "status"
           | "notificationsEnabled"
@@ -63,6 +62,7 @@ export type Failure =
       >
     | DoesNotExistError
     | DuplicateNameError
+    | InvalidEventStatusError
     | InternalError;
 
 export type Result = E.Either<Failure, Event>;
