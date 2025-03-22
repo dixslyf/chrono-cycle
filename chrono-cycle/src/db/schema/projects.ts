@@ -81,4 +81,6 @@ export const projectInsertSchema = createInsertSchema(projects, {
 export const projectUpdateSchema = createUpdateSchema(projects, {
     name: (schema) => schema.nonempty(),
     description: (schema) => schema.nonempty(),
+}).required({
+    id: true,
 });

@@ -68,4 +68,6 @@ export const userUpdateSchema = createUpdateSchema(users, {
     username: (schema) => refineUsernameSchema(schema),
     email: (schema) => schema.email().nonempty(),
     hashedPassword: (schema) => schema.nonempty(),
+}).required({
+    id: true,
 });

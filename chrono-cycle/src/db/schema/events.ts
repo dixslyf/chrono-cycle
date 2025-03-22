@@ -127,7 +127,9 @@ export const eventInsertSchema = createInsertSchema(events, {
 
 export const eventUpdateSchema = createUpdateSchema(events, {
     name: (schema) => schema.nonempty(),
-}).omit({ eventType: true });
+})
+    .omit({ eventType: true })
+    .required({ id: true });
 
 export const expandedEventUpdateSchema = eventUpdateSchema.extend({
     remindersDelete: z.array(z.number()),

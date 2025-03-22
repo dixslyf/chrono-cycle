@@ -84,4 +84,6 @@ export const projectTemplateUpdateSchema = createUpdateSchema(
         name: (schema) => schema.nonempty(),
         description: (schema) => schema.nonempty(),
     },
-);
+).required({
+    id: true,
+});

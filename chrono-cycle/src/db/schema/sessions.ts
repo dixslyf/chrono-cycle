@@ -24,4 +24,6 @@ export type DbSessionInsert = InferInsertModel<typeof sessions>;
 
 export const sessionSelectSchema = createSelectSchema(sessions);
 export const sessionInsertSchema = createInsertSchema(sessions);
-export const sessionUpdateSchema = createUpdateSchema(sessions);
+export const sessionUpdateSchema = createUpdateSchema(sessions).required({
+    id: true,
+});

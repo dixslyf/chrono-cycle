@@ -43,4 +43,6 @@ export type DbUserSettingsUpdate = Pick<DbUserSettings, "userId"> &
 
 export const userSettingsSelectSchema = createSelectSchema(userSettings);
 export const userSettingsInsertSchema = createInsertSchema(userSettings);
-export const userSettingsUpdateSchema = createUpdateSchema(userSettings);
+export const userSettingsUpdateSchema = createUpdateSchema(
+    userSettings,
+).required({ userId: true });

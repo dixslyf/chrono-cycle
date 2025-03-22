@@ -101,7 +101,9 @@ export const eventTemplateInsertSchema = createInsertSchema(eventTemplates, {
 export const eventTemplateUpdateSchema = createUpdateSchema(eventTemplates, {
     offsetDays: (schema) => schema.min(0),
     name: (schema) => schema.nonempty(),
-}).omit({ eventType: true });
+})
+    .omit({ eventType: true })
+    .required({ id: true });
 
 export const expandedEventTemplateUpdateSchema =
     eventTemplateUpdateSchema.extend({

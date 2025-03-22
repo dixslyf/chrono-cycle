@@ -41,4 +41,6 @@ export const tagInsertSchema = createInsertSchema(tags, {
 
 export const tagUpdateSchema = createUpdateSchema(tags, {
     name: (schema) => schema.nonempty(),
+}).required({
+    id: true,
 });
