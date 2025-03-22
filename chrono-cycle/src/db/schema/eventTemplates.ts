@@ -1,4 +1,4 @@
-import { InferInsertModel, InferSelectModel, sql } from "drizzle-orm";
+import { InferSelectModel, sql } from "drizzle-orm";
 import {
     boolean,
     check,
@@ -36,7 +36,7 @@ export const eventTemplates = pgTable(
         note: text("note").notNull().default(""),
         eventType: eventTypeEnum("event_type").notNull(),
         autoReschedule: boolean("auto_reschedule").notNull(),
-        updatedAt: timestamp("created_at", {
+        updatedAt: timestamp("updated_at", {
             withTimezone: true,
             mode: "date",
         })
@@ -57,14 +57,8 @@ export const eventTemplates = pgTable(
 );
 
 export type DbEventTemplate = InferSelectModel<typeof eventTemplates>;
-export type DbEventTemplateInsert = InferInsertModel<typeof eventTemplates>;
-export type DbEventTemplateUpdate = Pick<DbEventTemplate, "id"> &
-    Partial<
-        Omit<
-            DbEventTemplateInsert,
-            "id" | "eventType" | "projectTemplateId" | "updatedAt"
-        >
-    >;
+export type DbEventTemplateInsert = z.input<typeof eventTemplateInsertSchema>;
+export type DbEventTemplateUpdate = z.input<typeof eventTemplateUpdateSchema>;
 
 export type DbExpandedEventTemplate = {
     reminders: DbReminderTemplate[];
@@ -89,6 +83,7 @@ export const eventTemplateInsertSchema = createInsertSchema(eventTemplates, {
     offsetDays: (schema) => schema.min(0),
     name: (schema) => schema.nonempty(),
 })
+    .omit({ updatedAt: true })
     .refine(
         (val) => (val.eventType === "task" ? val.duration === 1 : true),
         "Tasks must have a duration of 1",
@@ -102,7 +97,7 @@ export const eventTemplateUpdateSchema = createUpdateSchema(eventTemplates, {
     offsetDays: (schema) => schema.min(0),
     name: (schema) => schema.nonempty(),
 })
-    .omit({ eventType: true })
+    .omit({ eventType: true, projectTemplateId: true })
     .required({ id: true });
 
 export const expandedEventTemplateUpdateSchema =

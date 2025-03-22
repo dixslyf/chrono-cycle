@@ -1,4 +1,4 @@
-import { InferInsertModel, InferSelectModel, sql } from "drizzle-orm";
+import { InferSelectModel, sql } from "drizzle-orm";
 import {
     check,
     pgTable,
@@ -43,7 +43,8 @@ export const users = pgTable(
 );
 
 export type DbUser = InferSelectModel<typeof users>;
-export type DbUserInsert = InferInsertModel<typeof users>;
+export type DbUserInsert = z.input<typeof userInsertSchema>;
+export type DbUserUpdate = z.input<typeof userUpdateSchema>;
 
 export type DbExpandedUser = DbUser & { settings: DbUserSettings };
 export type DbExpandedUserInsert = DbUserInsert & {
@@ -63,11 +64,13 @@ export const userInsertSchema = createInsertSchema(users, {
     username: (schema) => refineUsernameSchema(schema),
     email: (schema) => schema.email().nonempty(),
     hashedPassword: (schema) => schema.nonempty(),
-});
+}).omit({ createdAt: true });
 export const userUpdateSchema = createUpdateSchema(users, {
     username: (schema) => refineUsernameSchema(schema),
     email: (schema) => schema.email().nonempty(),
     hashedPassword: (schema) => schema.nonempty(),
-}).required({
-    id: true,
-});
+})
+    .omit({ createdAt: true })
+    .required({
+        id: true,
+    });

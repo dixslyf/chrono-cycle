@@ -1,10 +1,11 @@
-import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { InferSelectModel } from "drizzle-orm";
 import { integer, pgTable, primaryKey } from "drizzle-orm/pg-core";
 import {
     createInsertSchema,
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+import { z } from "zod";
 
 import { eventTemplates } from "./eventTemplates";
 import { tags } from "./tags";
@@ -23,8 +24,11 @@ export const eventTemplateTags = pgTable(
 );
 
 export type DbEventTemplateTag = InferSelectModel<typeof eventTemplateTags>;
-export type DbEventTemplateTagInsert = InferInsertModel<
-    typeof eventTemplateTags
+export type DbEventTemplateTagInsert = z.input<
+    typeof eventTemplateTagInsertSchema
+>;
+export type DbEventTemplateTagUpdate = z.input<
+    typeof eventTemplateTagUpdateSchema
 >;
 
 export const eventTemplateTagSelectSchema =

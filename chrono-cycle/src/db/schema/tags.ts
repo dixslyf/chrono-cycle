@@ -1,4 +1,4 @@
-import { InferInsertModel, InferSelectModel, sql } from "drizzle-orm";
+import { InferSelectModel, sql } from "drizzle-orm";
 import {
     check,
     integer,
@@ -12,6 +12,7 @@ import {
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+import { z } from "zod";
 
 import { users } from "./users";
 
@@ -31,7 +32,8 @@ export const tags = pgTable(
 );
 
 export type DbTag = InferSelectModel<typeof tags>;
-export type DbTagInsert = InferInsertModel<typeof tags>;
+export type DbTagInsert = z.input<typeof tagInsertSchema>;
+export type DbTagUpdate = z.input<typeof tagUpdateSchema>;
 
 export const tagSelectSchema = createSelectSchema(tags);
 

@@ -1,4 +1,4 @@
-import { InferInsertModel, InferSelectModel, sql } from "drizzle-orm";
+import { InferSelectModel, sql } from "drizzle-orm";
 import {
     check,
     date,
@@ -14,6 +14,7 @@ import {
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+import { z } from "zod";
 
 import { DbExpandedEvent, DbExpandedEventInsert } from "./events";
 import { projectTemplates } from "./projectTemplates";
@@ -56,14 +57,8 @@ export const projects = pgTable(
 );
 
 export type DbProject = InferSelectModel<typeof projects>;
-export type DbProjectInsert = InferInsertModel<typeof projects>;
-export type DbProjectUpdate = Pick<DbProject, "id"> &
-    Partial<
-        Omit<
-            DbProjectInsert,
-            "id" | "createdAt" | "updatedAt" | "projectTemplateId" | "userId"
-        >
-    >;
+export type DbProjectInsert = z.input<typeof projectInsertSchema>;
+export type DbProjectUpdate = z.input<typeof projectUpdateSchema>;
 
 export type DbExpandedProject = {
     events: DbExpandedEvent[];
@@ -77,10 +72,12 @@ export const projectSelectSchema = createSelectSchema(projects);
 export const projectInsertSchema = createInsertSchema(projects, {
     name: (schema) => schema.nonempty(),
     description: (schema) => schema.nonempty(),
-});
+}).omit({ createdAt: true, updatedAt: true });
 export const projectUpdateSchema = createUpdateSchema(projects, {
     name: (schema) => schema.nonempty(),
     description: (schema) => schema.nonempty(),
-}).required({
-    id: true,
-});
+})
+    .omit({ createdAt: true, projectTemplateId: true, userId: true })
+    .required({
+        id: true,
+    });

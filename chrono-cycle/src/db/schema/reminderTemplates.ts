@@ -1,4 +1,4 @@
-import { InferInsertModel, InferSelectModel, sql } from "drizzle-orm";
+import { InferSelectModel, sql } from "drizzle-orm";
 import {
     boolean,
     check,
@@ -12,6 +12,7 @@ import {
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+import { z } from "zod";
 
 import { eventTemplates } from "./eventTemplates";
 
@@ -40,11 +41,12 @@ export const reminderTemplates = pgTable(
 );
 
 export type DbReminderTemplate = InferSelectModel<typeof reminderTemplates>;
-export type DbReminderTemplateInsert = InferInsertModel<
-    typeof reminderTemplates
+export type DbReminderTemplateInsert = z.input<
+    typeof reminderTemplateInsertSchema
 >;
-export type DbReminderTemplateUpdate = Pick<DbReminderTemplate, "id"> &
-    Partial<Omit<DbReminderTemplateInsert, "id" | "eventTemplateId">>;
+export type DbReminderTemplateUpdate = z.input<
+    typeof reminderTemplateUpdateSchema
+>;
 
 export const reminderTemplateSelectSchema =
     createSelectSchema(reminderTemplates);
@@ -58,4 +60,6 @@ export const reminderTemplateInsertSchema = createInsertSchema(
 
 export const reminderTemplateUpdateSchema = createUpdateSchema(
     reminderTemplates,
-).required({ id: true });
+)
+    .omit({ eventTemplateId: true })
+    .required({ id: true });
