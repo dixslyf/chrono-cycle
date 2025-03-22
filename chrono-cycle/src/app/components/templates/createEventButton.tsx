@@ -38,8 +38,7 @@ export function CreateEventTemplateButton<T extends string>({
                 />
             </Modal>
             <Button
-                variant="transparent"
-                className="text-palette5 w-full hover:text-palette5"
+                className="text-palette3 hover:text-palette3 bg-palette2 hover:bg-palette1 transition-colors duration-300 ease-in"
                 onClick={openModal}
             >
                 <CalendarPlus className="mr-2" /> Add Event

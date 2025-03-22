@@ -3,7 +3,6 @@
 import {
     Box,
     Group,
-    ScrollArea,
     Skeleton,
     Stack,
     Text,
@@ -55,13 +54,13 @@ export function TemplateDetails<T extends string>({
                 <Text className="h-2/6 border border-gray-400 rounded-xl p-4">
                     {projectTemplate.description}
                 </Text>
-                <ScrollArea type="auto" className="h-2/5">
+                <Box className="h-2/5">
                     <EventsTable
                         projectTemplateId={projectTemplate.id}
                         eventTemplates={projectTemplate.events}
                         modalStack={modalStack}
                     />
-                </ScrollArea>
+                </Box>
             </Stack>
             {/* create & update timestamp & close button */}
             <Stack

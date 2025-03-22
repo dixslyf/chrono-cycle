@@ -1,6 +1,13 @@
 "use client";
 
-import { Box, Modal, Table, useModalsStack } from "@mantine/core";
+import {
+    Box,
+    Group,
+    Modal,
+    Pagination,
+    Table,
+    useModalsStack,
+} from "@mantine/core";
 import React, { useCallback, useState } from "react";
 
 import { EventTemplate } from "@/common/data/domain";
@@ -14,12 +21,14 @@ interface EventsTableProps<T extends string> {
         typeof useModalsStack<T | "add-event" | "event-details">
     >;
     eventTemplates: EventTemplate[];
+    rowsPerPage?: number;
 }
 
 export function EventsTable<T extends string>({
     projectTemplateId,
     modalStack,
     eventTemplates,
+    rowsPerPage = 5,
 }: EventsTableProps<T>): React.ReactNode {
     const { close: modalStackClose } = modalStack;
     const closeModal = useCallback(
@@ -30,6 +39,20 @@ export function EventsTable<T extends string>({
     // local state to track the event
     const [selectedEventTemplate, setSelectedEventTemplate] =
         useState<EventTemplate | null>(null);
+
+    // pagination state
+    const [activePage, setActivePage] = useState(1);
+
+    const totalPages = Math.ceil(eventTemplates.length / rowsPerPage);
+
+    // get current page data
+    const startIndex = (activePage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const currentPageData = eventTemplates.slice(startIndex, endIndex);
+
+    // generate empty rows if needed
+    const emptyRowsCount = Math.max(0, rowsPerPage - currentPageData.length);
+    const emptyRows = Array(emptyRowsCount).fill(null);
 
     // register new modal
     const { stackId, ...eventModalProps } =
@@ -62,7 +85,7 @@ export function EventsTable<T extends string>({
                 </Modal.Root>
             </Modal.Stack>
 
-            <Table className="border-gray-400 rounded-xl" highlightOnHover>
+            <Table highlightOnHover>
                 <Table.Thead>
                     <Table.Tr>
                         <Table.Th className="font-semibold">Name</Table.Th>
@@ -74,16 +97,22 @@ export function EventsTable<T extends string>({
                     </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                    {eventTemplates.map((eventTemplate) => (
+                    {currentPageData.map((eventTemplate) => (
                         <Table.Tr
                             key={eventTemplate.id}
                             onClick={() => handleRowClick(eventTemplate)}
                             className="cursor-pointer"
                         >
-                            <Table.Td>{eventTemplate.name}</Table.Td>
-                            <Table.Td>{eventTemplate.offsetDays}</Table.Td>
-                            <Table.Td>{eventTemplate.eventType}</Table.Td>
-                            <Table.Td>
+                            <Table.Td className="w-2/5">
+                                {eventTemplate.name}
+                            </Table.Td>
+                            <Table.Td className="w-1/5">
+                                {eventTemplate.offsetDays}
+                            </Table.Td>
+                            <Table.Td className="w-1/5">
+                                {eventTemplate.eventType}
+                            </Table.Td>
+                            <Table.Td className="w-1/5">
                                 {eventTemplate.eventType === "activity"
                                     ? eventTemplate.duration !== null
                                         ? eventTemplate.duration.toString()
@@ -92,20 +121,37 @@ export function EventsTable<T extends string>({
                             </Table.Td>
                         </Table.Tr>
                     ))}
-                    {/* Always display this add event row */}
-                    <Table.Tr>
-                        <Table.Td
-                            className="text-center hover:bg-gray-100 pt-2"
-                            colSpan={4}
-                        >
-                            <CreateEventTemplateButton
-                                projectTemplateId={projectTemplateId}
-                                modalStack={modalStack}
-                            />
-                        </Table.Td>
-                    </Table.Tr>
+                    {/* add empty rows to maintain fixed height */}
+                    {emptyRows.map((_, index) => (
+                        <Table.Tr key={`empty-row-${index}`}>
+                            <Table.Td colSpan={4}>&nbsp;</Table.Td>
+                        </Table.Tr>
+                    ))}
                 </Table.Tbody>
             </Table>
+
+            {/* pagination & create event button */}
+            <Group className="items-center justify-between mt-4">
+                {/* empty box */}
+                <Box className="flex-1" />
+
+                <Group className="flex-1" justify="center">
+                    {totalPages > 1 && (
+                        <Pagination
+                            value={activePage}
+                            onChange={setActivePage}
+                            total={totalPages}
+                        />
+                    )}
+                </Group>
+
+                <Group className="flex-1" justify="flex-end">
+                    <CreateEventTemplateButton
+                        projectTemplateId={projectTemplateId}
+                        modalStack={modalStack}
+                    />
+                </Group>
+            </Group>
         </>
     );
 }
