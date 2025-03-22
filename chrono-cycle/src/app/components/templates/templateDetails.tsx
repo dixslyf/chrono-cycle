@@ -35,7 +35,11 @@ export function TemplateDetails<T extends string>({
     projectTemplate: ProjectTemplate;
     modalStack: ReturnType<
         typeof useModalsStack<
-            "project-template-details" | "create-project" | "add-event" | T
+            | "project-template-details"
+            | "create-project"
+            | "add-event"
+            | "event-details"
+            | T
         >
     >;
     onClose: () => void;

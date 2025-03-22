@@ -52,6 +52,7 @@ export function TemplateTable({
         "project-template-details",
         "add-event",
         "create-project",
+        "event-details",
     ]);
 
     const { close: modalStackClose } = modalStack;
