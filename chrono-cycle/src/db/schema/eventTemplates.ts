@@ -13,7 +13,7 @@ import {
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
-import { z } from "zod";
+import { z, type ZodTypeDef } from "zod";
 
 import { eventTypeEnum } from "./eventType";
 import { projectTemplates } from "./projectTemplates";
@@ -79,19 +79,30 @@ export type DbExpandedEventTemplateUpdate = DbEventTemplateUpdate & {
 
 export const eventTemplateSelectSchema = createSelectSchema(eventTemplates);
 
-export const eventTemplateInsertSchema = createInsertSchema(eventTemplates, {
+export const rawEventTemplateInsertSchema = createInsertSchema(eventTemplates, {
     offsetDays: (schema) => schema.min(0),
     name: (schema) => schema.nonempty(),
-})
-    .omit({ updatedAt: true })
-    .refine(
-        (val) => (val.eventType === "task" ? val.duration === 1 : true),
-        "Tasks must have a duration of 1",
-    )
-    .refine(
-        (val) => (val.eventType === "activity" ? val.duration >= 1 : true),
-        "Activities must have a duration of at least 1",
-    );
+}).omit({ updatedAt: true });
+
+export function refineRawEventTemplateInsertSchema<
+    Output extends { eventType: "task" | "activity"; duration: number },
+    Def extends ZodTypeDef,
+    Input,
+>(schema: z.ZodType<Output, Def, Input>) {
+    return schema
+        .refine(
+            (val) => (val.eventType === "task" ? val.duration === 1 : true),
+            "Tasks must have a duration of 1",
+        )
+        .refine(
+            (val) => (val.eventType === "activity" ? val.duration >= 1 : true),
+            "Activities must have a duration of at least 1",
+        );
+}
+
+export const eventTemplateInsertSchema = refineRawEventTemplateInsertSchema(
+    rawEventTemplateInsertSchema,
+);
 
 export const eventTemplateUpdateSchema = createUpdateSchema(eventTemplates, {
     offsetDays: (schema) => schema.min(0),
