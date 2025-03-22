@@ -125,3 +125,11 @@ export function CancelReminderError(
 ): CancelReminderError {
     return { _errorKind: "CancelReminderError", handleId, context };
 }
+
+export type InvalidEventStatusError = {
+    _errorKind: "InvalidEventStatusError";
+};
+
+export function InvalidEventStatusError(): InvalidEventStatusError {
+    return { _errorKind: "InvalidEventStatusError" };
+}
