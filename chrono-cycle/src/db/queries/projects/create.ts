@@ -18,6 +18,7 @@ import { DbLike } from "@/db";
 import { listEventTemplates } from "@/db/queries/event-templates/list";
 import { wrapWithTransaction } from "@/db/queries/utils/transaction";
 import {
+    DbEventInsert,
     DbEventTemplate,
     DbExpandedEvent,
     DbExpandedEventTemplate,
@@ -60,8 +61,9 @@ async function insertEvents(
             projectId: project.id,
             eventTemplateId,
             startDate,
+            status: et.eventType === "task" ? "not started" : "none",
             ...rest,
-        };
+        } satisfies DbEventInsert;
     });
     return await db.insert(eventsTable).values(toInsert).returning();
 }
