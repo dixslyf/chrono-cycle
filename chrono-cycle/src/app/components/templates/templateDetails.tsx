@@ -52,7 +52,7 @@ export function TemplateDetails<T extends string>({
                 <Text className="text-3xl font-bold h-1/8">
                     {projectTemplate.name}
                 </Text>
-                <Text className="h-2/5 border border-gray-400 rounded-xl p-4">
+                <Text className="h-2/6 border border-gray-400 rounded-xl p-4">
                     {projectTemplate.description}
                 </Text>
                 <ScrollArea type="auto" className="h-2/5">
