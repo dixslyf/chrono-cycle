@@ -1,6 +1,14 @@
 "use client";
 
-import { Button, Group, Textarea, TextInput } from "@mantine/core";
+import {
+    Button,
+    Group,
+    Select,
+    Skeleton,
+    Stack,
+    Textarea,
+    TextInput,
+} from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,6 +19,8 @@ import { match } from "ts-pattern";
 import { z } from "zod";
 
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
+
+import { ProjectTemplateOverview } from "@/common/data/domain";
 
 import { createProjectAction } from "@/features/projects/create/action";
 import { Failure, payloadSchema } from "@/features/projects/create/data";
@@ -40,23 +50,43 @@ function getCreateErrorMessage(error: Failure) {
         .exhaustive();
 }
 
+export function CreateProjectFormSkeleton() {
+    return (
+        <Stack>
+            <Skeleton height={48} />
+            <Skeleton height={48} />
+            <Skeleton height={96} />
+            <Skeleton height={48} />
+            <Group justify="flex-end">
+                <Button disabled>Create</Button>
+            </Group>
+        </Stack>
+    );
+}
+
 export function CreateProjectForm({
-    projectTemplateId,
     onSuccess,
+    projectTemplates,
+    isPendingProjectTemplates,
 }: {
-    projectTemplateId: string;
     onSuccess: () => void;
+    projectTemplates?: ProjectTemplateOverview[];
+    isPendingProjectTemplates?: boolean;
 }): React.ReactNode {
     const form = useForm({
         mode: "uncontrolled",
         initialValues: {
+            projectTemplateId: "",
             name: "",
             description: "",
             startsAt: new Date(),
         },
         validate: zodResolver(
             payloadSchema
-                .omit({ projectTemplateId: true })
+                .setKey(
+                    "projectTemplateId",
+                    z.string().nonempty("Please select a template."),
+                )
                 .setKey("startsAt", z.date()),
         ),
     });
@@ -69,7 +99,7 @@ export function CreateProjectForm({
             const result = await createProjectAction({
                 ...rest,
                 startsAt: startsAt.toISOString().split("T")[0], // Extract YYYY-MM-DD.
-                projectTemplateId,
+                projectTemplateId: values.projectTemplateId,
             });
             return pipe(
                 result,
@@ -101,18 +131,36 @@ export function CreateProjectForm({
             }),
     });
 
+    if (isPendingProjectTemplates || !projectTemplates) {
+        return <CreateProjectFormSkeleton />;
+    }
+
     return (
         <form
             onSubmit={form.onSubmit((values) =>
                 createProjectMutation.mutate(values),
             )}
         >
+            <Select
+                label="Template"
+                required
+                description="The project template to use"
+                error="Invalid project template"
+                placeholder="Project template"
+                searchable
+                disabled={createProjectMutation.isPending}
+                data={projectTemplates?.map((pts) => ({
+                    label: `${pts.name} (${pts.id})`,
+                    value: pts.id,
+                }))}
+                {...form.getInputProps("projectTemplateId")}
+            />
             <TextInput
                 label="Name"
                 required
-                description="Name of the project template"
-                error="Invalid project template name"
-                placeholder="Project template name"
+                description="Name of the project"
+                error="Invalid project name"
+                placeholder="Project name"
                 disabled={createProjectMutation.isPending}
                 {...form.getInputProps("name")}
             />
