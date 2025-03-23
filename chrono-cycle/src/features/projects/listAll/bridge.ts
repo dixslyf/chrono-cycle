@@ -1,5 +1,4 @@
 import { pipe } from "fp-ts/function";
-import * as ROA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
 import { match } from "ts-pattern";
 
@@ -7,8 +6,7 @@ import { Project, toProject } from "@/common/data/domain";
 import { AssertionError } from "@/common/errors";
 
 import { getDb } from "@/db";
-import { listProjectTemplatesForUser } from "@/db/queries/project-templates/list";
-import { listProjects } from "@/db/queries/projects/list";
+import { listAllProjects } from "@/db/queries/projects/listAll";
 import { retrieveExpandedProject } from "@/db/queries/projects/retrieveExpanded";
 
 export function bridge(
@@ -18,18 +16,12 @@ export function bridge(
     return pipe(
         TE.Do,
         TE.bind("db", () => TE.fromTask(getDb)),
-        // List the user's project templates.
-        TE.bind("dbPts", ({ db }) =>
-            TE.fromTask(() => listProjectTemplatesForUser(db, userId)),
+        TE.bind("dbProjs", ({ db }) =>
+            TE.fromTask(() => listAllProjects(db, userId)),
         ),
-        TE.bind("dbExpandedProjs", ({ db, dbPts }) =>
+        TE.bind("dbExpandedProjs", ({ db, dbProjs }) =>
             pipe(
-                dbPts,
-                // List the project instances for each template.
-                TE.traverseArray((dbPt) =>
-                    TE.fromTask(() => listProjects(db, userId, dbPt.id)),
-                ),
-                TE.map(ROA.flatten),
+                TE.of(dbProjs),
                 // Get the expanded versions of the projects.
                 TE.chain(
                     TE.traverseArray((dbProj) =>
