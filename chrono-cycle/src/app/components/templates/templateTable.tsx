@@ -8,6 +8,8 @@ import { pipe } from "fp-ts/function";
 import { DataTable } from "mantine-datatable";
 import { useCallback, useState } from "react";
 
+import { formatDate } from "@/app/utils/dates";
+
 import {
     ProjectOverview,
     ProjectTemplate,
@@ -42,8 +44,8 @@ export function TemplateTable({
             id,
             name,
             description,
-            createdAt: createdAt.toString(),
-            updatedAt: updatedAt.toString(),
+            createdAt: formatDate(createdAt, { withTime: true }),
+            updatedAt: formatDate(updatedAt, { withTime: true }),
         }),
     );
 

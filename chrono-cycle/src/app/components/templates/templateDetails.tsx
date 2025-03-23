@@ -10,6 +10,8 @@ import {
 } from "@mantine/core";
 import { X } from "lucide-react";
 
+import { formatDate } from "@/app/utils/dates";
+
 import { ProjectTemplate } from "@/common/data/domain";
 
 import { DeleteTemplateButton } from "./deleteTemplateButton";
@@ -80,7 +82,9 @@ export function TemplateDetails<T extends string>({
                                 Created At:
                             </Text>
                             <Text className="text-lg font-medium text-gray-300">
-                                {projectTemplate.createdAt.toString()}
+                                {formatDate(projectTemplate.createdAt, {
+                                    withTime: true,
+                                })}
                             </Text>
                         </Group>
                         <Group>
@@ -88,7 +92,9 @@ export function TemplateDetails<T extends string>({
                                 Updated At:
                             </Text>
                             <Text className="text-lg font-medium text-gray-300">
-                                {projectTemplate.updatedAt.toString()}
+                                {formatDate(projectTemplate.updatedAt, {
+                                    withTime: true,
+                                })}
                             </Text>
                         </Group>
                     </Stack>
