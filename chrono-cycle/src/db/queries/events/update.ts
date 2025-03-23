@@ -2,7 +2,11 @@ import { eq } from "drizzle-orm";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 
-import { AssertionError, DoesNotExistError } from "@/common/errors";
+import {
+    AssertionError,
+    DoesNotExistError,
+    InvalidEventStatusError,
+} from "@/common/errors";
 
 import { DbLike } from "@/db";
 import { rawInsertReminders } from "@/db/queries/reminders/create";
@@ -24,18 +28,54 @@ import { checkUserOwnsEvents } from "./checkOwnership";
 function rawUpdateEvent(
     db: DbLike,
     data: DbEventUpdate,
-): TE.TaskEither<DoesNotExistError, DbEvent> {
+): TE.TaskEither<
+    DoesNotExistError | InvalidEventStatusError | AssertionError,
+    DbEvent
+> {
     return pipe(
         TE.fromTask(() =>
-            db
-                .update(eventsTable)
-                .set({ ...data, updatedAt: new Date() })
-                .where(eq(eventsTable.id, data.id))
-                .returning(),
+            db.select().from(eventsTable).where(eq(eventsTable.id, data.id)),
+        ),
+        TE.chain((selected) => {
+            if (selected.length < 1) {
+                return TE.left(
+                    DoesNotExistError() as
+                        | DoesNotExistError
+                        | InvalidEventStatusError
+                        | AssertionError,
+                );
+            }
+
+            if (selected.length > 1) {
+                return TE.left(
+                    AssertionError("Unexpected multiple matching events"),
+                );
+            }
+
+            const dbEvent = selected[0];
+
+            if (
+                (dbEvent.eventType === "task" && data.status === "none") ||
+                (dbEvent.eventType === "activity" && data.status !== "none")
+            ) {
+                return TE.left(InvalidEventStatusError());
+            }
+
+            return TE.right(dbEvent);
+        }),
+        TE.chain(() =>
+            TE.fromTask(() =>
+                db
+                    .update(eventsTable)
+                    .set({ ...data, updatedAt: new Date() })
+                    .where(eq(eventsTable.id, data.id))
+                    .returning(),
+            ),
         ),
         TE.chain((updated) =>
+            // We already checked for existence earlier.
             updated.length === 0
-                ? TE.left(DoesNotExistError())
+                ? TE.left(AssertionError("Unexpected missing event"))
                 : TE.right(updated[0]),
         ),
     );
@@ -45,9 +85,12 @@ function rawUpdateEvent(
 function unsafeUpdateExpandedEvent(
     db: DbLike,
     data: DbExpandedEventUpdate,
-): TE.TaskEither<DoesNotExistError | AssertionError, DbExpandedEvent> {
+): TE.TaskEither<
+    DoesNotExistError | InvalidEventStatusError | AssertionError,
+    DbExpandedEvent
+> {
     return pipe(
-        // Try updating the event .
+        // Try updating the event.
         rawUpdateEvent(db, data),
 
         // Update existing reminders.
@@ -109,7 +152,10 @@ export function updateEvent(
     db: DbLike,
     userId: number,
     data: DbExpandedEventUpdate,
-): TE.TaskEither<DoesNotExistError | AssertionError, DbExpandedEvent> {
+): TE.TaskEither<
+    DoesNotExistError | InvalidEventStatusError | AssertionError,
+    DbExpandedEvent
+> {
     return pipe(
         checkUserOwnsEvents(db, userId, new Set([data.id])),
         TE.chainW(() =>

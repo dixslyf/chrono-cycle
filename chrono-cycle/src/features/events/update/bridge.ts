@@ -10,6 +10,7 @@ import {
     CancelReminderError,
     DoesNotExistError,
     InternalError,
+    InvalidEventStatusError,
     ScheduleReminderError,
 } from "@/common/errors";
 
@@ -110,7 +111,13 @@ function unsafeBridge(
     db: DbLike,
     userId: number,
     payloadP: ParsedPayload,
-): TE.TaskEither<DoesNotExistError | AssertionError | InternalError, Event> {
+): TE.TaskEither<
+    | DoesNotExistError
+    | InvalidEventStatusError
+    | AssertionError
+    | InternalError,
+    Event
+> {
     return pipe(
         TE.Do,
         TE.bind("decodedRemindersDelete", () =>

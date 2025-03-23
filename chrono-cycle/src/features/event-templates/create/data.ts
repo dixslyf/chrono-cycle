@@ -13,30 +13,26 @@ import { payloadSchema as createReminderTemplatePayloadSchema } from "@/features
 
 import { encodedIdSchema } from "@/lib/identifiers";
 
-import { eventTemplateInsertSchema } from "@/db/schema";
+import {
+    rawEventTemplateInsertSchema,
+    refineRawEventTemplateInsertSchema,
+} from "@/db/schema";
 
-export const payloadSchema = z
-    .object({
-        name: eventTemplateInsertSchema.shape.name,
-        offsetDays: eventTemplateInsertSchema.shape.offsetDays,
-        duration: eventTemplateInsertSchema.shape.duration,
-        note: eventTemplateInsertSchema.shape.note,
-        eventType: eventTemplateInsertSchema.shape.eventType,
-        autoReschedule: eventTemplateInsertSchema.shape.autoReschedule,
+export const payloadSchema = refineRawEventTemplateInsertSchema(
+    z.object({
+        name: rawEventTemplateInsertSchema.shape.name,
+        offsetDays: rawEventTemplateInsertSchema.shape.offsetDays,
+        duration: rawEventTemplateInsertSchema.shape.duration,
+        note: rawEventTemplateInsertSchema.shape.note,
+        eventType: rawEventTemplateInsertSchema.shape.eventType,
+        autoReschedule: rawEventTemplateInsertSchema.shape.autoReschedule,
         projectTemplateId: encodedIdSchema, // Sqid, not the actual ID.
         reminders: z.array(
             createReminderTemplatePayloadSchema.omit({ eventTemplateId: true }),
         ),
         tags: z.array(tagNameSchema),
-    })
-    .refine(
-        (val) => (val.eventType === "task" ? val.duration === 1 : true),
-        "Duration for a task must be 1 day",
-    )
-    .refine(
-        (val) => (val.eventType === "activity" ? val.duration >= 1 : true),
-        "Duration for an activity must be at least 1 day",
-    );
+    }),
+);
 
 export type Payload = z.input<typeof payloadSchema>;
 export type ParsedPayload = z.output<typeof payloadSchema>;

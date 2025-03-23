@@ -1,10 +1,11 @@
-import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { InferSelectModel } from "drizzle-orm";
 import { integer, pgTable, primaryKey } from "drizzle-orm/pg-core";
 import {
     createInsertSchema,
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+import { z } from "zod";
 
 import { dependencyTypeEnum } from "./dependencyType";
 import { eventTemplates } from "./eventTemplates";
@@ -27,8 +28,11 @@ export const eventTemplateDependencies = pgTable(
 export type DbEventTemplateDependency = InferSelectModel<
     typeof eventTemplateDependencies
 >;
-export type DbEventTemplateDependencyInsert = InferInsertModel<
-    typeof eventTemplateDependencies
+export type DbEventTemplateDependencyInsert = z.input<
+    typeof eventTemplateDependencyInsertSchema
+>;
+export type DbEventTemplateDependencyUpdate = z.input<
+    typeof eventTemplateDependencyUpdateSchema
 >;
 
 export const eventTemplateDependencySelectSchema = createSelectSchema(

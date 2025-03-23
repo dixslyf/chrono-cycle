@@ -21,7 +21,6 @@ export const payloadSchema = z.object({
     offsetDays: expandedEventTemplateUpdateSchema.shape.offsetDays,
     duration: expandedEventTemplateUpdateSchema.shape.duration,
     note: expandedEventTemplateUpdateSchema.shape.note,
-    eventType: expandedEventTemplateUpdateSchema.shape.eventType,
     autoReschedule: expandedEventTemplateUpdateSchema.shape.autoReschedule,
     remindersDelete: z.array(encodedIdSchema),
     remindersInsert: z.array(
@@ -48,7 +47,6 @@ export type Failure =
           | "offsetDays"
           | "duration"
           | "note"
-          | "eventType"
           | "autoReschedule"
           | "remindersDelete"
           | "remindersInsert"

@@ -1,10 +1,11 @@
-import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { InferSelectModel } from "drizzle-orm";
 import { boolean, integer, pgEnum, pgTable } from "drizzle-orm/pg-core";
 import {
     createInsertSchema,
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+import { z } from "zod";
 
 import { users } from "./users";
 
@@ -37,10 +38,11 @@ export const userSettings = pgTable("user_settings", {
 });
 
 export type DbUserSettings = InferSelectModel<typeof userSettings>;
-export type DbUserSettingsInsert = InferInsertModel<typeof userSettings>;
-export type DbUserSettingsUpdate = Pick<DbUserSettings, "userId"> &
-    Partial<Omit<DbUserSettingsInsert, "userId">>;
+export type DbUserSettingsInsert = z.input<typeof userSettingsInsertSchema>;
+export type DbUserSettingsUpdate = z.input<typeof userSettingsUpdateSchema>;
 
 export const userSettingsSelectSchema = createSelectSchema(userSettings);
 export const userSettingsInsertSchema = createInsertSchema(userSettings);
-export const userSettingsUpdateSchema = createUpdateSchema(userSettings);
+export const userSettingsUpdateSchema = createUpdateSchema(
+    userSettings,
+).required({ userId: true });

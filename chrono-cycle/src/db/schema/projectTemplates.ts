@@ -1,5 +1,6 @@
-import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { InferSelectModel, sql } from "drizzle-orm";
 import {
+    check,
     integer,
     pgTable,
     serial,
@@ -12,6 +13,7 @@ import {
     createSelectSchema,
     createUpdateSchema,
 } from "drizzle-zod";
+import { z } from "zod";
 
 import {
     DbExpandedEventTemplate,
@@ -43,18 +45,21 @@ export const projectTemplates = pgTable(
     },
     (t) => [
         unique("project_templates_unique_user_id_name").on(t.userId, t.name),
+        check("project_templates_nonempty_name", sql`TRIM(${t.name}) <> ''`),
+        check(
+            "project_templates_nonempty_description",
+            sql`TRIM(${t.description}) <> ''`,
+        ),
     ],
 );
 
 export type DbProjectTemplate = InferSelectModel<typeof projectTemplates>;
-export type DbProjectTemplateInsert = InferInsertModel<typeof projectTemplates>;
-export type DbProjectTemplateUpdate = Pick<DbProjectTemplate, "id"> &
-    Partial<
-        Omit<
-            DbProjectTemplateInsert,
-            "id" | "createdAt" | "updatedAt" | "userId"
-        >
-    >;
+export type DbProjectTemplateInsert = z.input<
+    typeof projectTemplateInsertSchema
+>;
+export type DbProjectTemplateUpdate = z.input<
+    typeof projectTemplateUpdateSchema
+>;
 
 export type DbExpandedProjectTemplate = {
     events: DbExpandedEventTemplate[];
@@ -65,5 +70,21 @@ export type DbExpandedProjectTemplateInsert = {
 } & DbProjectTemplateInsert;
 
 export const projectTemplateSelectSchema = createSelectSchema(projectTemplates);
-export const projectTemplateInsertSchema = createInsertSchema(projectTemplates);
-export const projectTemplateUpdateSchema = createUpdateSchema(projectTemplates);
+export const projectTemplateInsertSchema = createInsertSchema(
+    projectTemplates,
+    {
+        name: (schema) => schema.nonempty(),
+        description: (schema) => schema.nonempty(),
+    },
+).omit({ createdAt: true, updatedAt: true });
+export const projectTemplateUpdateSchema = createUpdateSchema(
+    projectTemplates,
+    {
+        name: (schema) => schema.nonempty(),
+        description: (schema) => schema.nonempty(),
+    },
+)
+    .omit({ createdAt: true, userId: true })
+    .required({
+        id: true,
+    });
