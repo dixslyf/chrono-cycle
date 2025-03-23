@@ -11,10 +11,7 @@ import { useCallback, useState } from "react";
 import { formatDate } from "@/app/utils/dates";
 import { listProjectTemplatesOptions } from "@/app/utils/queries/listProjectTemplates";
 
-import {
-    ProjectOverview,
-    ProjectTemplate,
-} from "@/common/data/domain";
+import { ProjectOverview, ProjectTemplate } from "@/common/data/domain";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 import { listProjectsAction } from "@/features/projects/list/action";
@@ -39,14 +36,14 @@ export function ProjectTemplatesTable(): React.ReactNode {
     // Entries for the table.
     const records = listPtsQuery.data
         ? listPtsQuery.data.map(
-            ({ id, name, description, createdAt, updatedAt }) => ({
-                id,
-                name,
-                description,
-                createdAt: formatDate(createdAt),
-                updatedAt: formatDate(updatedAt),
-            }),
-        )
+              ({ id, name, description, createdAt, updatedAt }) => ({
+                  id,
+                  name,
+                  description,
+                  createdAt: formatDate(createdAt),
+                  updatedAt: formatDate(updatedAt),
+              }),
+          )
         : [];
 
     // For keeping track of modals.
