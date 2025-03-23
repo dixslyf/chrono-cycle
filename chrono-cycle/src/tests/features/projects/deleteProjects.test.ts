@@ -1,16 +1,12 @@
 import * as E from "fp-ts/Either";
 import { revalidatePath } from "next/cache";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { DoesNotExistError, ValidationError } from "@/common/errors";
 
 import { createProjectTemplateAction } from "@/features/project-templates/create/action";
 import { createProjectAction } from "@/features/projects/create/action";
 import { deleteProjectAction } from "@/features/projects/delete/action";
-
-vi.mock("next/cache", () => ({
-    revalidatePath: vi.fn(),
-}));
 
 describe("Delete Project server action", () => {
     it("should return validation error if payload has wrong types", async () => {

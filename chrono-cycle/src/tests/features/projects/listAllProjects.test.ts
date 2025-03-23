@@ -1,14 +1,9 @@
 import * as E from "fp-ts/Either";
-import { revalidatePath } from "next/cache";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { createProjectTemplateAction } from "@/features/project-templates/create/action";
 import { createProjectAction } from "@/features/projects/create/action";
 import { listAllProjectsAction } from "@/features/projects/listAll/action";
-
-vi.mock("next/cache", () => ({
-    revalidatePath: vi.fn(),
-}));
 
 describe("List All Project server action", () => {
     it("should list all project successfully", async () => {

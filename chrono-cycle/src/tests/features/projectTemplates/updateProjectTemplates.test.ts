@@ -11,10 +11,6 @@ import {
 import { createProjectTemplateAction } from "@/features/project-templates/create/action";
 import { updateProjectTemplateAction } from "@/features/project-templates/update/action";
 
-vi.mock("next/cache", () => ({
-    revalidatePath: vi.fn(),
-}));
-
 describe("Update Project template server action", () => {
     it("should return validation error if payload has wrong types", async () => {
         const result = await updateProjectTemplateAction(null, {

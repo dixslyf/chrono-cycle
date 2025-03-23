@@ -1,15 +1,9 @@
-import * as E from "fp-ts/Either";
-import * as TE from "fp-ts/TaskEither";
 import { revalidatePath } from "next/cache";
 import { describe, expect, it, vi } from "vitest";
 
 import { ValidationError } from "@/common/errors";
 
 import { updateSettingsAction } from "@/features/settings/update/action";
-
-vi.mock("next/cache", () => ({
-    revalidatePath: vi.fn(),
-}));
 
 describe("updateSettingsAction", () => {
     it("should update user settings and revalidate path", async () => {
