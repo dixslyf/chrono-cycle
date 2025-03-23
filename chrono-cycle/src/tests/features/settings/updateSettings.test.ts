@@ -5,10 +5,6 @@ import { ValidationError } from "@/common/errors";
 
 import { updateSettingsAction } from "@/features/settings/update/action";
 
-vi.mock("next/cache", () => ({
-    revalidatePath: vi.fn(),
-}));
-
 describe("updateSettingsAction", () => {
     it("should update user settings and revalidate path", async () => {
         const result = await updateSettingsAction(null, {

@@ -7,15 +7,6 @@ import { signInAction } from "@/features/auth/signIn/action";
 
 import { setSessionTokenCookie } from "@/lib/auth/sessions";
 
-vi.mock(import("@/lib/auth/sessions"), async (importOriginal) => ({
-    ...(await importOriginal()),
-    setSessionTokenCookie: vi.fn(),
-}));
-
-vi.mock("next/navigation", () => ({
-    redirect: vi.fn(),
-}));
-
 describe("Sign-in server action", () => {
     it("should return validation error if username is empty", async () => {
         const result = await signInAction(null, {

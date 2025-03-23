@@ -6,10 +6,6 @@ import { DuplicateNameError, ValidationError } from "@/common/errors";
 
 import { createProjectTemplateAction } from "@/features/project-templates/create/action";
 
-vi.mock("next/cache", () => ({
-    revalidatePath: vi.fn(),
-}));
-
 describe("Create Project template server action", () => {
     it("should return validation error if payload has wrong types", async () => {
         const result = await createProjectTemplateAction(null, {

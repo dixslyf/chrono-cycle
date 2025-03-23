@@ -7,10 +7,6 @@ import { DoesNotExistError, ValidationError } from "@/common/errors";
 import { createProjectTemplateAction } from "@/features/project-templates/create/action";
 import { deleteProjectTemplateAction } from "@/features/project-templates/delete/action";
 
-vi.mock("next/cache", () => ({
-    revalidatePath: vi.fn(),
-}));
-
 describe("Delete Project template server action", () => {
     it("should return validation error if payload has wrong types", async () => {
         const result = await deleteProjectTemplateAction(null, {

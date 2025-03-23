@@ -6,10 +6,6 @@ import { DoesNotExistError, ValidationError } from "@/common/errors";
 import { createProjectTemplateAction } from "@/features/project-templates/create/action";
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 
-vi.mock("next/cache", () => ({
-    revalidatePath: vi.fn(),
-}));
-
 describe("Retrieve Project template server action", () => {
     it("should return validation error if payload has wrong types", async () => {
         const result = await retrieveProjectTemplateAction({

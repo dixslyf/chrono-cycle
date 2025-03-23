@@ -23,14 +23,24 @@ vi.mock(import("@/db"), async (importOriginal) => {
     };
 });
 
-// Mock the `getCurrentUserSession` function.
+// Mock the auth functions.
 vi.mock(import("@/lib/auth/sessions"), async (importOriginal) => {
     const authSessionsMod = await importOriginal();
     return {
         ...authSessionsMod,
         getCurrentUserSession: vi.fn(),
+        setSessionTokenCookie: vi.fn(),
     };
 });
+
+// Mock next.js functions.
+vi.mock("next/cache", () => ({
+    revalidatePath: vi.fn(),
+}));
+
+vi.mock("next/navigation", () => ({
+    redirect: vi.fn(),
+}));
 
 beforeEach(async () => {
     // Mock database.

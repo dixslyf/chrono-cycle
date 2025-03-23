@@ -8,10 +8,6 @@ import { createProjectTemplateAction } from "@/features/project-templates/create
 import { createProjectAction } from "@/features/projects/create/action";
 import { deleteProjectAction } from "@/features/projects/delete/action";
 
-vi.mock("next/cache", () => ({
-    revalidatePath: vi.fn(),
-}));
-
 describe("Delete Project server action", () => {
     it("should return validation error if payload has wrong types", async () => {
         const result = await deleteProjectAction(null, {

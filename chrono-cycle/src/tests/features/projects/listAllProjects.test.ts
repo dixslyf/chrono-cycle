@@ -5,10 +5,6 @@ import { createProjectTemplateAction } from "@/features/project-templates/create
 import { createProjectAction } from "@/features/projects/create/action";
 import { listAllProjectsAction } from "@/features/projects/listAll/action";
 
-vi.mock("next/cache", () => ({
-    revalidatePath: vi.fn(),
-}));
-
 describe("List All Project server action", () => {
     it("should list all project successfully", async () => {
         const createProjectTemplateResult = await createProjectTemplateAction(

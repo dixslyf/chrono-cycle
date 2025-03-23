@@ -4,10 +4,6 @@ import { describe, expect, it, vi } from "vitest";
 import { createProjectTemplateAction } from "@/features/project-templates/create/action";
 import { listProjectTemplatesAction } from "@/features/project-templates/list/action";
 
-vi.mock("next/cache", () => ({
-    revalidatePath: vi.fn(),
-}));
-
 describe("List Project template server action", () => {
     it("should list project template successfully", async () => {
         const result = await createProjectTemplateAction(null, {
