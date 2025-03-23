@@ -1,5 +1,3 @@
-import "dotenv/config";
-
 import { ExtractTablesWithRelations, sql } from "drizzle-orm";
 import {
     type NodePgDatabase,

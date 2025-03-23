@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 
 import { Event } from "@/common/data/domain";
 import { UserSession } from "@/common/data/userSession";
-import { RestoreAssertionError } from "@/common/errors";
+import { AssertionError } from "@/common/errors";
 
 import { wrapServerAction } from "@/features/utils/decorators";
 import { validate } from "@/features/utils/validation";
@@ -19,11 +19,11 @@ async function updateEventActionImpl(
     userSession: UserSession,
     _prevState: Result | null,
     payload: Payload,
-): Promise<E.Either<RestoreAssertionError<Failure>, Event>> {
+): Promise<E.Either<Failure | AssertionError, Event>> {
     const task = pipe(
         TE.fromEither(validate(payloadSchema, payload)),
         TE.chainW((payloadP) => bridge(userSession.user.id, payloadP)),
-        TE.tapIO(() => () => revalidatePath("/s")),
+        TE.tapIO(() => () => revalidatePath("/dashboard")),
     );
 
     return await task();

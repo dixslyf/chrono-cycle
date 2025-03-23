@@ -96,3 +96,32 @@ export type MalformedTimeStringError = {
 export function MalformedTimeStringError(): MalformedTimeStringError {
     return { _errorKind: "MalformedTimeStringError" };
 }
+
+export type ScheduleReminderIssue = {
+    reminderId: string;
+    context?: string | undefined;
+};
+
+export type ScheduleReminderError = {
+    _errorKind: "ScheduleReminderError";
+    issues: ScheduleReminderIssue[];
+};
+
+export function ScheduleReminderError(
+    issues: ScheduleReminderIssue[],
+): ScheduleReminderError {
+    return { _errorKind: "ScheduleReminderError", issues };
+}
+
+export type CancelReminderError = {
+    _errorKind: "CancelReminderError";
+    handleId: string;
+    context?: string | undefined;
+};
+
+export function CancelReminderError(
+    handleId: string,
+    context?: string | undefined,
+): CancelReminderError {
+    return { _errorKind: "CancelReminderError", handleId, context };
+}

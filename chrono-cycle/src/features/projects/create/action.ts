@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 
 import { Project } from "@/common/data/domain";
 import { UserSession } from "@/common/data/userSession";
-import { RestoreAssertionError } from "@/common/errors";
+import { AssertionError } from "@/common/errors";
 
 import { wrapServerAction } from "@/features/utils/decorators";
 import { validate } from "@/features/utils/validation";
@@ -18,7 +18,7 @@ import { Failure, Payload, payloadSchema, Result } from "./data";
 async function createProjectActionImpl(
     userSession: UserSession,
     payload: Payload,
-): Promise<E.Either<RestoreAssertionError<Failure>, Project>> {
+): Promise<E.Either<AssertionError | Failure, Project>> {
     // Validate form schema.
     const task = pipe(
         TE.fromEither(validate(payloadSchema, payload)),

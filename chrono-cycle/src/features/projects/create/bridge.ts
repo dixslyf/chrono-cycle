@@ -1,3 +1,4 @@
+import * as A from "fp-ts/Array";
 import { pipe } from "fp-ts/lib/function";
 import * as TE from "fp-ts/TaskEither";
 
@@ -6,13 +7,17 @@ import {
     AssertionError,
     DoesNotExistError,
     DuplicateNameError,
+    InternalError,
     MalformedTimeStringError,
 } from "@/common/errors";
 
 import { decodeProjectTemplateId } from "@/lib/identifiers";
+import { scheduleRemindersForProject } from "@/lib/reminders";
 
 import { getDb } from "@/db";
 import { createProject } from "@/db/queries/projects/create";
+import { updateReminder } from "@/db/queries/reminders/update";
+import { wrapWithTransaction } from "@/db/queries/utils/transaction";
 
 import { ParsedPayload } from "./data";
 
@@ -23,19 +28,55 @@ export function bridge(
     | DuplicateNameError
     | AssertionError
     | DoesNotExistError
-    | MalformedTimeStringError,
+    | MalformedTimeStringError
+    | InternalError,
     Project
 > {
     return pipe(
         TE.fromTask(getDb),
-        TE.chain((db) => {
-            const { projectTemplateId, ...rest } = payloadP;
-            return createProject(db, {
-                userId,
-                projectTemplateId: decodeProjectTemplateId(projectTemplateId),
-                ...rest,
-            });
-        }),
-        TE.map(toProject),
+        TE.chain((db) =>
+            wrapWithTransaction(db, (tx) =>
+                pipe(
+                    TE.Do,
+                    TE.bind("dbProj", () => {
+                        const { projectTemplateId, ...rest } = payloadP;
+                        return createProject(tx, {
+                            userId,
+                            projectTemplateId:
+                                decodeProjectTemplateId(projectTemplateId),
+                            ...rest,
+                        });
+                    }),
+                    // Schedule the reminders.
+                    TE.bindW("scheduledDbReminders", ({ dbProj }) =>
+                        scheduleRemindersForProject(dbProj),
+                    ),
+                    // Save the scheduled reminder handles to the database.
+                    TE.tap(({ scheduledDbReminders }) =>
+                        pipe(
+                            scheduledDbReminders,
+                            A.traverse(TE.ApplicativePar)(
+                                (scheduledDbReminder) =>
+                                    updateReminder(tx, {
+                                        id: scheduledDbReminder.reminder.id,
+                                        triggerRunId:
+                                            scheduledDbReminder.handle.id,
+                                    }),
+                            ),
+                        ),
+                    ),
+                    // Map reminder errors to `InternalError` since the client shouldn't
+                    // need to know about it.
+                    TE.mapError((err) =>
+                        err._errorKind === "ScheduleReminderError"
+                            ? InternalError("Failed to schedule reminders")
+                            : err._errorKind === "CancelReminderError"
+                              ? InternalError("Failed to cancel reminders")
+                              : err,
+                    ),
+                    TE.map(({ dbProj }) => toProject(dbProj)),
+                ),
+            ),
+        ),
     );
 }
