@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal, Stack, useModalsStack } from "@mantine/core";
+import { Modal, useModalsStack } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { sequenceT } from "fp-ts/Apply";
 import * as E from "fp-ts/Either";
@@ -19,7 +19,10 @@ import {
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 import { listProjectsAction } from "@/features/projects/list/action";
 
-import { TemplateDetails, TemplateDetailsSkeleton } from "./templateDetails";
+import {
+    ProjectTemplateDetails,
+    ProjectTemplateDetailsSkeleton,
+} from "./projectTemplateDetails";
 
 const columns = [
     { accessor: "name", title: "Name" },
@@ -33,7 +36,7 @@ type ClickedData = {
     projects: ProjectOverview[];
 };
 
-export function TemplateTable({
+export function ProjectTemplatesTable({
     entries,
 }: {
     entries: ProjectTemplateOverview[];
@@ -115,7 +118,7 @@ export function TemplateTable({
                     {/* Template details */}
                     {retrieveQuery.data ? (
                         <>
-                            <TemplateDetails
+                            <ProjectTemplateDetails
                                 modalStack={modalStack}
                                 projectTemplate={
                                     retrieveQuery.data.projectTemplate
@@ -124,7 +127,7 @@ export function TemplateTable({
                             />
                         </>
                     ) : (
-                        <TemplateDetailsSkeleton />
+                        <ProjectTemplateDetailsSkeleton />
                     )}
                 </Modal>
             </Modal.Stack>

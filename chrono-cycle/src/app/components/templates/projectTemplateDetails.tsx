@@ -18,7 +18,7 @@ import { ProjectTemplate } from "@/common/data/domain";
 import { DeleteTemplateButton } from "./deleteTemplateButton";
 import { EventTemplatesTable } from "./eventTemplatesTable";
 
-export function TemplateDetailsSkeleton(): React.ReactNode {
+export function ProjectTemplateDetailsSkeleton(): React.ReactNode {
     return (
         <Stack>
             <Skeleton width={512} height={24} />
@@ -29,7 +29,7 @@ export function TemplateDetailsSkeleton(): React.ReactNode {
     );
 }
 
-export function TemplateDetails<T extends string>({
+export function ProjectTemplateDetails<T extends string>({
     projectTemplate,
     modalStack,
     onClose,
