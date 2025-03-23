@@ -1,12 +1,10 @@
 "use client";
 
-import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import {
     createTheme,
     DEFAULT_THEME,
     MantineProvider,
     mergeMantineTheme,
-    Stack,
 } from "@mantine/core";
 import { DatesProvider } from "@mantine/dates";
 import {
@@ -87,18 +85,16 @@ export default function RootProvider({
     return (
         <QueryClientProvider client={queryClient}>
             <MantineProvider theme={theme}>
-                <ChakraProvider value={defaultSystem}>
-                    <ThemeProvider>
-                        <DatesProvider
-                            settings={{
-                                // FIXME: For now, we assume the timezone is Singapore's.
-                                timezone: "Asia/Singapore",
-                            }}
-                        >
-                            {children}
-                        </DatesProvider>
-                    </ThemeProvider>
-                </ChakraProvider>
+                <ThemeProvider>
+                    <DatesProvider
+                        settings={{
+                            // FIXME: For now, we assume the timezone is Singapore's.
+                            timezone: "Asia/Singapore",
+                        }}
+                    >
+                        {children}
+                    </DatesProvider>
+                </ThemeProvider>
             </MantineProvider>
         </QueryClientProvider>
     );
