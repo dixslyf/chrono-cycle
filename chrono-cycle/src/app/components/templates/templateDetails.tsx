@@ -1,6 +1,7 @@
 "use client";
 
 import {
+    Badge,
     Box,
     Group,
     Skeleton,
@@ -15,7 +16,7 @@ import { formatDate } from "@/app/utils/dates";
 import { ProjectTemplate } from "@/common/data/domain";
 
 import { DeleteTemplateButton } from "./deleteTemplateButton";
-import { EventsTable } from "./eventTemplatesTable";
+import { EventTemplatesTable } from "./eventTemplatesTable";
 
 export function TemplateDetailsSkeleton(): React.ReactNode {
     return (
@@ -49,20 +50,32 @@ export function TemplateDetails<T extends string>({
         // This part will eventually change to form. Data will be the value for inputs
         <Group className="w-full h-full gap-0 items-stretch">
             {/* name & desc & table */}
-            <Stack className="w-2/3 py-8 px-12 h-full overflow-y-auto" gap="xl">
+            <Stack
+                className="w-2/3 py-8 px-12 h-full overflow-y-auto"
+                align="stretch"
+                gap="xl"
+            >
                 <Text className="text-3xl font-bold h-1/8">
                     {projectTemplate.name}
                 </Text>
-                <Text className="h-2/6 border border-gray-400 rounded-xl p-4">
-                    {projectTemplate.description}
-                </Text>
-                <Box className="h-2/5">
-                    <EventsTable
+                <Stack className="h-1/4" align="stretch">
+                    <Text className="text-palette5 font-semibold text-xl">
+                        Description:
+                    </Text>
+                    <Text className="flex-1 border border-gray-400 rounded-xl p-4">
+                        {projectTemplate.description}
+                    </Text>
+                </Stack>
+                <Stack className="flex-1">
+                    <Text className="text-palette5 font-semibold text-xl">
+                        Events:
+                    </Text>
+                    <EventTemplatesTable
                         projectTemplateId={projectTemplate.id}
                         eventTemplates={projectTemplate.events}
                         modalStack={modalStack}
                     />
-                </Box>
+                </Stack>
             </Stack>
             {/* create & update timestamp & close button */}
             <Stack
@@ -76,6 +89,14 @@ export function TemplateDetails<T extends string>({
                                 className="text-palette3 hover:text-gray-400 cursor-pointer w-8 h-8"
                                 onClick={onClose}
                             />
+                        </Group>
+                        <Group>
+                            <Text className="font-semibold text-xl text-palette3">
+                                Project Template ID
+                            </Text>
+                            <Badge className="bg-stone-500 bg-opacity-50 text-gray-300">
+                                {projectTemplate.id}
+                            </Badge>
                         </Group>
                         <Group gap="md">
                             <Text className="text-palette3 font-semibold text-xl">

@@ -100,39 +100,33 @@ export function TemplateTable({
         },
     });
 
-    // fix stackId dom props
-    const { stackId, ...modalProps } = modalStack.register(
-        "project-template-details",
-    );
-
     return (
         <>
             <Modal.Stack>
                 {/* Modal window for showing the details of the clicked project template. */}
-                <Modal.Root size="100%" centered {...modalProps}>
-                    <Modal.Overlay />
-                    <Modal.Content className="h-full w-full rounded-xl flex flex-col">
-                        <Modal.Body className="p-0 flex-1 flex flex-col overflow-hidden">
-                            <Stack className="flex-1">
-                                {/* Template details */}
-                                {retrieveQuery.data ? (
-                                    <>
-                                        <TemplateDetails
-                                            modalStack={modalStack}
-                                            projectTemplate={
-                                                retrieveQuery.data
-                                                    .projectTemplate
-                                            }
-                                            onClose={closeModal}
-                                        />
-                                    </>
-                                ) : (
-                                    <TemplateDetailsSkeleton />
-                                )}
-                            </Stack>
-                        </Modal.Body>
-                    </Modal.Content>
-                </Modal.Root>
+                <Modal
+                    centered
+                    size="100%"
+                    radius="xl"
+                    withCloseButton={false}
+                    padding={0}
+                    {...modalStack.register("project-template-details")}
+                >
+                    {/* Template details */}
+                    {retrieveQuery.data ? (
+                        <>
+                            <TemplateDetails
+                                modalStack={modalStack}
+                                projectTemplate={
+                                    retrieveQuery.data.projectTemplate
+                                }
+                                onClose={closeModal}
+                            />
+                        </>
+                    ) : (
+                        <TemplateDetailsSkeleton />
+                    )}
+                </Modal>
             </Modal.Stack>
 
             {/* Table to show available project templates. */}

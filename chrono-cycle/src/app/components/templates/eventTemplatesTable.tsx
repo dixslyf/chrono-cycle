@@ -13,33 +13,26 @@ import React, { useCallback, useState } from "react";
 import { EventTemplate } from "@/common/data/domain";
 
 import { CreateEventTemplateButton } from "./createEventButton";
-import DisplayEventTemplateDetails from "./eventTemplateDetails";
+import EventTemplateDetails from "./eventTemplateDetails";
 
 interface EventsTableProps<T extends string> {
     projectTemplateId: string;
     modalStack: ReturnType<
-        typeof useModalsStack<T | "add-event" | "event-details">
+        typeof useModalsStack<"add-event" | "event-details" | T>
     >;
     eventTemplates: EventTemplate[];
     rowsPerPage?: number;
 }
 
-export function EventsTable<T extends string>({
+function InnerEventTemplatesTable<T extends string>({
     projectTemplateId,
     modalStack,
     eventTemplates,
-    rowsPerPage = 5,
-}: EventsTableProps<T>): React.ReactNode {
-    const { close: modalStackClose } = modalStack;
-    const closeModal = useCallback(
-        () => modalStackClose("event-details"),
-        [modalStackClose],
-    );
-
-    // local state to track the event
-    const [selectedEventTemplate, setSelectedEventTemplate] =
-        useState<EventTemplate | null>(null);
-
+    rowsPerPage,
+    setSelectedEventTemplate,
+}: Required<EventsTableProps<T>> & {
+    setSelectedEventTemplate: (eventTemplate: EventTemplate) => void;
+}) {
     // pagination state
     const [activePage, setActivePage] = useState(1);
 
@@ -54,10 +47,6 @@ export function EventsTable<T extends string>({
     const emptyRowsCount = Math.max(0, rowsPerPage - currentPageData.length);
     const emptyRows = Array(emptyRowsCount).fill(null);
 
-    // register new modal
-    const { stackId, ...eventModalProps } =
-        modalStack.register("event-details");
-
     // handle row click
     const handleRowClick = (eventTemplate: EventTemplate) => {
         setSelectedEventTemplate(eventTemplate);
@@ -66,25 +55,6 @@ export function EventsTable<T extends string>({
 
     return (
         <>
-            {/* modal to display event details */}
-            <Modal.Stack>
-                <Modal.Root size="100%" centered {...eventModalProps}>
-                    <Modal.Overlay />
-                    <Modal.Content className="h-full w-full rounded-xl flex flex-col">
-                        <Modal.Body className="p-0 flex-1 overflow-hidden">
-                            {selectedEventTemplate ? (
-                                <DisplayEventTemplateDetails
-                                    eventTemplate={selectedEventTemplate}
-                                    onClose={closeModal}
-                                />
-                            ) : (
-                                <Box>Loading event details...</Box>
-                            )}
-                        </Modal.Body>
-                    </Modal.Content>
-                </Modal.Root>
-            </Modal.Stack>
-
             <Table highlightOnHover>
                 <Table.Thead>
                     <Table.Tr>
@@ -110,7 +80,8 @@ export function EventsTable<T extends string>({
                                 {eventTemplate.offsetDays}
                             </Table.Td>
                             <Table.Td className="w-1/5">
-                                {eventTemplate.eventType}
+                                {eventTemplate.eventType[0].toUpperCase() +
+                                    eventTemplate.eventType.slice(1)}
                             </Table.Td>
                             <Table.Td className="w-1/5">
                                 {eventTemplate.eventType === "activity"
@@ -152,6 +123,54 @@ export function EventsTable<T extends string>({
                     />
                 </Group>
             </Group>
+        </>
+    );
+}
+
+export function EventTemplatesTable<T extends string>({
+    projectTemplateId,
+    modalStack,
+    eventTemplates,
+    rowsPerPage = 10,
+}: EventsTableProps<T>): React.ReactNode {
+    const { close: modalStackClose } = modalStack;
+    const closeEventDetailsModal = useCallback(
+        () => modalStackClose("event-details"),
+        [modalStackClose],
+    );
+
+    // local state to track the event
+    const [selectedEventTemplate, setSelectedEventTemplate] =
+        useState<EventTemplate | null>(null);
+
+    return (
+        <>
+            {/* Modal to display event details */}
+            <Modal
+                centered
+                size="80%"
+                radius="xl"
+                withCloseButton={false}
+                padding={0}
+                {...modalStack.register("event-details")}
+            >
+                {selectedEventTemplate ? (
+                    <EventTemplateDetails
+                        eventTemplate={selectedEventTemplate}
+                        onClose={closeEventDetailsModal}
+                    />
+                ) : (
+                    <Box>Loading event details...</Box>
+                )}
+            </Modal>
+
+            <InnerEventTemplatesTable
+                projectTemplateId={projectTemplateId}
+                modalStack={modalStack}
+                eventTemplates={eventTemplates}
+                rowsPerPage={rowsPerPage}
+                setSelectedEventTemplate={setSelectedEventTemplate}
+            />
         </>
     );
 }
