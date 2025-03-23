@@ -1,6 +1,6 @@
 import * as E from "fp-ts/Either";
 import { revalidatePath } from "next/cache";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
     DoesNotExistError,
