@@ -1,5 +1,3 @@
-import * as E from "fp-ts/Either";
-import * as TE from "fp-ts/TaskEither";
 import { revalidatePath } from "next/cache";
 import { describe, expect, it, vi } from "vitest";
 

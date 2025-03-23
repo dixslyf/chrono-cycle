@@ -1,6 +1,5 @@
 import * as E from "fp-ts/Either";
-import { revalidatePath } from "next/cache";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { createProjectTemplateAction } from "@/features/project-templates/create/action";
 import { listProjectsAction } from "@/features/projects/list/action";

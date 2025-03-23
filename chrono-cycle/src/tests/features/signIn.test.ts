@@ -1,11 +1,9 @@
-import * as E from "fp-ts/Either";
 import { redirect } from "next/navigation";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { InvalidCredentialsError, ValidationError } from "@/common/errors";
 
 import { signInAction } from "@/features/auth/signIn/action";
-import { signUpAction } from "@/features/auth/signUp/action";
 
 import { setSessionTokenCookie } from "@/lib/auth/sessions";
 
