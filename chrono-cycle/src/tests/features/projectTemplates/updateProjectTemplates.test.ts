@@ -1,6 +1,6 @@
 import * as E from "fp-ts/Either";
 import { revalidatePath } from "next/cache";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
     DoesNotExistError,
@@ -46,61 +46,61 @@ describe("Update Project template server action", () => {
         );
     });
 
-    // it("should return validation error if project template name is empty", async () => {
-    //     const createProjectTemplateResult = await createProjectTemplateAction(
-    //         null,
-    //         {
-    //             name: "New Project Name",
-    //             description: "Description of a new project",
-    //         },
-    //     );
-    //     if (E.isLeft(createProjectTemplateResult)) {
-    //         throw new Error(
-    //             "Create project template action is not implemented correctly!",
-    //         );
-    //     }
-    //     const projectTemplate = createProjectTemplateResult.right;
-    //     const projectTemplateIdFormTest = projectTemplate.id;
-    //     const result = await updateProjectTemplateAction(null, {
-    //         id: projectTemplateIdFormTest,
-    //         name: "",
-    //         description: "Description of a new project",
-    //     });
+    it("should return validation error if project template name is empty", async () => {
+        const createProjectTemplateResult = await createProjectTemplateAction(
+            null,
+            {
+                name: "New Project Name",
+                description: "Description of a new project",
+            },
+        );
+        if (E.isLeft(createProjectTemplateResult)) {
+            throw new Error(
+                "Create project template action is not implemented correctly!",
+            );
+        }
+        const projectTemplate = createProjectTemplateResult.right;
+        const projectTemplateIdFormTest = projectTemplate.id;
+        const result = await updateProjectTemplateAction(null, {
+            id: projectTemplateIdFormTest,
+            name: "",
+            description: "Description of a new project",
+        });
 
-    //     expect(result).toEqualLeft(
-    //         ValidationError({
-    //             name: expect.any(Array),
-    //         }),
-    //     );
-    // });
+        expect(result).toEqualLeft(
+            ValidationError({
+                name: expect.any(Array),
+            }),
+        );
+    });
 
-    // it("should return validation error if project template description is empty", async () => {
-    //     const createProjectTemplateResult = await createProjectTemplateAction(
-    //         null,
-    //         {
-    //             name: "New Project Name",
-    //             description: "Description of a new project",
-    //         },
-    //     );
-    //     if (E.isLeft(createProjectTemplateResult)) {
-    //         throw new Error(
-    //             "Create project template action is not implemented correctly!",
-    //         );
-    //     }
-    //     const projectTemplate = createProjectTemplateResult.right;
-    //     const projectTemplateIdFormTest = projectTemplate.id;
-    //     const result = await updateProjectTemplateAction(null, {
-    //         id: projectTemplateIdFormTest,
-    //         name: "New Project Name",
-    //         description: "",
-    //     });
+    it("should return validation error if project template description is empty", async () => {
+        const createProjectTemplateResult = await createProjectTemplateAction(
+            null,
+            {
+                name: "New Project Name",
+                description: "Description of a new project",
+            },
+        );
+        if (E.isLeft(createProjectTemplateResult)) {
+            throw new Error(
+                "Create project template action is not implemented correctly!",
+            );
+        }
+        const projectTemplate = createProjectTemplateResult.right;
+        const projectTemplateIdFormTest = projectTemplate.id;
+        const result = await updateProjectTemplateAction(null, {
+            id: projectTemplateIdFormTest,
+            name: "New Project Name",
+            description: "",
+        });
 
-    //     expect(result).toEqualLeft(
-    //         ValidationError({
-    //             description: expect.any(Array),
-    //         }),
-    //     );
-    // });
+        expect(result).toEqualLeft(
+            ValidationError({
+                description: expect.any(Array),
+            }),
+        );
+    });
 
     it("should return DuplicateNameError if project template name already exists", async () => {
         const result = await createProjectTemplateAction(null, {

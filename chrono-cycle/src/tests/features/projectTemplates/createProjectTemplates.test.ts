@@ -25,31 +25,31 @@ describe("Create Project template server action", () => {
         );
     });
 
-    // it("should return validation error if project template name is empty", async () => {
-    //     const result = await createProjectTemplateAction(null, {
-    //         name: "",
-    //         description: "Description of a new project",
-    //     });
+    it("should return validation error if project template name is empty", async () => {
+        const result = await createProjectTemplateAction(null, {
+            name: "",
+            description: "Description of a new project",
+        });
 
-    //     expect(result).toEqualLeft(
-    //         ValidationError({
-    //             name: expect.any(Array),
-    //         }),
-    //     );
-    // });
+        expect(result).toEqualLeft(
+            ValidationError({
+                name: expect.any(Array),
+            }),
+        );
+    });
 
-    // it("should return validation error if project template description is empty", async () => {
-    //     const result = await createProjectTemplateAction(null, {
-    //         name: "New Project Name",
-    //         description: "",
-    //     });
+    it("should return validation error if project template description is empty", async () => {
+        const result = await createProjectTemplateAction(null, {
+            name: "New Project Name",
+            description: "",
+        });
 
-    //     expect(result).toEqualLeft(
-    //         ValidationError({
-    //             description: expect.any(Array),
-    //         }),
-    //     );
-    // });
+        expect(result).toEqualLeft(
+            ValidationError({
+                description: expect.any(Array),
+            }),
+        );
+    });
 
     it("should return DuplicateNameError if project template name already exists", async () => {
         const result = await createProjectTemplateAction(null, {
