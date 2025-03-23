@@ -1,5 +1,5 @@
 import { revalidatePath } from "next/cache";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { ValidationError } from "@/common/errors";
 

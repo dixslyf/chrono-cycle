@@ -1,5 +1,5 @@
 import * as E from "fp-ts/Either";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { DoesNotExistError, ValidationError } from "@/common/errors";
 

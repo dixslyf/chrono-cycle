@@ -1,5 +1,5 @@
 import * as E from "fp-ts/Either";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { createProjectTemplateAction } from "@/features/project-templates/create/action";
 import { listProjectTemplatesAction } from "@/features/project-templates/list/action";

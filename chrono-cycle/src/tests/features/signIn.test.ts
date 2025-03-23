@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { InvalidCredentialsError, ValidationError } from "@/common/errors";
 
