@@ -19,10 +19,7 @@ import {
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 import { listProjectsAction } from "@/features/projects/list/action";
 
-import {
-    ProjectTemplateDetails,
-    ProjectTemplateDetailsSkeleton,
-} from "./projectTemplateDetails";
+import { ProjectTemplateDetails } from "./projectTemplateDetails";
 
 const columns = [
     { accessor: "name", title: "Name" },
@@ -116,19 +113,16 @@ export function ProjectTemplatesTable({
                     {...modalStack.register("project-template-details")}
                 >
                     {/* Template details */}
-                    {retrieveQuery.data ? (
-                        <>
-                            <ProjectTemplateDetails
-                                modalStack={modalStack}
-                                projectTemplate={
-                                    retrieveQuery.data.projectTemplate
-                                }
-                                onClose={closeModal}
-                            />
-                        </>
-                    ) : (
-                        <ProjectTemplateDetailsSkeleton />
-                    )}
+                    <>
+                        <ProjectTemplateDetails
+                            modalStack={modalStack}
+                            projectTemplate={
+                                retrieveQuery.data?.projectTemplate
+                            }
+                            onClose={closeModal}
+                            isLoading={retrieveQuery.isPending}
+                        />
+                    </>
                 </Modal>
             </Modal.Stack>
 

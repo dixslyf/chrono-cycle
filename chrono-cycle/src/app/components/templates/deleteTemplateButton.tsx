@@ -13,9 +13,11 @@ import { deleteProjectTemplateAction } from "@/features/project-templates/delete
 export function DeleteTemplateButton({
     projectTemplateId,
     onSuccess,
+    disabled,
 }: {
     projectTemplateId: string;
     onSuccess: () => void;
+    disabled?: boolean;
 }): React.ReactNode {
     const [deleteResult, deleteAction, deletePending] = useActionState(
         deleteProjectTemplateAction,
@@ -49,7 +51,8 @@ export function DeleteTemplateButton({
         <Button
             variant="filled"
             color="red"
-            disabled={deletePending}
+            disabled={deletePending || disabled}
+            loading={deletePending}
             onClick={() =>
                 startTransition(() => deleteAction({ projectTemplateId }))
             }

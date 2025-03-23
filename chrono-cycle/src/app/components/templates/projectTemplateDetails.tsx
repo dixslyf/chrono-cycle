@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import { X } from "lucide-react";
 
+import brownSkeletonClasses from "@/app/skeleton-brown-bg.module.css";
 import { formatDate } from "@/app/utils/dates";
 
 import { ProjectTemplate } from "@/common/data/domain";
@@ -18,33 +19,20 @@ import { ProjectTemplate } from "@/common/data/domain";
 import { DeleteTemplateButton } from "./deleteTemplateButton";
 import { EventTemplatesTable } from "./eventTemplatesTable";
 
-export function ProjectTemplateDetailsSkeleton(): React.ReactNode {
-    return (
-        <Stack>
-            <Skeleton width={512} height={24} />
-            <Skeleton width={512} height={128} />
-            <Skeleton width={512} height={24} />
-            <Skeleton width={512} height={24} />
-        </Stack>
-    );
-}
-
 export function ProjectTemplateDetails<T extends string>({
     projectTemplate,
     modalStack,
     onClose,
+    isLoading,
 }: {
-    projectTemplate: ProjectTemplate;
+    projectTemplate?: ProjectTemplate | undefined;
     modalStack: ReturnType<
         typeof useModalsStack<
-            | "project-template-details"
-            | "create-project"
-            | "add-event"
-            | "event-details"
-            | T
+            "project-template-details" | "add-event" | "event-details" | T
         >
     >;
     onClose: () => void;
+    isLoading?: boolean | undefined;
 }): React.ReactNode {
     return (
         // This part will eventually change to form. Data will be the value for inputs
@@ -55,27 +43,33 @@ export function ProjectTemplateDetails<T extends string>({
                 align="stretch"
                 gap="xl"
             >
-                <Text className="text-3xl font-bold h-1/8">
-                    {projectTemplate.name}
-                </Text>
-                <Stack className="h-1/4" align="stretch">
-                    <Text className="text-palette5 font-semibold text-xl">
-                        Description:
+                <Skeleton visible={isLoading}>
+                    <Text className="text-3xl font-bold h-1/8">
+                        {projectTemplate?.name}
                     </Text>
-                    <Text className="flex-1 border border-gray-400 rounded-xl p-4">
-                        {projectTemplate.description}
-                    </Text>
-                </Stack>
-                <Stack className="flex-1">
-                    <Text className="text-palette5 font-semibold text-xl">
-                        Events:
-                    </Text>
-                    <EventTemplatesTable
-                        projectTemplateId={projectTemplate.id}
-                        eventTemplates={projectTemplate.events}
-                        modalStack={modalStack}
-                    />
-                </Stack>
+                </Skeleton>
+                <Skeleton visible={isLoading}>
+                    <Stack className="h-1/4" align="stretch">
+                        <Text className="text-palette5 font-semibold text-xl">
+                            Description:
+                        </Text>
+                        <Text className="flex-1 border border-gray-400 rounded-xl p-4">
+                            {projectTemplate?.description}
+                        </Text>
+                    </Stack>
+                </Skeleton>
+                <Skeleton visible={isLoading}>
+                    <Stack className="flex-1">
+                        <Text className="text-palette5 font-semibold text-xl">
+                            Events:
+                        </Text>
+                        <EventTemplatesTable
+                            projectTemplateId={projectTemplate?.id ?? ""}
+                            eventTemplates={projectTemplate?.events ?? []}
+                            modalStack={modalStack}
+                        />
+                    </Stack>
+                </Skeleton>
             </Stack>
             {/* create & update timestamp & close button */}
             <Stack
@@ -90,40 +84,58 @@ export function ProjectTemplateDetails<T extends string>({
                                 onClick={onClose}
                             />
                         </Group>
-                        <Group>
-                            <Text className="font-semibold text-xl text-palette3">
-                                Project Template ID
-                            </Text>
-                            <Badge className="bg-stone-500 bg-opacity-50 text-gray-300">
-                                {projectTemplate.id}
-                            </Badge>
-                        </Group>
-                        <Group gap="md">
-                            <Text className="text-palette3 font-semibold text-xl">
-                                Created At:
-                            </Text>
-                            <Text className="text-lg font-medium text-gray-300">
-                                {formatDate(projectTemplate.createdAt, {
-                                    withTime: true,
-                                })}
-                            </Text>
-                        </Group>
-                        <Group>
-                            <Text className="text-palette3 font-semibold text-xl">
-                                Updated At:
-                            </Text>
-                            <Text className="text-lg font-medium text-gray-300">
-                                {formatDate(projectTemplate.updatedAt, {
-                                    withTime: true,
-                                })}
-                            </Text>
-                        </Group>
+                        <Skeleton
+                            visible={isLoading}
+                            className={brownSkeletonClasses.root}
+                        >
+                            <Group>
+                                <Text className="font-semibold text-xl text-palette3">
+                                    Project Template ID
+                                </Text>
+                                <Badge className="bg-stone-500 bg-opacity-50 text-gray-300">
+                                    {projectTemplate?.id}
+                                </Badge>
+                            </Group>
+                        </Skeleton>
+                        <Skeleton
+                            visible={isLoading}
+                            className={brownSkeletonClasses.root}
+                        >
+                            <Group gap="md">
+                                <Text className="text-palette3 font-semibold text-xl">
+                                    Created At:
+                                </Text>
+                                <Text className="text-lg font-medium text-gray-300">
+                                    {projectTemplate &&
+                                        formatDate(projectTemplate.createdAt, {
+                                            withTime: true,
+                                        })}
+                                </Text>
+                            </Group>
+                        </Skeleton>
+                        <Skeleton
+                            visible={isLoading}
+                            className={brownSkeletonClasses.root}
+                        >
+                            <Group>
+                                <Text className="text-palette3 font-semibold text-xl">
+                                    Updated At:
+                                </Text>
+                                <Text className="text-lg font-medium text-gray-300">
+                                    {projectTemplate &&
+                                        formatDate(projectTemplate.updatedAt, {
+                                            withTime: true,
+                                        })}
+                                </Text>
+                            </Group>
+                        </Skeleton>
                     </Stack>
                 </Box>
                 <Group justify="flex-end">
                     <DeleteTemplateButton
-                        projectTemplateId={projectTemplate.id}
+                        projectTemplateId={projectTemplate?.id ?? ""}
                         onSuccess={onClose}
+                        disabled={isLoading}
                     />
                 </Group>
             </Stack>
