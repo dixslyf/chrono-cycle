@@ -3,14 +3,16 @@ import { createRequire } from "node:module";
 import { PGlite } from "@electric-sql/pglite";
 import { encodeBase32LowerCaseNoPadding } from "@oslojs/encoding";
 import { drizzle } from "drizzle-orm/pglite";
+import { reset } from "drizzle-seed";
 import * as O from "fp-ts/Option";
-import { afterEach, beforeEach, vi, type Mock } from "vitest";
+import { afterEach, beforeAll, beforeEach, vi, type Mock } from "vitest";
 
 import { hashPassword } from "@/lib/auth/passwords";
 import * as authSessionsMod from "@/lib/auth/sessions";
 import { sessionIdFromToken } from "@/lib/auth/sessions";
 
 import * as dbMod from "@/db";
+import { getDb } from "@/db";
 import * as schema from "@/db/schema";
 import { sessions, users, userSettings } from "@/db/schema";
 
@@ -42,7 +44,7 @@ vi.mock("next/navigation", () => ({
     redirect: vi.fn(),
 }));
 
-beforeEach(async () => {
+beforeAll(async () => {
     // Mock database.
     const client = new PGlite();
     const testDb = drizzle(client);
@@ -56,6 +58,10 @@ beforeEach(async () => {
     await apply();
 
     (dbMod.getDb as Mock).mockResolvedValue(testDb);
+});
+
+beforeEach(async () => {
+    const testDb = await getDb();
 
     // Mock user session.
     const token = encodeBase32LowerCaseNoPadding(new Uint8Array(20));
@@ -101,6 +107,10 @@ beforeEach(async () => {
     });
 });
 
-afterEach(() => {
+afterEach(async () => {
+    // Reset the database.
+    const testDb = await getDb();
+    await reset(testDb, schema);
+
     vi.clearAllMocks();
 });
