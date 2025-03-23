@@ -1,17 +1,20 @@
 .mantine-Switch-track {
-  @apply bg-palette5;
-  @apply border-none;
+  border: none;
 
-  .mantine-Switch-input:checked + & {
-    @apply bg-palette2;
+  @mixin light {
+    --switch-bg: var(--mantine-primary-color-filled);
+  }
+
+  @mixin dark {
+    --switch-bg: var(--mantine-color-dark-6);
   }
 }
 
 .mantine-Switch-thumb {
-  @apply bg-white;
+  border: none;
 }
 
-.mantine-Pagination-control[data-active]{
-  @apply bg-palette2;
+.mantine-Pagination-control[data-active] {
+  background-color: var(--mantine-primary-color-filled);
   border-color: var(--bg-palette2);
 }
