@@ -19,18 +19,6 @@ vi.mock("next/navigation", () => ({
 }));
 
 describe("Sign-in server action", () => {
-    beforeEach(async () => {
-        // Set up a sample user.
-        const signUpResult = await signUpAction(null, {
-            username: "asdf",
-            email: "asdf@email.com",
-            password: "asdfASDF1234",
-        });
-        if (E.isLeft(signUpResult)) {
-            throw new Error("Sign up action is not implemented correctly!");
-        }
-    });
-
     it("should return validation error if username is empty", async () => {
         const result = await signInAction(null, {
             username: "",
