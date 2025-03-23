@@ -4,7 +4,7 @@ import { Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Plus } from "lucide-react";
 
-import { CreateProjectTemplateForm } from "./createTemplateForm";
+import { CreateProjectTemplateForm } from "./createProjectTemplateForm";
 
 export function CreateProjectTemplateButton() {
     const [opened, { open, close }] = useDisclosure(false);

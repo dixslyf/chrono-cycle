@@ -1,12 +1,14 @@
 "use client";
 
-import { Group, Modal, Stack, useModalsStack } from "@mantine/core";
+import { Modal, useModalsStack } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { sequenceT } from "fp-ts/Apply";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { DataTable } from "mantine-datatable";
 import { useCallback, useState } from "react";
+
+import { formatDate } from "@/app/utils/dates";
 
 import {
     ProjectOverview,
@@ -17,9 +19,7 @@ import {
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 import { listProjectsAction } from "@/features/projects/list/action";
 
-import { CreateEventTemplateButton } from "./createEventButton";
-import { DeleteTemplateButton } from "./deleteTemplateButton";
-import { TemplateDetails, TemplateDetailsSkeleton } from "./templateDetails";
+import { ProjectTemplateDetails } from "./projectTemplateDetails";
 
 const columns = [
     { accessor: "name", title: "Name" },
@@ -33,7 +33,7 @@ type ClickedData = {
     projects: ProjectOverview[];
 };
 
-export function TemplateTable({
+export function ProjectTemplatesTable({
     entries,
 }: {
     entries: ProjectTemplateOverview[];
@@ -44,8 +44,8 @@ export function TemplateTable({
             id,
             name,
             description,
-            createdAt: createdAt.toString(),
-            updatedAt: updatedAt.toString(),
+            createdAt: formatDate(createdAt, { withTime: true }),
+            updatedAt: formatDate(updatedAt, { withTime: true }),
         }),
     );
 
@@ -54,6 +54,7 @@ export function TemplateTable({
         "project-template-details",
         "add-event",
         "create-project",
+        "event-details",
     ]);
 
     const { close: modalStackClose } = modalStack;
@@ -104,45 +105,24 @@ export function TemplateTable({
             <Modal.Stack>
                 {/* Modal window for showing the details of the clicked project template. */}
                 <Modal
-                    title="Project Template Details"
-                    size="auto"
                     centered
+                    size="100%"
+                    radius="xl"
+                    withCloseButton={false}
+                    padding={0}
                     {...modalStack.register("project-template-details")}
                 >
-                    <Stack>
-                        {/* Template details */}
-                        {retrieveQuery.data ? (
-                            <>
-                                <TemplateDetails
-                                    modalStack={modalStack}
-                                    projectTemplate={
-                                        retrieveQuery.data.projectTemplate
-                                    }
-                                    projects={retrieveQuery.data.projects}
-                                />
-
-                                {/* Delete and create event buttons */}
-                                <Group justify="flex-end">
-                                    <DeleteTemplateButton
-                                        projectTemplateId={
-                                            retrieveQuery.data.projectTemplate
-                                                .id
-                                        }
-                                        onSuccess={closeModal}
-                                    />
-                                    <CreateEventTemplateButton
-                                        projectTemplateId={
-                                            retrieveQuery.data.projectTemplate
-                                                .id
-                                        }
-                                        modalStack={modalStack}
-                                    />
-                                </Group>
-                            </>
-                        ) : (
-                            <TemplateDetailsSkeleton />
-                        )}
-                    </Stack>
+                    {/* Template details */}
+                    <>
+                        <ProjectTemplateDetails
+                            modalStack={modalStack}
+                            projectTemplate={
+                                retrieveQuery.data?.projectTemplate
+                            }
+                            onClose={closeModal}
+                            isLoading={retrieveQuery.isPending}
+                        />
+                    </>
                 </Modal>
             </Modal.Stack>
 

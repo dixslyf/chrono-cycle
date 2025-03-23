@@ -4,7 +4,8 @@ import { Modal, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useRef, useState } from "react";
 
-import EventDetails from "@/app/components/event/EventDetails";
+// import EventDetails from "@/app/components/event/EventDetails";
+import DisplayEventDetails from "@/app/components/event/eventDetails";
 import { areSameDay } from "@/app/utils/dates";
 
 import { Event, Project } from "@/common/data/domain";
@@ -210,7 +211,7 @@ function Timeline({
                 onClose={closeModal}
                 title="Event Details"
             >
-                {clickedEvent && <EventDetails event={clickedEvent} />}
+                {clickedEvent && <DisplayEventDetails event={clickedEvent} />}
             </Modal>
             <div className="flex h-full flex-1 relative">
                 {days.map((day, i) => {

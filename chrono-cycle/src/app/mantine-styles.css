@@ -10,3 +10,8 @@
 .mantine-Switch-thumb {
   @apply bg-white;
 }
+
+.mantine-Pagination-control[data-active]{
+  @apply bg-palette2;
+  border-color: var(--bg-palette2);
+}

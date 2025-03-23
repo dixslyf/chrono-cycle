@@ -1,0 +1,11 @@
+.root {
+  &:where([data-visible]) {
+    &::before {
+      background-color: #b2a99f;
+    }
+
+    &::after {
+      background-color: #8c7f6d;
+    }
+  }
+}

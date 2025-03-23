@@ -4,8 +4,8 @@ import { Group, Stack } from "@mantine/core";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 
-import { CreateProjectTemplateButton } from "@/app/components/templates/createTemplateButton";
-import { TemplateTable } from "@/app/components/templates/templateTable";
+import { CreateProjectTemplateButton } from "@/app/components/templates/createProjectTemplateButton";
+import { ProjectTemplatesTable } from "@/app/components/templates/projectTemplatesTable";
 
 import { ProjectTemplateOverview } from "@/common/data/domain";
 
@@ -29,7 +29,7 @@ export default async function Templates() {
             {/* create template section */}
             <section className="w-full flex justify-center">
                 <Stack>
-                    <TemplateTable entries={entries} />
+                    <ProjectTemplatesTable entries={entries} />
                     <Group justify="flex-end">
                         <CreateProjectTemplateButton />
                     </Group>

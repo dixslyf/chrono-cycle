@@ -15,16 +15,21 @@ import {
 } from "@mantine/core";
 import { TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
 import { Clock, Plus, Trash } from "lucide-react";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { startTransition, useActionState, useEffect, useState } from "react";
+import { useState } from "react";
 
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 
 import { createEventTemplateAction } from "@/features/event-templates/create/action";
-import { Payload, payloadSchema } from "@/features/event-templates/create/data";
+import {
+    Failure,
+    Payload,
+    payloadSchema,
+} from "@/features/event-templates/create/data";
 
 type ReminderData = Required<Payload["reminders"][number]>;
 
@@ -35,35 +40,6 @@ export function CreateEventTemplateForm({
     projectTemplateId: string;
     onSuccess: () => void;
 }): React.ReactNode {
-    // Action state for creating a project template.
-    const [createResult, createAction, createPending] = useActionState(
-        createEventTemplateAction,
-        null,
-    );
-
-    // Call `onSuccess` whenever creation is successful + show notifications.
-    useEffect(() => {
-        if (!createResult) {
-            return;
-        }
-
-        pipe(
-            createResult,
-            E.match(
-                (_err) =>
-                    notifyError({
-                        message: `Failed to create event.`,
-                    }),
-                () => {
-                    notifySuccess({
-                        message: "Successfully created event.",
-                    });
-                    onSuccess();
-                },
-            ),
-        );
-    }, [createResult, onSuccess]);
-
     const form = useForm<Payload>({
         mode: "uncontrolled",
         initialValues: {
@@ -79,6 +55,34 @@ export function CreateEventTemplateForm({
         },
         validate: zodResolver(payloadSchema),
     });
+    type FormValues = typeof form.values;
+
+    const queryClient = useQueryClient();
+    const mutation = useMutation({
+        mutationFn: async (values: FormValues) => {
+            const result = await createEventTemplateAction(values);
+            return pipe(
+                result,
+                E.getOrElseW((err) => {
+                    throw err;
+                }),
+            );
+        },
+        onSuccess: () => {
+            // Call `onSuccess` whenever creation is successful + show notifications.
+            queryClient.invalidateQueries({
+                queryKey: ["retrieve-project-template-data"],
+            });
+            notifySuccess({
+                message: "Successfully created event.",
+            });
+            onSuccess();
+        },
+        onError: (_err: Failure) =>
+            notifyError({
+                message: `Failed to create event.`,
+            }),
+    });
 
     // Disable duration field and set it to 1 when event type is set to "task".
     const [durationDisabled, setDurationDisabled] = useState(true);
@@ -86,22 +90,18 @@ export function CreateEventTemplateForm({
         if (change.value === "task") {
             form.setFieldValue("duration", 1);
         }
-        setDurationDisabled(createPending || change.value === "task");
+        setDurationDisabled(mutation.isPending || change.value === "task");
     });
 
     return (
-        <form
-            onSubmit={form.onSubmit((values) =>
-                startTransition(() => createAction(values)),
-            )}
-        >
+        <form onSubmit={form.onSubmit((values) => mutation.mutate(values))}>
             <Fieldset legend="Basic Information">
                 <TextInput
                     label="Name"
                     description="Name of the event"
                     error="Invalid event name"
                     placeholder="Event name"
-                    disabled={createPending}
+                    disabled={mutation.isPending}
                     required
                     {...form.getInputProps("name")}
                 />
@@ -109,7 +109,7 @@ export function CreateEventTemplateForm({
                     label="Offset days"
                     description="The number of offset days from the project start date"
                     error="Invalid number of offset days"
-                    disabled={createPending}
+                    disabled={mutation.isPending}
                     required
                     {...form.getInputProps("offsetDays")}
                 />
@@ -124,7 +124,7 @@ export function CreateEventTemplateForm({
                         placeholder="Event type"
                         description="The type of event (task or activity)"
                         error="Invalid event type"
-                        disabled={createPending}
+                        disabled={mutation.isPending}
                         {...form.getInputProps("eventType")}
                     />
                     <NumberInput
@@ -142,7 +142,7 @@ export function CreateEventTemplateForm({
                     label="Automatically Reschedule"
                     description="Whether to automatically reschedule the event when a dependency event is delayed"
                     defaultChecked
-                    disabled={createPending}
+                    disabled={mutation.isPending}
                     {...form.getInputProps("autoReschedule")}
                 />
             </Fieldset>
@@ -159,7 +159,7 @@ export function CreateEventTemplateForm({
                                         label="Days before event"
                                         description="The number of days before the event to trigger the reminder"
                                         min={0}
-                                        disabled={createPending}
+                                        disabled={mutation.isPending}
                                         required
                                         {...form.getInputProps(
                                             `reminders.${index}.daysBeforeEvent`,
@@ -171,7 +171,7 @@ export function CreateEventTemplateForm({
                                         )}
                                         label="Time"
                                         description="The time at which to trigger the reminder"
-                                        disabled={createPending}
+                                        disabled={mutation.isPending}
                                         leftSection={<Clock size={16} />}
                                         required
                                         {...form.getInputProps(
@@ -197,7 +197,7 @@ export function CreateEventTemplateForm({
                                     label="Email notification"
                                     description="Whether to send an email notification for this reminder"
                                     defaultChecked
-                                    disabled={createPending}
+                                    disabled={mutation.isPending}
                                     {...form.getInputProps(
                                         `reminders.${index}.emailNotifications`,
                                     )}
@@ -209,7 +209,7 @@ export function CreateEventTemplateForm({
                                     label="Desktop notification"
                                     description="Whether to send an desktop notification for this reminder"
                                     defaultChecked
-                                    disabled={createPending}
+                                    disabled={mutation.isPending}
                                     {...form.getInputProps(
                                         `reminders.${index}.desktopNotifications`,
                                     )}
@@ -240,7 +240,7 @@ export function CreateEventTemplateForm({
                     description="Attach a note to the event"
                     error="Invalid note"
                     placeholder="Enter note"
-                    disabled={createPending}
+                    disabled={mutation.isPending}
                     {...form.getInputProps("note")}
                 />
                 {/* TODO: autocomplete tags */}
@@ -251,7 +251,7 @@ export function CreateEventTemplateForm({
                 />
             </Fieldset>
             <Group justify="flex-end">
-                <Button type="submit" loading={createPending}>
+                <Button type="submit" loading={mutation.isPending}>
                     Add
                 </Button>
             </Group>
