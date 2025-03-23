@@ -6,7 +6,7 @@ import { listProjectTemplatesAction } from "@/features/project-templates/list/ac
 
 describe("List Project template server action", () => {
     it("should list project template successfully", async () => {
-        const result = await createProjectTemplateAction(null, {
+        const result = await createProjectTemplateAction({
             name: "New Project Name",
             description: "Description of a new project",
         });
@@ -15,7 +15,7 @@ describe("List Project template server action", () => {
                 "Create project template action is not implemented correctly!",
             );
         }
-        const duplicatedResult = await createProjectTemplateAction(null, {
+        const duplicatedResult = await createProjectTemplateAction({
             name: "Project",
             description: "Description of project",
         });

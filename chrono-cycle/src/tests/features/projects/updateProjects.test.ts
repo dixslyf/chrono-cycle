@@ -44,13 +44,10 @@ describe("Update Project server action", () => {
     });
 
     it("should return validation error if project name is empty", async () => {
-        const createProjectTemplateResult = await createProjectTemplateAction(
-            null,
-            {
-                name: "New Project Name",
-                description: "Description of a new project",
-            },
-        );
+        const createProjectTemplateResult = await createProjectTemplateAction({
+            name: "New Project Name",
+            description: "Description of a new project",
+        });
         if (E.isLeft(createProjectTemplateResult)) {
             throw new Error(
                 "Create project template action is not implemented correctly!",
@@ -85,13 +82,10 @@ describe("Update Project server action", () => {
     });
 
     it("should return validation error if project description is empty", async () => {
-        const createProjectTemplateResult = await createProjectTemplateAction(
-            null,
-            {
-                name: "New Project Name",
-                description: "Description of a new project",
-            },
-        );
+        const createProjectTemplateResult = await createProjectTemplateAction({
+            name: "New Project Name",
+            description: "Description of a new project",
+        });
         if (E.isLeft(createProjectTemplateResult)) {
             throw new Error(
                 "Create project template action is not implemented correctly!",
@@ -126,7 +120,7 @@ describe("Update Project server action", () => {
     });
 
     it("should return DuplicateNameError if project name already exists", async () => {
-        const result = await createProjectTemplateAction(null, {
+        const result = await createProjectTemplateAction({
             name: "New Project Name",
             description: "Description of a new project",
         });
@@ -168,13 +162,10 @@ describe("Update Project server action", () => {
     });
 
     it("should update a project template successfully", async () => {
-        const createProjectTemplateResult = await createProjectTemplateAction(
-            null,
-            {
-                name: "New Project Name",
-                description: "Description of a new project",
-            },
-        );
+        const createProjectTemplateResult = await createProjectTemplateAction({
+            name: "New Project Name",
+            description: "Description of a new project",
+        });
         if (E.isLeft(createProjectTemplateResult)) {
             throw new Error(
                 "Create project template action is not implemented correctly!",

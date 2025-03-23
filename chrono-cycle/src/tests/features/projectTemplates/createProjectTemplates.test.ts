@@ -8,7 +8,7 @@ import { createProjectTemplateAction } from "@/features/project-templates/create
 
 describe("Create Project template server action", () => {
     it("should return validation error if payload has wrong types", async () => {
-        const result = await createProjectTemplateAction(null, {
+        const result = await createProjectTemplateAction({
             name: 1234 as unknown as string,
             description: 5678 as unknown as string,
         });
@@ -22,7 +22,7 @@ describe("Create Project template server action", () => {
     });
 
     it("should return validation error if project template name is empty", async () => {
-        const result = await createProjectTemplateAction(null, {
+        const result = await createProjectTemplateAction({
             name: "",
             description: "Description of a new project",
         });
@@ -35,7 +35,7 @@ describe("Create Project template server action", () => {
     });
 
     it("should return validation error if project template description is empty", async () => {
-        const result = await createProjectTemplateAction(null, {
+        const result = await createProjectTemplateAction({
             name: "New Project Name",
             description: "",
         });
@@ -48,7 +48,7 @@ describe("Create Project template server action", () => {
     });
 
     it("should return DuplicateNameError if project template name already exists", async () => {
-        const result = await createProjectTemplateAction(null, {
+        const result = await createProjectTemplateAction({
             name: "New Project Name",
             description: "Description of a new project",
         });
@@ -57,7 +57,7 @@ describe("Create Project template server action", () => {
                 "Create project template action is not implemented correctly!",
             );
         }
-        const duuplicaterResult = await createProjectTemplateAction(null, {
+        const duuplicaterResult = await createProjectTemplateAction({
             name: "New Project Name",
             description: "Description of a new project",
         });
@@ -65,7 +65,7 @@ describe("Create Project template server action", () => {
     });
 
     it("should create a project template successfully", async () => {
-        const result = await createProjectTemplateAction(null, {
+        const result = await createProjectTemplateAction({
             name: "New Project Name",
             description: "Description of a new project",
         });
