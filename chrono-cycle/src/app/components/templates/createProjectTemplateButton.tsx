@@ -10,11 +10,13 @@ import {
     Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { useQuery } from "@tanstack/react-query";
 import { ChevronUp, Copy, Upload } from "lucide-react";
 import { useState } from "react";
 
 import splitButtonClasses from "@/app/split-button.module.css";
 import { notifyError } from "@/app/utils/notifications";
+import { listProjectTemplatesOptions } from "@/app/utils/queries/listProjectTemplates";
 
 import {
     Payload as ImportPayload,
@@ -22,14 +24,19 @@ import {
 } from "@/features/project-templates/import/data";
 
 import { CreateProjectTemplateForm } from "./createProjectTemplateForm";
+import { DuplicateProjectTemplateForm } from "./duplicateProjectTemplateForm";
 import { ImportProjectTemplateForm } from "./importProjectTemplateForm";
 
 export function CreateProjectTemplateButton() {
+    // Modal disclosures.
     const [createOpened, { open: openCreate, close: closeCreate }] =
         useDisclosure(false);
     const [importOpened, { open: openImport, close: closeImport }] =
         useDisclosure(false);
+    const [duplicateOpened, { open: openDuplicate, close: closeDuplicate }] =
+        useDisclosure(false);
 
+    // For importing.
     const [importData, setImportData] = useState<ImportPayload | null>(null);
     function fileOnChange(newFile: File | null) {
         if (!newFile) {
@@ -47,10 +54,28 @@ export function CreateProjectTemplateButton() {
                 notifyError({ message: "Invalid project template file!" });
             }
         };
-
         reader.onerror = () => notifyError({ message: "Failed to read file!" });
-
         reader.readAsText(newFile);
+    }
+
+    // Query to fetch the list of project templates for duplicating a project template.
+    const listPtsQuery = useQuery({
+        ...listProjectTemplatesOptions({
+            onError: closeDuplicate,
+        }),
+        enabled: false,
+    });
+
+    // On-click handler for the Duplicate button.
+    async function onClickDuplicate() {
+        openDuplicate();
+        const result = await listPtsQuery.refetch();
+        if (result.data && result.data.length === 0) {
+            notifyError({
+                message: "No project templates to duplicate.",
+            });
+            closeDuplicate();
+        }
     }
 
     return (
@@ -72,6 +97,18 @@ export function CreateProjectTemplateButton() {
                 <ImportProjectTemplateForm
                     importData={importData ?? undefined}
                     onSuccess={closeImport}
+                />
+            </Modal>
+            <Modal
+                opened={duplicateOpened}
+                onClose={closeDuplicate}
+                title="Duplicate Project Template"
+                centered
+            >
+                <DuplicateProjectTemplateForm
+                    projectTemplates={listPtsQuery.data}
+                    isPendingProjectTemplates={listPtsQuery.isPending}
+                    onSuccess={closeDuplicate}
                 />
             </Modal>
             {/* Based on: https://ui.mantine.dev/category/buttons/#split-button */}
@@ -104,6 +141,12 @@ export function CreateProjectTemplateButton() {
                                 </Menu.Item>
                             )}
                         </FileButton>
+                        <Menu.Item
+                            leftSection={<Copy />}
+                            onClick={onClickDuplicate}
+                        >
+                            Duplicate
+                        </Menu.Item>
                     </Menu.Dropdown>
                 </Menu>
             </Group>
