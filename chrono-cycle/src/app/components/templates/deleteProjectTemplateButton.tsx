@@ -10,7 +10,7 @@ import { notifyError, notifySuccess } from "@/app/utils/notifications";
 
 import { deleteProjectTemplateAction } from "@/features/project-templates/delete/action";
 
-export function DeleteTemplateButton({
+export function DeleteProjectTemplateButton({
     projectTemplateId,
     onSuccess,
     disabled,

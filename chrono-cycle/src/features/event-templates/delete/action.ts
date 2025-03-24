@@ -15,7 +15,6 @@ import { Failure, Payload, payloadSchema, Result } from "./data";
 
 async function deleteEventTemplatesImpl(
     userSession: UserSession,
-    _previousState: Result | null,
     payload: Payload,
 ): Promise<E.Either<RestoreAssertionError<Failure>, void>> {
     // Validate form schema.
@@ -27,10 +26,5 @@ async function deleteEventTemplatesImpl(
     return await task();
 }
 
-export const deleteEventTemplatesAction: (
-    _previousState: Result | null,
-    payload: Payload,
-) => Promise<Result> = wrapServerAction(
-    "deleteEventTemplates",
-    deleteEventTemplatesImpl,
-);
+export const deleteEventTemplatesAction: (payload: Payload) => Promise<Result> =
+    wrapServerAction("deleteEventTemplates", deleteEventTemplatesImpl);
