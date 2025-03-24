@@ -1,6 +1,14 @@
 "use client";
 
-import { Modal, useModalsStack } from "@mantine/core";
+import {
+    Center,
+    Loader,
+    Modal,
+    ScrollArea,
+    Table,
+    Text,
+    useModalsStack,
+} from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
@@ -16,7 +24,22 @@ import { retrieveProjectTemplateAction } from "@/features/project-templates/retr
 
 import { ProjectTemplateDetails } from "./projectTemplateDetails";
 
-const columns = [
+// TODO
+// should put this somewhere else
+interface ProjecTemplateRecord {
+    id: string;
+    name: string;
+    description: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+type Column = {
+    accessor: keyof ProjecTemplateRecord;
+    title: string;
+};
+
+const columns: Column[] = [
     { accessor: "name", title: "Name" },
     { accessor: "description", title: "Description" },
     { accessor: "createdAt", title: "Created at" },
@@ -105,7 +128,7 @@ export function ProjectTemplatesTable(): React.ReactNode {
             </Modal.Stack>
 
             {/* Table to show available project templates. */}
-            <DataTable
+            {/* <DataTable
                 highlightOnHover
                 withTableBorder
                 columns={columns}
@@ -117,7 +140,60 @@ export function ProjectTemplatesTable(): React.ReactNode {
                     modalStack.open("project-template-details");
                     setClickedId(id);
                 }}
-            />
+            /> */}
+            <ScrollArea>
+                <Table highlightOnHover>
+                    <Table.Thead>
+                        <Table.Tr>
+                            {columns.map((column) => (
+                                <Table.Th key={column.accessor}>
+                                    {column.title}
+                                </Table.Th>
+                            ))}
+                        </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
+                        {listPtsQuery.isPending ? (
+                            <Table.Tr>
+                                <Table.Td colSpan={columns.length}>
+                                    <Center>
+                                        <Loader size="sm" />
+                                    </Center>
+                                </Table.Td>
+                            </Table.Tr>
+                        ) : records.length === 0 ? (
+                            <Table.Tr>
+                                <Table.Td colSpan={columns.length}>
+                                    <Center>
+                                        <Text>No Project Template</Text>
+                                    </Center>
+                                </Table.Td>
+                            </Table.Tr>
+                        ) : (
+                            records.map((record) => (
+                                <Table.Tr
+                                    key={record.id}
+                                    className="cursor-pointer"
+                                    onClick={() => {
+                                        modalStack.open(
+                                            "project-template-details",
+                                        );
+                                        setClickedId(record.id);
+                                    }}
+                                >
+                                    {columns.map((column) => (
+                                        <Table.Td
+                                            key={`${record.id}-${column.accessor}`}
+                                        >
+                                            {record[column.accessor]}
+                                        </Table.Td>
+                                    ))}
+                                </Table.Tr>
+                            ))
+                        )}
+                    </Table.Tbody>
+                </Table>
+            </ScrollArea>
         </>
     );
 }
