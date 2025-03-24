@@ -16,7 +16,7 @@ import { formatDate } from "@/app/utils/dates";
 
 import { ProjectTemplate } from "@/common/data/domain";
 
-import { DeleteTemplateButton } from "./deleteTemplateButton";
+import { DeleteProjectTemplateButton } from "./deleteProjectTemplateButton";
 import { EventTemplatesTable } from "./eventTemplatesTable";
 
 export function ProjectTemplateDetails<T extends string>({
@@ -132,7 +132,7 @@ export function ProjectTemplateDetails<T extends string>({
                     </Stack>
                 </Box>
                 <Group justify="flex-end">
-                    <DeleteTemplateButton
+                    <DeleteProjectTemplateButton
                         projectTemplateId={projectTemplate?.id ?? ""}
                         onSuccess={onClose}
                         disabled={isLoading}
