@@ -15,6 +15,8 @@ import { formatReminderTemplateTime } from "@/app/utils/dates";
 
 import { EventTemplate, ReminderTemplate, Tag } from "@/common/data/domain";
 
+import { DeleteEventTemplateButton } from "./deleteEventTemplateButton";
+
 interface DisplayEventDetailsProps {
     eventTemplate: EventTemplate;
     onClose: () => void;
@@ -99,91 +101,102 @@ function EventTemplateDetails({
             </Stack>
 
             {/* right panel */}
-            <Stack className="py-8 px-4 w-2/5 items-stretch bg-palette1">
-                <Group justify="space-between">
-                    <Group>
-                        <Text className="font-semibold text-xl text-palette3">
-                            Event ID
-                        </Text>
-                        <Badge className="bg-stone-500 bg-opacity-50 text-gray-300">
-                            {eventTemplate.id}
-                        </Badge>
-                    </Group>
-                    <X
-                        className="text-palette3 hover:text-gray-400 cursor-pointer w-8 h-8"
-                        onClick={onClose}
-                    />
-                </Group>
-                <SimpleGrid cols={2}>
-                    <Group justify="space-between" className="p-4">
-                        <Text className="text-md font-semibold text-palette3">
-                            Offset Days
-                        </Text>
-                        <Text className="text-md font-semibold text-red-500">
-                            {eventTemplate.offsetDays}
-                        </Text>
-                    </Group>
-                    <Group justify="space-between" className="p-4">
-                        <Text className="text-md font-semibold text-palette3">
-                            Automatic Reschedule
-                        </Text>
-                        <Checkbox
-                            checked={eventTemplate.autoReschedule}
-                            readOnly
+            <Stack
+                className="py-8 px-4 w-2/5 items-stretch bg-palette1"
+                justify="space-between"
+            >
+                <Stack>
+                    <Group justify="space-between">
+                        <Group>
+                            <Text className="font-semibold text-xl text-palette3">
+                                Event ID
+                            </Text>
+                            <Badge className="bg-stone-500 bg-opacity-50 text-gray-300">
+                                {eventTemplate.id}
+                            </Badge>
+                        </Group>
+                        <X
+                            className="text-palette3 hover:text-gray-400 cursor-pointer w-8 h-8"
+                            onClick={onClose}
                         />
                     </Group>
-                    <Group justify="space-between" className="p-4">
-                        <Text className="text-md font-semibold text-palette3">
-                            Event Type
-                        </Text>
-                        <Text
-                            className={`text-md font-semibold ${
-                                eventTemplate.eventType === "task"
-                                    ? "text-fuchsia-500"
-                                    : "text-blue-400"
-                            }`}
-                        >
-                            {eventTemplate.eventType === "task"
-                                ? "Task"
-                                : "Activity"}
-                        </Text>
-                    </Group>
-                    <Group justify="space-between" className="p-4">
-                        <Text className="text-md font-semibold text-palette3">
-                            Duration (days)
-                        </Text>
-                        <Text className="text-md font-semibold text-green-400">
-                            {eventTemplate.eventType === "activity"
-                                ? eventTemplate.duration !== null
-                                    ? eventTemplate.duration
-                                    : "-"
-                                : "-"}
-                        </Text>
-                    </Group>
-                </SimpleGrid>
-                <Stack gap="sm" className="p-4">
-                    <Text className="text-md font-semibold text-palette3">
-                        Tags
-                    </Text>
-                    <Group>
-                        {eventTemplate.tags.length > 0 ? (
-                            <Group>
-                                {eventTemplate.tags.map((tag: Tag) => (
-                                    <Badge
-                                        key={tag.id}
-                                        className="bg-stone-500 bg-opacity-50 text-gray-300"
-                                    >
-                                        {tag.name}
-                                    </Badge>
-                                ))}
-                            </Group>
-                        ) : (
-                            <Text className="text-gray-300">
-                                No tags assigned
+                    <SimpleGrid cols={2}>
+                        <Group justify="space-between" className="p-4">
+                            <Text className="text-md font-semibold text-palette3">
+                                Offset Days
                             </Text>
-                        )}
-                    </Group>
+                            <Text className="text-md font-semibold text-red-500">
+                                {eventTemplate.offsetDays}
+                            </Text>
+                        </Group>
+                        <Group justify="space-between" className="p-4">
+                            <Text className="text-md font-semibold text-palette3">
+                                Automatic Reschedule
+                            </Text>
+                            <Checkbox
+                                checked={eventTemplate.autoReschedule}
+                                readOnly
+                            />
+                        </Group>
+                        <Group justify="space-between" className="p-4">
+                            <Text className="text-md font-semibold text-palette3">
+                                Event Type
+                            </Text>
+                            <Text
+                                className={`text-md font-semibold ${
+                                    eventTemplate.eventType === "task"
+                                        ? "text-fuchsia-500"
+                                        : "text-blue-400"
+                                }`}
+                            >
+                                {eventTemplate.eventType === "task"
+                                    ? "Task"
+                                    : "Activity"}
+                            </Text>
+                        </Group>
+                        <Group justify="space-between" className="p-4">
+                            <Text className="text-md font-semibold text-palette3">
+                                Duration (days)
+                            </Text>
+                            <Text className="text-md font-semibold text-green-400">
+                                {eventTemplate.eventType === "activity"
+                                    ? eventTemplate.duration !== null
+                                        ? eventTemplate.duration
+                                        : "-"
+                                    : "-"}
+                            </Text>
+                        </Group>
+                    </SimpleGrid>
+                    <Stack gap="sm" className="p-4">
+                        <Text className="text-md font-semibold text-palette3">
+                            Tags
+                        </Text>
+                        <Group>
+                            {eventTemplate.tags.length > 0 ? (
+                                <Group>
+                                    {eventTemplate.tags.map((tag: Tag) => (
+                                        <Badge
+                                            key={tag.id}
+                                            className="bg-stone-500 bg-opacity-50 text-gray-300"
+                                        >
+                                            {tag.name}
+                                        </Badge>
+                                    ))}
+                                </Group>
+                            ) : (
+                                <Text className="text-gray-300">
+                                    No tags assigned
+                                </Text>
+                            )}
+                        </Group>
+                    </Stack>
                 </Stack>
+                <Group justify="flex-end">
+                    <DeleteEventTemplateButton
+                        eventTemplateId={eventTemplate.id}
+                        onSuccess={onClose}
+                    />
+                </Group>
             </Stack>
         </Group>
     );
