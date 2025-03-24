@@ -18,21 +18,21 @@ import {
     refineRawEventTemplateInsertSchema,
 } from "@/db/schema";
 
-export const payloadSchema = refineRawEventTemplateInsertSchema(
-    z.object({
-        name: rawEventTemplateInsertSchema.shape.name,
-        offsetDays: rawEventTemplateInsertSchema.shape.offsetDays,
-        duration: rawEventTemplateInsertSchema.shape.duration,
-        note: rawEventTemplateInsertSchema.shape.note,
-        eventType: rawEventTemplateInsertSchema.shape.eventType,
-        autoReschedule: rawEventTemplateInsertSchema.shape.autoReschedule,
-        projectTemplateId: encodedIdSchema, // Sqid, not the actual ID.
-        reminders: z.array(
-            createReminderTemplatePayloadSchema.omit({ eventTemplateId: true }),
-        ),
-        tags: z.array(tagNameSchema),
-    }),
-);
+export const rawPayloadSchema = z.object({
+    name: rawEventTemplateInsertSchema.shape.name,
+    offsetDays: rawEventTemplateInsertSchema.shape.offsetDays,
+    duration: rawEventTemplateInsertSchema.shape.duration,
+    note: rawEventTemplateInsertSchema.shape.note,
+    eventType: rawEventTemplateInsertSchema.shape.eventType,
+    autoReschedule: rawEventTemplateInsertSchema.shape.autoReschedule,
+    projectTemplateId: encodedIdSchema, // Sqid, not the actual ID.
+    reminders: z.array(
+        createReminderTemplatePayloadSchema.omit({ eventTemplateId: true }),
+    ),
+    tags: z.array(tagNameSchema),
+});
+export const payloadSchema =
+    refineRawEventTemplateInsertSchema(rawPayloadSchema);
 
 export type Payload = z.input<typeof payloadSchema>;
 export type ParsedPayload = z.output<typeof payloadSchema>;
