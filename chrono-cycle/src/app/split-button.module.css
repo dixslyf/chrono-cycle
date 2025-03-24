@@ -1,0 +1,13 @@
+/* Taken from: https://ui.mantine.dev/category/buttons/#split-button */
+
+.button {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.menuControl {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border: 0;
+  border-left: 1px solid var(--mantine-color-body);
+}

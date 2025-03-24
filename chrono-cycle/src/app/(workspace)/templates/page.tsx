@@ -3,7 +3,6 @@
 import { Group, Stack } from "@mantine/core";
 
 import { CreateProjectTemplateButton } from "@/app/components/templates/createProjectTemplateButton";
-import { ImportProjectTemplateButton } from "@/app/components/templates/importProjectTemplateButton";
 import { ProjectTemplatesTable } from "@/app/components/templates/projectTemplatesTable";
 
 export default async function Templates() {
@@ -20,7 +19,6 @@ export default async function Templates() {
                 <Stack>
                     <ProjectTemplatesTable />
                     <Group justify="flex-end">
-                        <ImportProjectTemplateButton />
                         <CreateProjectTemplateButton />
                     </Group>
                 </Stack>
