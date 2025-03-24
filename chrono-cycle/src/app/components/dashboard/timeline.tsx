@@ -5,6 +5,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
+import * as O from "fp-ts/Option";
 import { useEffect, useRef, useState } from "react";
 
 import DisplayEventDetails from "@/app/components/event/eventDetails";
@@ -214,14 +215,19 @@ function Timeline({
         { open: openProjectDetailsModal, close: closeProjectDetailsModal },
     ] = useDisclosure(false);
     const retrieveProjectTemplateQuery = useQuery({
-        queryKey: [
-            "retrieve-project-template",
-            clickedProject?.projectTemplateId,
-        ],
+        queryKey: ["retrieve-project-template-of-project", clickedProject?.id],
         queryFn: async () => {
-            // Safety: This query is only called when a project is clicked.
+            // Type cast. Guaranteed to not be null since this query is only enabled
+            // when it is set.
+            const clickedProj = clickedProject as Project;
+
+            // No project template (i.e., the project template has been deleted).
+            if (clickedProj.projectTemplateId === null) {
+                return O.none;
+            }
+
             const result = await retrieveProjectTemplateAction({
-                projectTemplateId: clickedProject?.projectTemplateId as string,
+                projectTemplateId: clickedProj.projectTemplateId,
             });
             return pipe(
                 result,
@@ -229,9 +235,10 @@ function Timeline({
                     // To trigger error notification from Tanstack query.
                     throw err;
                 }),
+                O.some,
             );
         },
-        enabled: Boolean(clickedProject?.projectTemplateId),
+        enabled: Boolean(clickedProject),
         meta: {
             errorMessage:
                 "Failed to retrieve project's project template information.",

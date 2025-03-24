@@ -1,6 +1,8 @@
 "use client";
 
 import { Skeleton, Stack, Text } from "@mantine/core";
+import { pipe } from "fp-ts/lib/function";
+import * as O from "fp-ts/Option";
 
 import { formatDate } from "@/app/utils/dates";
 
@@ -8,7 +10,7 @@ import { Project, ProjectTemplate } from "@/common/data/domain";
 
 interface ProjectDetailsProps {
     project: Project;
-    projectTemplate?: ProjectTemplate | undefined;
+    projectTemplate?: O.Option<ProjectTemplate> | undefined;
     isLoading?: boolean | undefined;
 }
 
@@ -46,7 +48,13 @@ function ProjectDetails({
             <Skeleton visible={isLoading}>
                 <Text>
                     Project template:{" "}
-                    {`${projectTemplate?.name} (${projectTemplate?.id})`}
+                    {pipe(
+                        projectTemplate,
+                        O.fromNullable,
+                        O.flatten,
+                        O.map((pt) => `${pt.name} (${pt.id})`),
+                        O.getOrElse(() => "None"),
+                    )}
                 </Text>
             </Skeleton>
         </Stack>
