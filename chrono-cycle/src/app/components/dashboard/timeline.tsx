@@ -4,8 +4,8 @@ import { Modal, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useRef, useState } from "react";
 
-// import EventDetails from "@/app/components/event/EventDetails";
 import DisplayEventDetails from "@/app/components/event/eventDetails";
+import ProjectDetails from "@/app/components/project/projectDetails";
 import { areSameDay } from "@/app/utils/dates";
 
 import { Event, Project } from "@/common/data/domain";
@@ -197,8 +197,17 @@ function Timeline({
 
     // States for showing event details in a modal window.
     const [clickedEvent, setClickedEvent] = useState<Event | null>(null);
-    const [modalOpened, { open: openModal, close: closeModal }] =
-        useDisclosure(false);
+    const [
+        eventDetailsModalOpened,
+        { open: openEventDetailsModal, close: closeEventDetailsModal },
+    ] = useDisclosure(false);
+
+    // States for showing project details in a modal window.
+    const [clickedProject, setClickedProject] = useState<Project | null>(null);
+    const [
+        projectDetailsModalOpened,
+        { open: openProjectDetailsModal, close: closeProjectDetailsModal },
+    ] = useDisclosure(false);
 
     // each day is one column wide, so number of columns should be days.length
     return (
@@ -207,11 +216,18 @@ function Timeline({
             className="overflow-x-auto w-full flex-1 h-full flex flex-col relative z-0"
         >
             <Modal
-                opened={modalOpened}
-                onClose={closeModal}
+                opened={eventDetailsModalOpened}
+                onClose={closeEventDetailsModal}
                 title="Event Details"
             >
                 {clickedEvent && <DisplayEventDetails event={clickedEvent} />}
+            </Modal>
+            <Modal
+                opened={projectDetailsModalOpened}
+                onClose={closeProjectDetailsModal}
+                title="Project Details"
+            >
+                {clickedProject && <ProjectDetails project={clickedProject} />}
             </Modal>
             <div className="flex h-full flex-1 relative">
                 {days.map((day, i) => {
@@ -276,12 +292,16 @@ function Timeline({
                                 eventHeight={eventHeight}
                                 rowSpacing={rowSpacing}
                                 expanded={!!expandedProjects[project.id]}
+                                onProjectClick={(project) => {
+                                    setClickedProject(project);
+                                    openProjectDetailsModal();
+                                }}
                                 toggleProject={toggleProject}
                                 topOffset={topOffset}
                                 headerHeight={headerHeight}
                                 onEventClick={(event) => {
                                     setClickedEvent(event);
-                                    openModal();
+                                    openEventDetailsModal();
                                 }}
                             />
                         );

@@ -18,6 +18,7 @@ interface ProjectRowProps {
     eventHeight: number;
     rowSpacing: number;
     expanded: boolean;
+    onProjectClick: (project: Project) => void;
     toggleProject: (projectId: string) => void;
     topOffset: number; // computed vertical offset for this row
     headerHeight: number; // height for the header (e.g., 24px)
@@ -31,6 +32,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
     eventHeight,
     rowSpacing,
     expanded,
+    onProjectClick,
     toggleProject: toggleProject,
     topOffset,
     headerHeight,
@@ -41,6 +43,15 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
         areSameDay(d.date, project.startsAt),
     );
     if (projectStartIndex === -1) return null;
+
+    // On-click handler for the chevron icon to toggle events.
+    function chevronOnClick(e: React.MouseEvent<SVGElement>) {
+        // Needed to prevent the event from bubbling up to the bar itself.
+        // Otherwise, clicking on the chevron icon will also open the
+        // project details modal.
+        e.stopPropagation();
+        toggleProject(project.id);
+    }
 
     // For the end index, determine the farthest day among the events in this project.
     // const eventEndIndexes = events.map((event) => {
@@ -71,13 +82,21 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
                         height: `${headerHeight}px`,
                         lineHeight: `${headerHeight}px`,
                     }}
-                    onClick={() => toggleProject(project.id)}
+                    onClick={() => onProjectClick(project)}
                 >
                     {project.name}
                     {expanded ? (
-                        <ChevronUp size={16} className="ml-1" />
+                        <ChevronUp
+                            size={16}
+                            className="ml-1"
+                            onClick={chevronOnClick}
+                        />
                     ) : (
-                        <ChevronDown size={16} className="ml-1" />
+                        <ChevronDown
+                            size={16}
+                            className="ml-1"
+                            onClick={chevronOnClick}
+                        />
                     )}
                 </Paper>
             </div>
@@ -107,13 +126,21 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
                     height: `${headerHeight}px`,
                     lineHeight: `${headerHeight}px`,
                 }}
-                onClick={() => toggleProject(project.id)}
+                onClick={() => onProjectClick(project)}
             >
                 {project.name}
                 {expanded ? (
-                    <ChevronUp size={16} className="ml-1" />
+                    <ChevronUp
+                        size={16}
+                        className="ml-1"
+                        onClick={chevronOnClick}
+                    />
                 ) : (
-                    <ChevronDown size={16} className="ml-1" />
+                    <ChevronDown
+                        size={16}
+                        className="ml-1"
+                        onClick={chevronOnClick}
+                    />
                 )}
             </Paper>
 
