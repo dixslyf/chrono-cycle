@@ -18,6 +18,7 @@ import { ProjectTemplate } from "@/common/data/domain";
 
 import { DeleteProjectTemplateButton } from "./deleteProjectTemplateButton";
 import { EventTemplatesTable } from "./eventTemplatesTable";
+import { ExportProjectTemplateButton } from "./exportProjectTemplateButton";
 
 export function ProjectTemplateDetails<T extends string>({
     projectTemplate,
@@ -132,6 +133,9 @@ export function ProjectTemplateDetails<T extends string>({
                     </Stack>
                 </Box>
                 <Group justify="flex-end">
+                    <ExportProjectTemplateButton
+                        projectTemplate={projectTemplate}
+                    />
                     <DeleteProjectTemplateButton
                         projectTemplateId={projectTemplate?.id ?? ""}
                         onSuccess={onClose}
