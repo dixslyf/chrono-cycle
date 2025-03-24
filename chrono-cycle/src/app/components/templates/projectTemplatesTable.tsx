@@ -12,7 +12,6 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
-import { DataTable } from "mantine-datatable";
 import { useCallback, useState } from "react";
 
 import { formatDate } from "@/app/utils/dates";
@@ -126,21 +125,7 @@ export function ProjectTemplatesTable(): React.ReactNode {
                     />
                 </Modal>
             </Modal.Stack>
-
-            {/* Table to show available project templates. */}
-            {/* <DataTable
-                highlightOnHover
-                withTableBorder
-                columns={columns}
-                records={records}
-                fetching={listPtsQuery.isPending}
-                minHeight={150}
-                noRecordsText="No project templates"
-                onRowClick={async ({ record: { id } }) => {
-                    modalStack.open("project-template-details");
-                    setClickedId(id);
-                }}
-            /> */}
+            {/* Project Template Table */}
             <ScrollArea>
                 <Table highlightOnHover>
                     <Table.Thead>
