@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@mantine/core";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { Trash } from "lucide-react";
@@ -19,43 +20,34 @@ export function DeleteProjectTemplateButton({
     onSuccess: () => void;
     disabled?: boolean;
 }): React.ReactNode {
-    const [deleteResult, deleteAction, deletePending] = useActionState(
-        deleteProjectTemplateAction,
-        null,
-    );
-
-    // Handle the deletion result.
-    useEffect(() => {
-        if (!deleteResult) {
-            return;
-        }
-
-        pipe(
-            deleteResult,
-            E.match(
-                (_err) =>
-                    notifyError({
-                        message: "Failed to delete project template.",
-                    }),
-                () => {
-                    notifySuccess({
-                        message: "Successfully deleted project template.",
-                    });
-                    onSuccess();
-                },
-            ),
-        );
-    }, [deleteResult, onSuccess]);
+    const queryClient = useQueryClient();
+    const deleteMutation = useMutation({
+        mutationFn: async (projectTemplateId: string) => {
+            await deleteProjectTemplateAction(null, { projectTemplateId });
+        },
+        onSuccess: () => {
+            notifySuccess({
+                message: "Successfully deleted project template.",
+            });
+            // Refresh the project template for project details.
+            queryClient.invalidateQueries({
+                queryKey: ["retrieve-project-template-of-project"],
+            });
+            onSuccess();
+        },
+        onError: () =>
+            notifyError({
+                message: "Failed to delete project template.",
+            }),
+    });
 
     return (
         <Button
             variant="filled"
             color="red"
-            disabled={deletePending || disabled}
-            loading={deletePending}
-            onClick={() =>
-                startTransition(() => deleteAction({ projectTemplateId }))
-            }
+            disabled={disabled}
+            loading={deleteMutation.isPending}
+            onClick={() => deleteMutation.mutate(projectTemplateId)}
         >
             <Trash className="mr-2" />
             Delete Template
