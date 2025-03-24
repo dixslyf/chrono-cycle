@@ -24,18 +24,17 @@ export function ImportProjectTemplateButton() {
 
         const reader = new FileReader();
         reader.onload = () => {
-            const json = JSON.parse(reader.result as string);
-            const parseResult = payloadSchema.safeParse(json);
-            if (!parseResult.success) {
+            try {
+                const json = JSON.parse(reader.result as string);
+                const importData = payloadSchema.parse(json);
+                setImportData(importData);
+                openModal();
+            } catch (_err) {
                 notifyError({ message: "Invalid project template file!" });
-                return;
             }
-            setImportData(parseResult.data);
-            openModal();
         };
 
-        reader.onerror = () =>
-            notifyError({ message: "Invalid project template file!" });
+        reader.onerror = () => notifyError({ message: "Failed to read file!" });
 
         reader.readAsText(newFile);
     }
