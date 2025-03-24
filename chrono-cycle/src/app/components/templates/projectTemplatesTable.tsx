@@ -1,10 +1,12 @@
 "use client";
 
 import {
+    Box,
     Center,
     Loader,
     Modal,
     ScrollArea,
+    Stack,
     Table,
     Text,
     useModalsStack,
@@ -126,39 +128,18 @@ export function ProjectTemplatesTable(): React.ReactNode {
                 </Modal>
             </Modal.Stack>
             {/* Project Template Table */}
-            <ScrollArea>
-                <Table highlightOnHover>
-                    <Table.Thead>
-                        <Table.Tr>
-                            {columns.map((column) => (
-                                <Table.Th key={column.accessor}>
-                                    {column.title}
-                                </Table.Th>
-                            ))}
-                        </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>
-                        {listPtsQuery.isPending ? (
-                            <Table.Tr>
-                                <Table.Td colSpan={columns.length}>
-                                    <Center>
-                                        <Loader size="sm" />
-                                    </Center>
-                                </Table.Td>
-                            </Table.Tr>
-                        ) : records.length === 0 ? (
-                            <Table.Tr>
-                                <Table.Td colSpan={columns.length}>
-                                    <Center>
-                                        <Text>No Project Template</Text>
-                                    </Center>
-                                </Table.Td>
-                            </Table.Tr>
-                        ) : (
-                            records.map((record) => (
-                                <Table.Tr
+            <ScrollArea className="h-[80%]">
+                <Stack className="py-2 px-4">
+                    {listPtsQuery.isPending ? (
+                        <Loader size="md" />
+                    ) : records.length === 0 ? (
+                        <Text className="text-lg">No Project Templates</Text>
+                    ) : (
+                        <Stack>
+                            {records.map((record) => (
+                                <Box
                                     key={record.id}
-                                    className="cursor-pointer"
+                                    className="cursor-pointer border border-gray-200 rounded-xl p-4 hover:bg-gray-200 transition-colors duration-200"
                                     onClick={() => {
                                         modalStack.open(
                                             "project-template-details",
@@ -166,18 +147,14 @@ export function ProjectTemplatesTable(): React.ReactNode {
                                         setClickedId(record.id);
                                     }}
                                 >
-                                    {columns.map((column) => (
-                                        <Table.Td
-                                            key={`${record.id}-${column.accessor}`}
-                                        >
-                                            {record[column.accessor]}
-                                        </Table.Td>
-                                    ))}
-                                </Table.Tr>
-                            ))
-                        )}
-                    </Table.Tbody>
-                </Table>
+                                    <Text className="text-xl font-semibold">
+                                        {record.name}
+                                    </Text>
+                                </Box>
+                            ))}
+                        </Stack>
+                    )}
+                </Stack>
             </ScrollArea>
         </>
     );
