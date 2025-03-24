@@ -17,7 +17,6 @@ import { Failure, Payload, payloadSchema, Result } from "./data";
 
 async function createProjectTemplateActionImpl(
     userSession: UserSession,
-    _prevState: Result | null,
     payload: Payload,
 ): Promise<E.Either<RestoreAssertionError<Failure>, ProjectTemplateOverview>> {
     const task = pipe(
@@ -30,7 +29,6 @@ async function createProjectTemplateActionImpl(
 }
 
 export const createProjectTemplateAction: (
-    _prevState: Result | null,
     payload: Payload,
 ) => Promise<Result> = wrapServerAction(
     "createProjectTemplate",

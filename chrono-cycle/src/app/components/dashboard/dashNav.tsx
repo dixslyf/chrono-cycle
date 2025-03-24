@@ -1,6 +1,8 @@
 "use client";
 
-import { ActionIcon, Button, Menu, Select, Text } from "@mantine/core";
+import { ActionIcon, Button, Menu, Modal, Select, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { useQuery } from "@tanstack/react-query";
 import {
     ArrowBigLeft,
     ArrowBigRight,
@@ -9,6 +11,10 @@ import {
     ChevronDown,
     ClipboardList,
 } from "lucide-react";
+
+import { CreateProjectForm } from "@/app/components/templates/createProjectForm";
+import { notifyError } from "@/app/utils/notifications";
+import { listProjectTemplatesOptions } from "@/app/utils/queries/listProjectTemplates";
 
 interface Month {
     value: string;
@@ -47,9 +53,44 @@ function DashNav({
     const handleSelectChange = (value: string | null) => {
         if (value) onSelectMonth(value);
     };
+    const [
+        createProjectModalOpened,
+        { open: openCreateProjectModal, close: closeCreateProjectModal },
+    ] = useDisclosure();
+
+    // Get the list of project templates.
+    const listPtsQuery = useQuery({
+        ...listProjectTemplatesOptions({
+            onError: close,
+        }),
+        enabled: false,
+    });
+
+    async function onClickCreateProject() {
+        openCreateProjectModal();
+        const result = await listPtsQuery.refetch();
+        if (result.data && result.data.length === 0) {
+            notifyError({
+                message: "No project templates to create a project from.",
+            });
+            closeCreateProjectModal();
+        }
+    }
 
     return (
         <>
+            <Modal
+                title="Create Project"
+                centered
+                opened={createProjectModalOpened}
+                onClose={closeCreateProjectModal}
+            >
+                <CreateProjectForm
+                    onSuccess={closeCreateProjectModal}
+                    projectTemplates={listPtsQuery.data}
+                    isPendingProjectTemplates={listPtsQuery.isPending}
+                />
+            </Modal>
             <nav className="flex h-12 border-b-2 border-gray-300">
                 {/* year arrows and month select */}
                 <div className="ml-4 flex items-center gap-2 w-1/3">
@@ -145,6 +186,7 @@ function DashNav({
                             <Menu.Item
                                 leftSection={<ClipboardList />}
                                 className="text-lg hover:bg-[#00000030] p-2"
+                                onClick={onClickCreateProject}
                             >
                                 Choose a template
                             </Menu.Item>

@@ -9,12 +9,9 @@ import { DataTable } from "mantine-datatable";
 import { useCallback, useState } from "react";
 
 import { formatDate } from "@/app/utils/dates";
+import { listProjectTemplatesOptions } from "@/app/utils/queries/listProjectTemplates";
 
-import {
-    ProjectOverview,
-    ProjectTemplate,
-    ProjectTemplateOverview,
-} from "@/common/data/domain";
+import { ProjectOverview, ProjectTemplate } from "@/common/data/domain";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 import { listProjectsAction } from "@/features/projects/list/action";
@@ -33,27 +30,26 @@ type ClickedData = {
     projects: ProjectOverview[];
 };
 
-export function ProjectTemplatesTable({
-    entries,
-}: {
-    entries: ProjectTemplateOverview[];
-}): React.ReactNode {
+export function ProjectTemplatesTable(): React.ReactNode {
+    const listPtsQuery = useQuery(listProjectTemplatesOptions());
+
     // Entries for the table.
-    const records = entries.map(
-        ({ id, name, description, createdAt, updatedAt }) => ({
-            id,
-            name,
-            description,
-            createdAt: formatDate(createdAt, { withTime: true }),
-            updatedAt: formatDate(updatedAt, { withTime: true }),
-        }),
-    );
+    const records = listPtsQuery.data
+        ? listPtsQuery.data.map(
+              ({ id, name, description, createdAt, updatedAt }) => ({
+                  id,
+                  name,
+                  description,
+                  createdAt: formatDate(createdAt),
+                  updatedAt: formatDate(updatedAt),
+              }),
+          )
+        : [];
 
     // For keeping track of modals.
     const modalStack = useModalsStack([
         "project-template-details",
         "add-event",
-        "create-project",
         "event-details",
     ]);
 
@@ -113,16 +109,12 @@ export function ProjectTemplatesTable({
                     {...modalStack.register("project-template-details")}
                 >
                     {/* Template details */}
-                    <>
-                        <ProjectTemplateDetails
-                            modalStack={modalStack}
-                            projectTemplate={
-                                retrieveQuery.data?.projectTemplate
-                            }
-                            onClose={closeModal}
-                            isLoading={retrieveQuery.isPending}
-                        />
-                    </>
+                    <ProjectTemplateDetails
+                        modalStack={modalStack}
+                        projectTemplate={retrieveQuery.data?.projectTemplate}
+                        onClose={closeModal}
+                        isLoading={retrieveQuery.isPending}
+                    />
                 </Modal>
             </Modal.Stack>
 
@@ -132,6 +124,7 @@ export function ProjectTemplatesTable({
                 withTableBorder
                 columns={columns}
                 records={records}
+                fetching={listPtsQuery.isPending}
                 minHeight={150}
                 noRecordsText="No project templates"
                 onRowClick={async ({ record: { id } }) => {

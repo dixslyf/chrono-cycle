@@ -7,13 +7,10 @@ import { listAllProjectsAction } from "@/features/projects/listAll/action";
 
 describe("List All Project server action", () => {
     it("should list all project successfully", async () => {
-        const createProjectTemplateResult = await createProjectTemplateAction(
-            null,
-            {
-                name: "New Project Name",
-                description: "Description of a new project",
-            },
-        );
+        const createProjectTemplateResult = await createProjectTemplateAction({
+            name: "New Project Name",
+            description: "Description of a new project",
+        });
         if (E.isLeft(createProjectTemplateResult)) {
             throw new Error(
                 "Create project template action is not implemented correctly!",
