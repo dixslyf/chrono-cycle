@@ -84,12 +84,18 @@ export function CreateProjectTemplateButton() {
                 opened={createOpened}
                 onClose={closeCreate}
                 centered
-                size="100%"
+                size="50%"
                 padding={0}
                 withCloseButton={false}
                 radius="xl"
+                styles={{
+                    content: { height: "80%" },
+                }}
             >
-                <CreateProjectTemplateForm onSuccess={closeCreate} />
+                <CreateProjectTemplateForm
+                    onSuccess={closeCreate}
+                    onClose={closeCreate}
+                />
             </Modal>
             <Modal
                 opened={importOpened}
