@@ -5,7 +5,7 @@ import * as TE from "fp-ts/TaskEither";
 import { AssertionError, DoesNotExistError } from "@/common/errors";
 
 import { DbLike } from "@/db";
-import { listEventTemplates } from "@/db/queries/event-templates/list";
+import { listExpandedEventTemplates } from "@/db/queries/event-templates/list";
 import {
     DbExpandedProjectTemplate,
     projectTemplates as projectTemplatesTable,
@@ -49,7 +49,7 @@ export function retrieveExpandedProjectTemplate(
             return TE.right(selected[0]);
         }),
         TE.bind("events", () =>
-            listEventTemplates(db, userId, projectTemplateId),
+            listExpandedEventTemplates(db, userId, projectTemplateId),
         ),
     );
 }

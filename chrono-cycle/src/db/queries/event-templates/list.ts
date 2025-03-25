@@ -171,7 +171,7 @@ function processFatEventTemplates(
     return Object.values(etMap);
 }
 
-export function listEventTemplates(
+export function listExpandedEventTemplates(
     db: DbLike,
     userId: number,
     projectTemplateId: number,
