@@ -52,10 +52,11 @@ export function DeleteEventTemplateButton({
     return (
         <Button
             variant="filled"
-            color="red"
+            // color="red"
             disabled={deleteMutation.isPending || disabled}
             loading={deleteMutation.isPending}
             onClick={() => deleteMutation.mutate(eventTemplateId)}
+            className="bg-red-500 hover:bg-red-600 transition-colors duration-200 ease-in"
         >
             <Trash className="mr-2" />
             Delete

@@ -117,6 +117,7 @@ export function ProjectTemplatesTable(): React.ReactNode {
                     withCloseButton={false}
                     padding={0}
                     {...modalStack.register("project-template-details")}
+                    // className="h-min-screen"
                 >
                     {/* Template details */}
                     <ProjectTemplateDetails

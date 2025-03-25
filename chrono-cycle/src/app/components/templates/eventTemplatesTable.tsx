@@ -131,7 +131,7 @@ export function EventTemplatesTable<T extends string>({
     projectTemplateId,
     modalStack,
     eventTemplates,
-    rowsPerPage = 10,
+    rowsPerPage = 7,
 }: EventsTableProps<T>): React.ReactNode {
     const { close: modalStackClose } = modalStack;
     const closeEventDetailsModal = useCallback(
@@ -148,7 +148,7 @@ export function EventTemplatesTable<T extends string>({
             {/* Modal to display event details */}
             <Modal
                 centered
-                size="80%"
+                size="100%"
                 radius="xl"
                 withCloseButton={false}
                 padding={0}

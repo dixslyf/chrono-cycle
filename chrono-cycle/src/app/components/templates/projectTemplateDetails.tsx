@@ -77,25 +77,25 @@ export function ProjectTemplateDetails<T extends string>({
                 className="py-8 px-4 w-1/3 items-stretch bg-palette1"
                 justify="space-between"
             >
-                <Box>
-                    <Stack>
-                        <Group justify="flex-end">
-                            <X
-                                className="text-palette3 hover:text-gray-400 cursor-pointer w-8 h-8"
-                                onClick={onClose}
-                            />
-                        </Group>
+                <Box className="h-full">
+                    <Stack className="gap-10">
                         <Skeleton
                             visible={isLoading}
                             className={brownSkeletonClasses.root}
                         >
-                            <Group>
-                                <Text className="font-semibold text-xl text-palette3">
-                                    Project Template ID
-                                </Text>
-                                <Badge className="bg-stone-500 bg-opacity-50 text-gray-300">
-                                    {projectTemplate?.id}
-                                </Badge>
+                            <Group justify="space-between">
+                                <Group>
+                                    <Text className="font-semibold text-xl text-palette3">
+                                        Project Template ID
+                                    </Text>
+                                    <Badge className="bg-stone-500 bg-opacity-50 text-gray-300">
+                                        {projectTemplate?.id}
+                                    </Badge>
+                                </Group>
+                                <X
+                                    className="text-palette3 hover:text-gray-400 cursor-pointer w-8 h-8"
+                                    onClick={onClose}
+                                />
                             </Group>
                         </Skeleton>
                         <Skeleton
