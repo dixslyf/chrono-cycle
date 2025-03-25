@@ -6,6 +6,7 @@ import {
     Select,
     Skeleton,
     Stack,
+    Text,
     Textarea,
     TextInput,
 } from "@mantine/core";
@@ -13,6 +14,7 @@ import { useForm } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
+import { X } from "lucide-react";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { match } from "ts-pattern";
 
@@ -42,10 +44,12 @@ export function DuplicateProjectTemplateForm({
     onSuccess,
     projectTemplates,
     isPendingProjectTemplates,
+    onClose,
 }: {
     onSuccess: () => void;
     projectTemplates?: ProjectTemplateOverview[];
     isPendingProjectTemplates?: boolean;
+    onClose: () => void;
 }): React.ReactNode {
     const form = useForm({
         mode: "uncontrolled",
@@ -88,62 +92,78 @@ export function DuplicateProjectTemplateForm({
     });
 
     return (
-        <form
-            onSubmit={form.onSubmit((values) =>
-                duplicateMutation.mutate(values),
-            )}
-        >
+        <Stack className="p-6 w-full" justify="center">
             <Stack>
-                <Skeleton visible={isPendingProjectTemplates}>
-                    <Select
-                        label="Project Template"
-                        required
-                        description="The project template to duplicate"
-                        error="Invalid project template"
-                        placeholder="Project template"
-                        searchable
-                        disabled={duplicateMutation.isPending}
-                        data={projectTemplates?.map((pts) => ({
-                            label: `${pts.name} (${pts.id})`,
-                            value: pts.id,
-                        }))}
-                        {...form.getInputProps("projectTemplateId")}
+                <Group justify="space-between">
+                    <Text className="text-3xl font-bold">
+                        Duplicate Project Template
+                    </Text>
+                    <X
+                        className="text-palette5 hover:text-gray-500 cursor-pointer w-8 h-8"
+                        onClick={onClose}
                     />
-                </Skeleton>
-                <Skeleton visible={isPendingProjectTemplates}>
-                    <TextInput
-                        name="name"
-                        label="Name"
-                        required
-                        description="Name of the new project template"
-                        error="Invalid project template name"
-                        placeholder="Project template name"
-                        disabled={duplicateMutation.isPending}
-                        {...form.getInputProps("name")}
-                    />
-                </Skeleton>
-                <Skeleton visible={isPendingProjectTemplates}>
-                    <Textarea
-                        name="description"
-                        label="Description"
-                        required
-                        description="A description of the new project template"
-                        error="Invalid description"
-                        placeholder="Add description"
-                        disabled={duplicateMutation.isPending}
-                        {...form.getInputProps("description")}
-                    />
-                </Skeleton>
-                <Group justify="flex-end">
-                    <Button
-                        type="submit"
-                        disabled={isPendingProjectTemplates}
-                        loading={duplicateMutation.isPending}
-                    >
-                        Duplicate
-                    </Button>
                 </Group>
+                <form
+                    onSubmit={form.onSubmit((values) =>
+                        duplicateMutation.mutate(values),
+                    )}
+                    className="py-10"
+                >
+                    <Stack gap="xl" mt="md">
+                        <Skeleton visible={isPendingProjectTemplates}>
+                            <Select
+                                size="lg"
+                                label="Project Template"
+                                required
+                                description="The project template to duplicate"
+                                error="Invalid project template"
+                                searchable
+                                disabled={duplicateMutation.isPending}
+                                data={projectTemplates?.map((pts) => ({
+                                    label: `${pts.name} (${pts.id})`,
+                                    value: pts.id,
+                                }))}
+                                {...form.getInputProps("projectTemplateId")}
+                            />
+                        </Skeleton>
+                        <Skeleton visible={isPendingProjectTemplates}>
+                            <TextInput
+                                size="lg"
+                                name="name"
+                                label="Name"
+                                required
+                                description="Name of the new project template"
+                                error="Invalid project template name"
+                                placeholder="Project template name"
+                                disabled={duplicateMutation.isPending}
+                                {...form.getInputProps("name")}
+                            />
+                        </Skeleton>
+                        <Skeleton visible={isPendingProjectTemplates}>
+                            <Textarea
+                                size="lg"
+                                name="description"
+                                label="Description"
+                                required
+                                description="A description of a new project template"
+                                error="Invalid description"
+                                placeholder="Add description"
+                                disabled={duplicateMutation.isPending}
+                                {...form.getInputProps("description")}
+                            />
+                        </Skeleton>
+                        <Group justify="flex-end">
+                            <Button
+                                type="submit"
+                                disabled={isPendingProjectTemplates}
+                                loading={duplicateMutation.isPending}
+                            >
+                                Duplicate
+                            </Button>
+                        </Group>
+                    </Stack>
+                </form>
             </Stack>
-        </form>
+        </Stack>
     );
 }

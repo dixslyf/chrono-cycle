@@ -48,6 +48,7 @@ export function DeleteProjectTemplateButton({
             disabled={disabled}
             loading={deleteMutation.isPending}
             onClick={() => deleteMutation.mutate(projectTemplateId)}
+            className="bg-red-500 hover:bg-red-600 transition-colors duration-200 ease-in"
         >
             <Trash className="mr-2" />
             Delete Template

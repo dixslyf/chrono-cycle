@@ -111,13 +111,20 @@ export function CreateProjectTemplateButton() {
             <Modal
                 opened={duplicateOpened}
                 onClose={closeDuplicate}
-                title="Duplicate Project Template"
+                size="50%"
+                padding={0}
+                withCloseButton={false}
+                radius="xl"
                 centered
+                styles={{
+                    content: { height: "95%" },
+                }}
             >
                 <DuplicateProjectTemplateForm
                     projectTemplates={listPtsQuery.data}
                     isPendingProjectTemplates={listPtsQuery.isPending}
                     onSuccess={closeDuplicate}
+                    onClose={closeDuplicate}
                 />
             </Modal>
             {/* Based on: https://ui.mantine.dev/category/buttons/#split-button */}
