@@ -55,7 +55,7 @@ function InnerEventTemplatesTable<T extends string>({
 
     return (
         <>
-            <Table highlightOnHover>
+            <Table>
                 <Table.Thead>
                     <Table.Tr>
                         <Table.Th className="font-semibold">Name</Table.Th>
@@ -71,7 +71,7 @@ function InnerEventTemplatesTable<T extends string>({
                         <Table.Tr
                             key={eventTemplate.id}
                             onClick={() => handleRowClick(eventTemplate)}
-                            className="cursor-pointer"
+                            className="cursor-pointer hover:bg-gray-200"
                         >
                             <Table.Td className="w-2/5">
                                 {eventTemplate.name}
