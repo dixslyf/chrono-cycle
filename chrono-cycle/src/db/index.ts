@@ -23,10 +23,18 @@ export type DbTransaction =
       >;
 export type DbLike = Db | DbTransaction;
 
-async function devDb(): Promise<PgliteDatabase> {
-    console.log("Using development database");
+async function dbNodePg(connectionString: string): Promise<NodePgDatabase> {
+    const { drizzle } = await import("drizzle-orm/node-postgres");
+    const { Pool } = await import("pg");
 
-    // Use file-based postgres database using pglite.
+    return drizzle(
+        new Pool({
+            connectionString,
+        }),
+    );
+}
+
+async function dbPglite(): Promise<PgliteDatabase> {
     const { PGlite } = await import("@electric-sql/pglite");
     const { drizzle } = await import("drizzle-orm/pglite");
     const { DB_PATH } = await import("@root/drizzle/config.dev");
@@ -35,6 +43,17 @@ async function devDb(): Promise<PgliteDatabase> {
     const db = drizzle({ client });
 
     return db;
+}
+
+async function devDb(): Promise<NodePgDatabase | PgliteDatabase> {
+    if (process.env.DEV_DATABASE_URL) {
+        console.log("Using NodePg development database");
+        return dbNodePg(process.env.DEV_DATABASE_URL);
+    }
+
+    // Fall back to PGlite database.
+    console.log("Using PGLite development database");
+    return dbPglite();
 }
 
 async function prodDb(): Promise<NodePgDatabase> {
@@ -46,26 +65,7 @@ async function prodDb(): Promise<NodePgDatabase> {
         );
     }
 
-    // Use real database.
-    const { drizzle } = await import("drizzle-orm/node-postgres");
-    const { Pool } = await import("pg");
-
-    const db = drizzle(
-        new Pool({
-            connectionString: process.env.DATABASE_URL,
-        }),
-    );
-
-    // Dummy statement to test the connection and send an exception early if fail.
-    try {
-        await db.execute(sql`SELECT 1`);
-    } catch {
-        throw new Error(
-            "Failed to determine database URL in production environment!",
-        );
-    }
-
-    return db;
+    return dbNodePg(process.env.DATABASE_URL);
 }
 
 async function initDb(): Promise<NodePgDatabase | PgliteDatabase> {
