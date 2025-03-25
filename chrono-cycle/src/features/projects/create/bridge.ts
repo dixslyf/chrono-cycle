@@ -9,12 +9,14 @@ import {
     DuplicateNameError,
     InternalError,
     MalformedTimeStringError,
+    NoEventTemplatesError,
 } from "@/common/errors";
 
 import { decodeProjectTemplateId } from "@/lib/identifiers";
 import { scheduleRemindersForProject } from "@/lib/reminders";
 
 import { getDb } from "@/db";
+import { listEventTemplates } from "@/db/queries/event-templates/list";
 import { createProject } from "@/db/queries/projects/create";
 import { updateReminder } from "@/db/queries/reminders/update";
 import { wrapWithTransaction } from "@/db/queries/utils/transaction";
@@ -29,21 +31,30 @@ export function bridge(
     | AssertionError
     | DoesNotExistError
     | MalformedTimeStringError
+    | NoEventTemplatesError
     | InternalError,
     Project
 > {
+    const projectTemplateId = decodeProjectTemplateId(
+        payloadP.projectTemplateId,
+    );
     return pipe(
         TE.fromTask(getDb),
         TE.chain((db) =>
             wrapWithTransaction(db, (tx) =>
                 pipe(
-                    TE.Do,
-                    TE.bind("dbProj", () => {
-                        const { projectTemplateId, ...rest } = payloadP;
+                    listEventTemplates(tx, userId, projectTemplateId),
+                    TE.mapError((err) =>
+                        err._errorKind === "DoesNotExistError"
+                            ? NoEventTemplatesError()
+                            : err,
+                    ),
+                    TE.chainW(() => TE.Do),
+                    TE.bindW("dbProj", () => {
+                        const { projectTemplateId: _, ...rest } = payloadP;
                         return createProject(tx, {
                             userId,
-                            projectTemplateId:
-                                decodeProjectTemplateId(projectTemplateId),
+                            projectTemplateId,
                             ...rest,
                         });
                     }),
