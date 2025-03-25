@@ -140,6 +140,7 @@ function DisplayEventDetails({ event }: DisplayEventDetailsProps) {
                     <Stack gap="xs">
                         <Text fw={500}>Status</Text>
                         <Badge
+                            tt="uppercase"
                             color={
                                 event.status === "completed"
                                     ? "green"
@@ -150,8 +151,7 @@ function DisplayEventDetails({ event }: DisplayEventDetailsProps) {
                                         : "gray"
                             }
                         >
-                            {event.status.charAt(0).toUpperCase() +
-                                event.status.slice(1)}
+                            {event.status}
                         </Badge>
                     </Stack>
 
