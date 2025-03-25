@@ -61,7 +61,7 @@ function DashNav({
     // Get the list of project templates.
     const listPtsQuery = useQuery({
         ...listProjectTemplatesOptions({
-            onError: close,
+            onError: closeCreateProjectModal,
         }),
         enabled: false,
     });
