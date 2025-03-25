@@ -1,6 +1,7 @@
 "use client";
 
 import {
+    Badge,
     createTheme,
     DEFAULT_THEME,
     MantineProvider,
@@ -50,6 +51,13 @@ const themeOverride = createTheme({
     black: "#0a0908",
     primaryShade: { light: 7, dark: 8 },
     primaryColor: "brown",
+    components: {
+        Badge: Badge.extend({
+            defaultProps: {
+                tt: "none",
+            },
+        }),
+    },
 });
 
 const theme = mergeMantineTheme(DEFAULT_THEME, themeOverride);
