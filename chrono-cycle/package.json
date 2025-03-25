@@ -35,7 +35,7 @@
     "lucide-react": "^0.475.0",
     "mantine-datatable": "^7.15.1",
     "mantine-form-zod-resolver": "^1.1.0",
-    "next": "15.1.5",
+    "next": "^15.2.4",
     "next-themes": "^0.4.4",
     "nodemailer": "^6.10.0",
     "nodemailer-postmark-transport": "^6.0.1",
