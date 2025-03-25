@@ -27,14 +27,17 @@ export function CreateEventTemplateButton<T extends string>({
     return (
         <>
             <Modal
-                title="Add Event"
-                size="xl"
+                size="100%"
+                radius="xl"
+                withCloseButton={false}
+                padding={0}
                 centered
                 {...modalStack.register("add-event")}
             >
                 <CreateEventTemplateForm
                     projectTemplateId={projectTemplateId}
                     onSuccess={closeModal}
+                    onClose={closeModal}
                 />
             </Modal>
             <Button
