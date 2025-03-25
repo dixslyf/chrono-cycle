@@ -44,6 +44,11 @@ function getCreateErrorMessage(error: Failure) {
             () => "One or more reminder templates have a malformed time.",
         )
         .with(
+            { _errorKind: "NoEventTemplatesError" },
+            () =>
+                "The selected project template does not have any events. Please add some events and try again.",
+        )
+        .with(
             { _errorKind: "InternalError" },
             () => "An internal error occurred",
         )
