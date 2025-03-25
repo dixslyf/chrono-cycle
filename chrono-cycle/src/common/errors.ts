@@ -133,3 +133,11 @@ export type InvalidEventStatusError = {
 export function InvalidEventStatusError(): InvalidEventStatusError {
     return { _errorKind: "InvalidEventStatusError" };
 }
+
+export type NoEventTemplatesError = {
+    _errorKind: "NoEventTemplatesError";
+};
+
+export function NoEventTemplatesError(): NoEventTemplatesError {
+    return { _errorKind: "NoEventTemplatesError" };
+}
