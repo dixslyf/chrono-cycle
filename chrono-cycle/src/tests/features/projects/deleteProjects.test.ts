@@ -1,10 +1,10 @@
+import { createInstantiableProjectTemplate } from "@/tests/utils";
 import * as E from "fp-ts/Either";
 import { revalidatePath } from "next/cache";
 import { describe, expect, it } from "vitest";
 
 import { DoesNotExistError, ValidationError } from "@/common/errors";
 
-import { createProjectTemplateAction } from "@/features/project-templates/create/action";
 import { createProjectAction } from "@/features/projects/create/action";
 import { deleteProjectAction } from "@/features/projects/delete/action";
 
@@ -41,22 +41,13 @@ describe("Delete Project server action", () => {
     });
 
     it("should delete a project successfully", async () => {
-        const createProjectTemplateResult = await createProjectTemplateAction({
-            name: "New Project Name",
-            description: "Description of a new project",
-        });
-        if (E.isLeft(createProjectTemplateResult)) {
-            throw new Error(
-                "Create project template action is not implemented correctly!",
-            );
-        }
-        const projectTemplate = createProjectTemplateResult.right;
-        const projectTemplateIdFormTest = projectTemplate.id;
+        const projectTemplate = await createInstantiableProjectTemplate();
+
         const result = await createProjectAction({
             name: "New Project Name",
             description: "Description of a new project",
             startsAt: "2024-01-01",
-            projectTemplateId: projectTemplateIdFormTest,
+            projectTemplateId: projectTemplate.id,
         });
         if (E.isLeft(result)) {
             throw new Error(

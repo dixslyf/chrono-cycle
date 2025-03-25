@@ -1,3 +1,4 @@
+import { createInstantiableProjectTemplate } from "@/tests/utils";
 import * as E from "fp-ts/Either";
 import { revalidatePath } from "next/cache";
 import { describe, expect, it } from "vitest";
@@ -44,22 +45,12 @@ describe("Update Project server action", () => {
     });
 
     it("should return validation error if project name is empty", async () => {
-        const createProjectTemplateResult = await createProjectTemplateAction({
-            name: "New Project Name",
-            description: "Description of a new project",
-        });
-        if (E.isLeft(createProjectTemplateResult)) {
-            throw new Error(
-                "Create project template action is not implemented correctly!",
-            );
-        }
-        const projectTemplate = createProjectTemplateResult.right;
-        const projectTemplateIdFormTest = projectTemplate.id;
+        const projectTemplate = await createInstantiableProjectTemplate();
         const createProjectResult = await createProjectAction({
             name: "Test Project",
             description: "Test Description",
             startsAt: "2024-01-01",
-            projectTemplateId: projectTemplateIdFormTest,
+            projectTemplateId: projectTemplate.id,
         });
         if (E.isLeft(createProjectResult)) {
             throw new Error(
@@ -82,22 +73,12 @@ describe("Update Project server action", () => {
     });
 
     it("should return validation error if project description is empty", async () => {
-        const createProjectTemplateResult = await createProjectTemplateAction({
-            name: "New Project Name",
-            description: "Description of a new project",
-        });
-        if (E.isLeft(createProjectTemplateResult)) {
-            throw new Error(
-                "Create project template action is not implemented correctly!",
-            );
-        }
-        const projectTemplate = createProjectTemplateResult.right;
-        const projectTemplateIdFormTest = projectTemplate.id;
+        const projectTemplate = await createInstantiableProjectTemplate();
         const createProjectResult = await createProjectAction({
             name: "Test Project",
             description: "Test Description",
             startsAt: "2024-01-01",
-            projectTemplateId: projectTemplateIdFormTest,
+            projectTemplateId: projectTemplate.id,
         });
         if (E.isLeft(createProjectResult)) {
             throw new Error(
@@ -120,22 +101,12 @@ describe("Update Project server action", () => {
     });
 
     it("should return DuplicateNameError if project name already exists", async () => {
-        const result = await createProjectTemplateAction({
-            name: "New Project Name",
-            description: "Description of a new project",
-        });
-        if (E.isLeft(result)) {
-            throw new Error(
-                "Create project template action is not implemented correctly!",
-            );
-        }
-        const projectTemplate = result.right;
-        const projectTemplateIdFormTest = projectTemplate.id;
+        const projectTemplate = await createInstantiableProjectTemplate();
         const createProjectResult = await createProjectAction({
             name: "New Project Name",
             description: "Test Description",
             startsAt: "2024-01-01",
-            projectTemplateId: projectTemplateIdFormTest,
+            projectTemplateId: projectTemplate.id,
         });
         if (E.isLeft(createProjectResult)) {
             throw new Error(
@@ -162,22 +133,12 @@ describe("Update Project server action", () => {
     });
 
     it("should update a project template successfully", async () => {
-        const createProjectTemplateResult = await createProjectTemplateAction({
-            name: "New Project Name",
-            description: "Description of a new project",
-        });
-        if (E.isLeft(createProjectTemplateResult)) {
-            throw new Error(
-                "Create project template action is not implemented correctly!",
-            );
-        }
-        const projectTemplate = createProjectTemplateResult.right;
-        const projectTemplateIdFormTest = projectTemplate.id;
+        const projectTemplate = await createInstantiableProjectTemplate();
         const createProjectResult = await createProjectAction({
             name: "Test Project",
             description: "Test Description",
             startsAt: "2024-01-01",
-            projectTemplateId: projectTemplateIdFormTest,
+            projectTemplateId: projectTemplate.id,
         });
         if (E.isLeft(createProjectResult)) {
             throw new Error(

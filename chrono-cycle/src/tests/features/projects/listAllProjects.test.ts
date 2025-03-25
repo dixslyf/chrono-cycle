@@ -1,3 +1,4 @@
+import { createInstantiableProjectTemplate } from "@/tests/utils";
 import * as E from "fp-ts/Either";
 import { describe, expect, it } from "vitest";
 
@@ -7,22 +8,12 @@ import { listAllProjectsAction } from "@/features/projects/listAll/action";
 
 describe("List All Project server action", () => {
     it("should list all project successfully", async () => {
-        const createProjectTemplateResult = await createProjectTemplateAction({
-            name: "New Project Name",
-            description: "Description of a new project",
-        });
-        if (E.isLeft(createProjectTemplateResult)) {
-            throw new Error(
-                "Create project template action is not implemented correctly!",
-            );
-        }
-        const projectTemplate = createProjectTemplateResult.right;
-        const projectTemplateIdFormTest = projectTemplate.id;
+        const projectTemplate = await createInstantiableProjectTemplate();
         const result = await createProjectAction({
             name: "New Project Name",
             description: "Description of a new project",
             startsAt: "2024-01-01",
-            projectTemplateId: projectTemplateIdFormTest,
+            projectTemplateId: projectTemplate.id,
         });
         if (E.isLeft(result)) {
             throw new Error(
@@ -33,7 +24,7 @@ describe("List All Project server action", () => {
             name: "New Project",
             description: "Description of a new project",
             startsAt: "2024-02-01",
-            projectTemplateId: projectTemplateIdFormTest,
+            projectTemplateId: projectTemplate.id,
         });
         if (E.isLeft(duuplicaterResult)) {
             throw new Error(
