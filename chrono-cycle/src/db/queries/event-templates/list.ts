@@ -1,4 +1,4 @@
-import { eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 import { pipe } from "fp-ts/function";
 import * as NEA from "fp-ts/NonEmptyArray";
 import * as R from "fp-ts/Record";
@@ -12,6 +12,7 @@ import {
     DbReminderTemplate,
     DbTag,
     eventTemplateTags,
+    projectTemplates,
     reminderTemplates,
     tags,
 } from "@/db/schema";
@@ -182,5 +183,36 @@ export function listExpandedEventTemplates(
     return pipe(
         retrieveFatEventTemplates(db, userId, projectTemplateId),
         TE.map((rows) => processFatEventTemplates(rows)),
+    );
+}
+
+export function listEventTemplates(
+    db: DbLike,
+    userId: number,
+    projectTemplateId: number,
+): TE.TaskEither<DoesNotExistError, DbEventTemplate[]> {
+    return pipe(
+        TE.fromTask(() =>
+            db
+                .select(getTableColumns(eventTemplates))
+                .from(eventTemplates)
+                .innerJoin(
+                    projectTemplates,
+                    eq(projectTemplates.id, eventTemplates.projectTemplateId),
+                )
+                .where(
+                    and(
+                        eq(projectTemplates.userId, userId),
+                        eq(projectTemplates.id, projectTemplateId),
+                    ),
+                ),
+        ),
+        TE.chain((selected) => {
+            if (selected.length <= 0) {
+                return TE.left(DoesNotExistError());
+            }
+
+            return TE.right(selected);
+        }),
     );
 }
