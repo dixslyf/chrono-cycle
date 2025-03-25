@@ -17,6 +17,7 @@ import { decodeEventId, decodeReminderId } from "@/lib/identifiers";
 import { getDb } from "@/db";
 import { retrieveExpandedEvent } from "@/db/queries/events/retrieveExpanded";
 import { retrieveUserOwner } from "@/db/queries/reminders/retrieveUserOwner";
+import { updateReminder } from "@/db/queries/reminders/update";
 
 export type EmailReminderPayload = {
     reminderId: string;
@@ -74,6 +75,15 @@ export const emailReminderTask = task({
                         }),
                     (err) => err,
                 ),
+            ),
+
+            // Once the email has been sent, remove the trigger run ID
+            // from the reminder database entry.
+            TE.tap(({ db }) =>
+                updateReminder(db, {
+                    id: reminderId,
+                    triggerRunId: null,
+                }),
             ),
 
             // Return value for Trigger.dev.
