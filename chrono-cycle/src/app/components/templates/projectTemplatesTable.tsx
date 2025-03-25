@@ -2,7 +2,6 @@
 
 import { Modal, useModalsStack } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
-import { sequenceT } from "fp-ts/Apply";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { DataTable } from "mantine-datatable";
@@ -11,10 +10,9 @@ import { useCallback, useState } from "react";
 import { formatDate } from "@/app/utils/dates";
 import { listProjectTemplatesOptions } from "@/app/utils/queries/listProjectTemplates";
 
-import { ProjectOverview, ProjectTemplate } from "@/common/data/domain";
+import { ProjectTemplate } from "@/common/data/domain";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
-import { listProjectsAction } from "@/features/projects/list/action";
 
 import { ProjectTemplateDetails } from "./projectTemplateDetails";
 
@@ -24,11 +22,6 @@ const columns = [
     { accessor: "createdAt", title: "Created at" },
     { accessor: "updatedAt", title: "Updated at" },
 ];
-
-type ClickedData = {
-    projectTemplate: ProjectTemplate;
-    projects: ProjectOverview[];
-};
 
 export function ProjectTemplatesTable(): React.ReactNode {
     const listPtsQuery = useQuery(listProjectTemplatesOptions());
@@ -64,29 +57,22 @@ export function ProjectTemplatesTable(): React.ReactNode {
 
     // Query for retrieving project template data.
     const retrieveQuery = useQuery({
-        queryKey: ["retrieve-project-template-data", clickedId],
-        queryFn: async (): Promise<ClickedData> => {
+        queryKey: ["retrieve-project-template", clickedId],
+        queryFn: async (): Promise<ProjectTemplate> => {
             // Safety: This query is only called when clicked ID is set.
             const projectTemplateId = clickedId as string;
 
-            // Retrieve the template data and its projects.
-            const [ptResult, projectsResult] = await Promise.all([
-                retrieveProjectTemplateAction({ projectTemplateId }),
-                listProjectsAction({ projectTemplateId }),
-            ]);
+            // Retrieve the project template data.
+            const result = await retrieveProjectTemplateAction({
+                projectTemplateId,
+            });
 
             return pipe(
-                sequenceT(E.Apply)(ptResult, projectsResult),
-                E.match(
-                    (err) => {
-                        // To trigger error notification from Tanstack query.
-                        throw err;
-                    },
-                    ([projectTemplate, projects]) => ({
-                        projectTemplate,
-                        projects,
-                    }),
-                ),
+                result,
+                E.getOrElseW((err) => {
+                    // To trigger error notification from Tanstack query.
+                    throw err;
+                }),
             );
         },
         enabled: Boolean(clickedId),
@@ -111,7 +97,7 @@ export function ProjectTemplatesTable(): React.ReactNode {
                     {/* Template details */}
                     <ProjectTemplateDetails
                         modalStack={modalStack}
-                        projectTemplate={retrieveQuery.data?.projectTemplate}
+                        projectTemplate={retrieveQuery.data}
                         onClose={closeModal}
                         isLoading={retrieveQuery.isPending}
                     />

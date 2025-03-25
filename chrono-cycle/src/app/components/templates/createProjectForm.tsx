@@ -111,7 +111,7 @@ export function CreateProjectForm({
         onSuccess: () => {
             // Re-fetch the project template data so that the projects table is updated.
             queryClient.invalidateQueries({
-                queryKey: ["retrieve-project-template-data"],
+                queryKey: ["retrieve-project-template"],
             });
 
             // Also re-fetch the projects data for the dashboard.
