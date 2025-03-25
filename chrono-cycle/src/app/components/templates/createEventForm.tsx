@@ -71,7 +71,7 @@ export function CreateEventTemplateForm({
         onSuccess: () => {
             // Call `onSuccess` whenever creation is successful + show notifications.
             queryClient.invalidateQueries({
-                queryKey: ["retrieve-project-template-data"],
+                queryKey: ["retrieve-project-template"],
             });
             notifySuccess({
                 message: "Successfully created event.",

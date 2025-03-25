@@ -43,7 +43,7 @@ export function DeleteEventTemplateButton({
                 message: "Successfully deleted event template.",
             });
             queryClient.invalidateQueries({
-                queryKey: ["retrieve-project-template-data"],
+                queryKey: ["retrieve-project-template"],
             });
             onSuccess();
         },
