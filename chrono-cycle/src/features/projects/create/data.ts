@@ -7,6 +7,7 @@ import {
     DuplicateNameError,
     InternalError,
     MalformedTimeStringError,
+    NoEventTemplatesError,
     ValidationError,
 } from "@/common/errors";
 
@@ -29,6 +30,7 @@ export type Failure =
     | DuplicateNameError
     | DoesNotExistError
     | MalformedTimeStringError
+    | NoEventTemplatesError
     | InternalError;
 
 export type Result = E.Either<Failure, Project>;

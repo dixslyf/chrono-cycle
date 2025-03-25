@@ -7,7 +7,7 @@ import { AssertionError, DoesNotExistError } from "@/common/errors";
 import { decodeProjectTemplateId } from "@/lib/identifiers";
 
 import { getDb } from "@/db";
-import { listEventTemplates } from "@/db/queries/event-templates/list";
+import { listExpandedEventTemplates } from "@/db/queries/event-templates/list";
 
 import { ParsedPayload } from "./data";
 
@@ -18,7 +18,7 @@ export function bridge(
     return pipe(
         TE.fromTask(getDb),
         TE.chain((db) =>
-            listEventTemplates(
+            listExpandedEventTemplates(
                 db,
                 userId,
                 decodeProjectTemplateId(payloadP.projectTemplateId),

@@ -15,7 +15,7 @@ import {
 import { extractTimeStringComponents } from "@/lib/reminders";
 
 import { DbLike } from "@/db";
-import { listEventTemplates } from "@/db/queries/event-templates/list";
+import { listExpandedEventTemplates } from "@/db/queries/event-templates/list";
 import { wrapWithTransaction } from "@/db/queries/utils/transaction";
 import {
     DbEventInsert,
@@ -248,7 +248,7 @@ export function createProject(
             toInsert.projectTemplateId
                 ? // Creating with a template.
                   pipe(
-                      listEventTemplates(
+                      listExpandedEventTemplates(
                           db,
                           toInsert.userId,
                           toInsert.projectTemplateId,

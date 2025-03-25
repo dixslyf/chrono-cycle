@@ -1,3 +1,4 @@
+import { createInstantiableProjectTemplate } from "@/tests/utils";
 import * as E from "fp-ts/Either";
 import { describe, expect, it } from "vitest";
 
@@ -40,22 +41,12 @@ describe("Retrieve Project server action", () => {
     });
 
     it("should retrieve a project successfully", async () => {
-        const createProjectTemplateResult = await createProjectTemplateAction({
-            name: "New Project Name",
-            description: "Description of a new project",
-        });
-        if (E.isLeft(createProjectTemplateResult)) {
-            throw new Error(
-                "Create project template action is not implemented correctly!",
-            );
-        }
-        const projectTemplate = createProjectTemplateResult.right;
-        const projectTemplateIdFormTest = projectTemplate.id;
+        const projectTemplate = await createInstantiableProjectTemplate();
         const createProjectResult = await createProjectAction({
             name: "Test Project",
             description: "Test Description",
             startsAt: "2024-01-01",
-            projectTemplateId: projectTemplateIdFormTest,
+            projectTemplateId: projectTemplate.id,
         });
         if (E.isLeft(createProjectResult)) {
             throw new Error(
