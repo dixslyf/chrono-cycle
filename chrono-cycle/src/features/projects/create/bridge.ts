@@ -17,6 +17,7 @@ import { scheduleRemindersForProject } from "@/lib/reminders";
 
 import { getDb } from "@/db";
 import { listEventTemplates } from "@/db/queries/event-templates/list";
+import { retrieveProjectTemplate } from "@/db/queries/project-templates/retrieve";
 import { createProject } from "@/db/queries/projects/create";
 import { updateReminder } from "@/db/queries/reminders/update";
 import { wrapWithTransaction } from "@/db/queries/utils/transaction";
@@ -43,13 +44,7 @@ export function bridge(
         TE.chain((db) =>
             wrapWithTransaction(db, (tx) =>
                 pipe(
-                    listEventTemplates(tx, userId, projectTemplateId),
-                    TE.mapError((err) =>
-                        err._errorKind === "DoesNotExistError"
-                            ? NoEventTemplatesError()
-                            : err,
-                    ),
-                    TE.chainW(() => TE.Do),
+                    TE.Do,
                     TE.bindW("dbProj", () => {
                         const { projectTemplateId: _, ...rest } = payloadP;
                         return createProject(tx, {
@@ -58,6 +53,19 @@ export function bridge(
                             ...rest,
                         });
                     }),
+                    TE.tap(() =>
+                        // Check that the project template has event templates.
+                        // If this fails, the transaction will rollback and undo
+                        // the project creation above.
+                        pipe(
+                            listEventTemplates(tx, userId, projectTemplateId),
+                            TE.mapError((err) =>
+                                err._errorKind === "DoesNotExistError"
+                                    ? NoEventTemplatesError()
+                                    : err,
+                            ),
+                        ),
+                    ),
                     // Schedule the reminders.
                     TE.bindW("scheduledDbReminders", ({ dbProj }) =>
                         scheduleRemindersForProject(dbProj),
