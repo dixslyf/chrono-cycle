@@ -83,8 +83,11 @@ export function CreateProjectTemplateButton() {
             <Modal
                 opened={createOpened}
                 onClose={closeCreate}
-                title="Create Project Template"
                 centered
+                size="100%"
+                padding={0}
+                withCloseButton={false}
+                radius="xl"
             >
                 <CreateProjectTemplateForm onSuccess={closeCreate} />
             </Modal>
