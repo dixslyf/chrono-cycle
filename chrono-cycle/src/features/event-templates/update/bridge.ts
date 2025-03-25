@@ -5,7 +5,7 @@ import { EventTemplate, toEventTemplate } from "@/common/data/domain";
 import { AssertionError, DoesNotExistError } from "@/common/errors";
 
 import {
-    decodeProjectTemplateId,
+    decodeEventTemplateId,
     decodeReminderTemplateId,
 } from "@/lib/identifiers";
 
@@ -25,7 +25,7 @@ export function bridge(
                 payloadP;
 
             return updateEventTemplate(db, userId, {
-                id: decodeProjectTemplateId(id),
+                id: decodeEventTemplateId(id),
                 remindersDelete: remindersDelete.map((id) =>
                     decodeReminderTemplateId(id),
                 ),
