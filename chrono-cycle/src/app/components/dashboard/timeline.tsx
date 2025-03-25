@@ -2,6 +2,10 @@
 
 import { Modal, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { useQuery } from "@tanstack/react-query";
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
+import * as O from "fp-ts/Option";
 import { useEffect, useRef, useState } from "react";
 
 import DisplayEventDetails from "@/app/components/event/eventDetails";
@@ -9,6 +13,8 @@ import ProjectDetails from "@/app/components/project/projectDetails";
 import { areSameDay } from "@/app/utils/dates";
 
 import { Event, Project } from "@/common/data/domain";
+
+import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 
 import ProjectRow from "./projectRow";
 
@@ -208,6 +214,37 @@ function Timeline({
         projectDetailsModalOpened,
         { open: openProjectDetailsModal, close: closeProjectDetailsModal },
     ] = useDisclosure(false);
+    const retrieveProjectTemplateQuery = useQuery({
+        queryKey: ["retrieve-project-template-of-project", clickedProject?.id],
+        queryFn: async () => {
+            // Type cast. Guaranteed to not be null since this query is only enabled
+            // when it is set.
+            const clickedProj = clickedProject as Project;
+
+            // No project template (i.e., the project template has been deleted).
+            if (clickedProj.projectTemplateId === null) {
+                return O.none;
+            }
+
+            const result = await retrieveProjectTemplateAction({
+                projectTemplateId: clickedProj.projectTemplateId,
+            });
+            return pipe(
+                result,
+                E.getOrElseW((err) => {
+                    // To trigger error notification from Tanstack query.
+                    throw err;
+                }),
+                O.some,
+            );
+        },
+        enabled: Boolean(clickedProject),
+        meta: {
+            errorMessage:
+                "Failed to retrieve project's project template information.",
+            onError: () => closeProjectDetailsModal(),
+        },
+    });
 
     // each day is one column wide, so number of columns should be days.length
     return (
@@ -227,7 +264,13 @@ function Timeline({
                 onClose={closeProjectDetailsModal}
                 title="Project Details"
             >
-                {clickedProject && <ProjectDetails project={clickedProject} />}
+                {clickedProject && (
+                    <ProjectDetails
+                        project={clickedProject}
+                        projectTemplate={retrieveProjectTemplateQuery.data}
+                        isLoading={retrieveProjectTemplateQuery.isPending}
+                    />
+                )}
             </Modal>
             <div className="flex h-full flex-1 relative">
                 {days.map((day, i) => {
