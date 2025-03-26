@@ -150,24 +150,6 @@ export function EventTemplatesTable<T extends string>({
 
     return (
         <>
-            {/* Modal to display event details */}
-            {/* <Modal
-                centered
-                size="100%"
-                radius="xl"
-                withCloseButton={false}
-                padding={0}
-                {...modalStack.register("event-details")}
-            >
-                {selectedEventTemplate ? (
-                    <EventTemplateDetails
-                        eventTemplate={selectedEventTemplate}
-                        onClose={closeEventDetailsModal}
-                    />
-                ) : (
-                    <Box>Loading event details...</Box>
-                )}
-            </Modal> */}
             <Modal.Stack>
                 <SplitModal {...modalStack.register("event-details")}>
                     {selectedEventTemplate ? (

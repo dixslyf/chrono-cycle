@@ -1,12 +1,9 @@
 "use client";
 
-import { Button } from "@mantine/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import * as E from "fp-ts/Either";
-import { pipe } from "fp-ts/function";
 import { Trash } from "lucide-react";
-import { startTransition, useActionState, useEffect } from "react";
 
+import { CriticalButton } from "@/app/components/customComponent/criticalButton";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 
 import { deleteProjectTemplateAction } from "@/features/project-templates/delete/action";
@@ -42,16 +39,13 @@ export function DeleteProjectTemplateButton({
     });
 
     return (
-        <Button
-            variant="filled"
-            color="red"
+        <CriticalButton
             disabled={disabled}
             loading={deleteMutation.isPending}
             onClick={() => deleteMutation.mutate(projectTemplateId)}
-            className="bg-red-500 hover:bg-red-600 transition-colors duration-200 ease-in"
         >
             <Trash className="mr-2" />
             Delete Template
-        </Button>
+        </CriticalButton>
     );
 }
