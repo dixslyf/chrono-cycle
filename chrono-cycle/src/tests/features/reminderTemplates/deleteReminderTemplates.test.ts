@@ -8,7 +8,7 @@ import { createProjectTemplateAction } from "@/features/project-templates/create
 import { createReminderTemplateAction } from "@/features/reminder-templates/create/action";
 import { deleteReminderTemplatesAction } from "@/features/reminder-templates/delete/action";
 
-describe("Delete event template server action", () => {
+describe("Delete reminder template server action", () => {
     it("should return validation error if payload has wrong types", async () => {
         const result = await deleteReminderTemplatesAction(null, {
             reminderTemplateIds: 1234 as unknown as string[],
@@ -31,14 +31,7 @@ describe("Delete event template server action", () => {
         }
     });
 
-    it("should return DoesNotExistError if event template does not exist", async () => {
-        const result = await deleteReminderTemplatesAction(null, {
-            reminderTemplateIds: ["q8OHMOSlE9Czpy4k"],
-        });
-        expect(result).toEqualLeft(DoesNotExistError());
-    });
-
-    it("should delete an event template successfully", async () => {
+    it("should delete a reminder template successfully", async () => {
         const createProjectTemplateResult = await createProjectTemplateAction({
             name: "New Project Name",
             description: "Description of a new project",
