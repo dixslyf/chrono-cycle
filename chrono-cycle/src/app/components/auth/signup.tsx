@@ -1,7 +1,7 @@
 // sign up component
 "use client";
 
-import { Button, TextInput } from "@mantine/core";
+import { Flex, Stack } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useMutation } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
@@ -80,7 +80,7 @@ const SignupForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     });
 
     return (
-        <div className="w-full h-full flex flex-col gap-10">
+        <Stack className="w-full h-full gap-10">
             {/* header */}
             <h1 className="text-palette1 font-bold text-3xl p-5">Sign Up</h1>
             <form
@@ -88,43 +88,45 @@ const SignupForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                     signUpMutation.mutate(values),
                 )}
             >
-                <div className="flex flex-col items-center gap-16">
-                    <div className="w-full flex flex-col items-center gap-5">
-                        {/* username input */}
-                        <AuthTextInput
-                            label="Username"
-                            placeholder="Username"
-                            required
-                            {...form.getInputProps("username")}
-                        />
+                <Flex justify="center">
+                    <Stack className="w-3/4 gap-16">
+                        <Stack className="w-full gap-5">
+                            {/* username input */}
+                            <AuthTextInput
+                                label="Username"
+                                placeholder="Username"
+                                required
+                                {...form.getInputProps("username")}
+                            />
 
-                        {/* email input */}
-                        <AuthTextInput
-                            label="Email"
-                            placeholder="abc@example.com"
-                            required
-                            {...form.getInputProps("email")}
-                        />
+                            {/* email input */}
+                            <AuthTextInput
+                                label="Email"
+                                placeholder="abc@example.com"
+                                required
+                                {...form.getInputProps("email")}
+                            />
 
-                        {/* password input */}
-                        <AuthTextInput
-                            type="password"
-                            label="Password"
-                            placeholder="Password"
-                            required
-                            {...form.getInputProps("password")}
-                        />
-                    </div>
-                    <AuthButton
-                        type="submit"
-                        disabled={Object.keys(form.errors).length > 0}
-                        loading={signUpMutation.isPending}
-                    >
-                        Sign Up
-                    </AuthButton>
-                </div>
+                            {/* password input */}
+                            <AuthTextInput
+                                type="password"
+                                label="Password"
+                                placeholder="Password"
+                                required
+                                {...form.getInputProps("password")}
+                            />
+                        </Stack>
+                        <AuthButton
+                            type="submit"
+                            disabled={Object.keys(form.errors).length > 0}
+                            loading={signUpMutation.isPending}
+                        >
+                            Sign Up
+                        </AuthButton>
+                    </Stack>
+                </Flex>
             </form>
-        </div>
+        </Stack>
     );
 };
 

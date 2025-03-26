@@ -9,7 +9,7 @@ export function AuthButton(
 ) {
     return (
         <Button
-            className="w-3/4 p-1 rounded-xl bg-palette2 hover:bg-[#a08368] transition duration-300 text-palette3"
+            className="w-full p-1 rounded-xl bg-palette2 hover:bg-[#a08368] transition duration-300 text-palette3"
             {...props}
         >
             {props.children}

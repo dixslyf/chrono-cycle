@@ -1,6 +1,7 @@
 // sign in component
 "use client";
 
+import { Checkbox, Flex, Group, Stack } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useMutation } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
@@ -66,99 +67,68 @@ const SigninForm = () => {
     });
 
     return (
-        <div className="w-full h-full flex flex-col gap-10">
+        <Stack className="w-full h-full gap-10">
             {/* header */}
             <h1 className="text-palette1 font-bold text-3xl p-5">Sign In</h1>
             <form
                 onSubmit={form.onSubmit((values) =>
                     signInMutation.mutate(values),
                 )}
-                className="flex flex-col items-center gap-16"
             >
-                <div className="w-full flex flex-col items-center gap-5">
-                    {/* username input */}
-                    <AuthTextInput
-                        type="text"
-                        id="username"
-                        label="Username"
-                        name="username"
-                        placeholder="Username"
-                        required
-                        {...form.getInputProps("username")}
-                    />
-
-                    {/* password input */}
-                    <AuthTextInput
-                        type="password"
-                        id="password"
-                        label="Password"
-                        name="password"
-                        placeholder="Password"
-                        required
-                        {...form.getInputProps("password")}
-                    />
-                </div>
-
-                <div className="w-full flex flex-col items-center gap-5">
-                    <AuthButton
-                        type="submit"
-                        loading={signInMutation.isPending}
-                    >
-                        Sign In
-                    </AuthButton>
-
-                    {/* remember me & forget password wrapper */}
-                    <div className="w-3/4 flex justify-between text-sm">
-                        {/* remember me */}
-                        <div className="flex items-center gap-1">
-                            <input
-                                type="checkbox"
-                                className="
-                                relative peer mt-1
-                                appearance-none w-4 h-4 border-2 border-palette2 bg-white rounded-sm
-                                checked:bg-palette2 checked:border-0
-                                "
-                                id="remember"
-                                name="remember"
-                                {...form.getInputProps("remember", {
-                                    type: "checkbox",
-                                })}
+                <Flex justify="center">
+                    <Stack className="w-3/4 gap-16">
+                        <Stack className="w-full gap-5">
+                            {/* username input */}
+                            <AuthTextInput
+                                type="text"
+                                id="username"
+                                label="Username"
+                                name="username"
+                                placeholder="Username"
+                                required
+                                {...form.getInputProps("username")}
                             />
-                            <label
-                                htmlFor="remember"
-                                className="font-medium text-palette2 mt-1"
-                            >
-                                Remember Me
-                            </label>
-                            <svg
-                                className="
-                                absolute
-                                w-4 h-4 mt-1
-                                hidden peer-checked:block
-                                pointer-events-none text-palette3
-                                "
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                        </div>
 
-                        {/* forget password */}
-                        <div>
-                            <a href="#" className=" text-gray-400">
-                                Forget Password?
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                            {/* password input */}
+                            <AuthTextInput
+                                type="password"
+                                id="password"
+                                label="Password"
+                                name="password"
+                                placeholder="Password"
+                                required
+                                {...form.getInputProps("password")}
+                            />
+                        </Stack>
+                        <Stack className="w-full items-center gap-5">
+                            <AuthButton
+                                type="submit"
+                                loading={signInMutation.isPending}
+                            >
+                                Sign In
+                            </AuthButton>
+
+                            {/* remember me */}
+                            <Group justify="flex-end" className="w-full">
+                                <Checkbox
+                                    id="remember"
+                                    name="remember"
+                                    label="Remember Me"
+                                    labelPosition="right"
+                                    classNames={{
+                                        input: "border-palette2 border-2",
+                                        label: "text-palette2 font-medium ml-[-5]",
+                                    }}
+                                    {...form.getInputProps("remember", {
+                                        type: "checkbox",
+                                    })}
+                                />
+                            </Group>
+                        </Stack>
+                    </Stack>
+                </Flex>
             </form>
-        </div>
+        </Stack>
     );
 };
 
