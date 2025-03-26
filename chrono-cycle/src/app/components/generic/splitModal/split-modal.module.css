@@ -1,0 +1,5 @@
+.closeButton {
+  &:hover {
+    background-color: var(--mantine-color-brown-5);
+  }
+}
