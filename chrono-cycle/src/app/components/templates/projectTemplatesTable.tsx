@@ -2,6 +2,7 @@
 
 import {
     Box,
+    Group,
     Loader,
     Modal,
     ScrollArea,
@@ -123,32 +124,37 @@ export function ProjectTemplatesTable(): React.ReactNode {
             </Modal.Stack>
             {/* Project Template Table */}
             <ScrollArea className="h-[80%]">
-                <Stack className="py-2 px-4">
-                    {listPtsQuery.isPending ? (
-                        <Loader size="md" />
-                    ) : records.length === 0 ? (
-                        <Text className="text-lg">No Project Templates</Text>
-                    ) : (
-                        <Stack>
-                            {records.map((record) => (
-                                <Box
-                                    key={record.id}
-                                    className="cursor-pointer border border-gray-200 rounded-xl p-4 hover:bg-gray-200 transition-colors duration-200"
-                                    onClick={() => {
-                                        modalStack.open(
-                                            "project-template-details",
-                                        );
-                                        setClickedId(record.id);
-                                    }}
-                                >
-                                    <Text className="text-xl font-semibold">
-                                        {record.name}
-                                    </Text>
-                                </Box>
-                            ))}
-                        </Stack>
-                    )}
-                </Stack>
+                <Group justify="center">
+                    <Stack className="py-2 px-4 w-4/6">
+                        {listPtsQuery.isPending ? (
+                            <Loader size="md" />
+                        ) : records.length === 0 ? (
+                            <Text className="text-lg">
+                                No Project Templates
+                            </Text>
+                        ) : (
+                            <Stack>
+                                {records.map((record) => (
+                                    <Group
+                                        key={record.id}
+                                        className="cursor-pointer border border-gray-300 rounded-xl p-4 hover:bg-gray-200 transition-colors duration-200 ease-in"
+                                        onClick={() => {
+                                            modalStack.open(
+                                                "project-template-details",
+                                            );
+                                            setClickedId(record.id);
+                                        }}
+                                        justify="center"
+                                    >
+                                        <Text className="text-xl font-semibold text-palette5">
+                                            {record.name}
+                                        </Text>
+                                    </Group>
+                                ))}
+                            </Stack>
+                        )}
+                    </Stack>
+                </Group>
             </ScrollArea>
         </>
     );

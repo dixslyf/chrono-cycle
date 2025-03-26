@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronUp, Copy, Upload } from "lucide-react";
+import { ChevronDown, Copy, Upload } from "lucide-react";
 import { useState } from "react";
 
 import splitButtonClasses from "@/app/split-button.module.css";
@@ -137,22 +137,29 @@ export function CreateProjectTemplateButton() {
                 </Button>
                 {/* keepMounted is required for FileButton to work correctly.
                     See: https://help.mantine.dev/q/file-button-in-menu */}
-                <Menu position="top-end" keepMounted withinPortal>
+                <Menu position="bottom-end" keepMounted withinPortal>
                     <Menu.Target>
                         <ActionIcon
                             size={36}
                             className={splitButtonClasses.menuControl}
                         >
-                            <ChevronUp />
+                            <ChevronDown />
                         </ActionIcon>
                     </Menu.Target>
-                    <Menu.Dropdown>
+                    <Menu.Dropdown className="rounded-lg overflow-hidden shadow-lg p-0">
+                        <Text className="px-4 py-2 text-lg font-semibold text-palette3 bg-palette2 border-b">
+                            Template Actions
+                        </Text>
                         <FileButton
                             onChange={fileOnChange}
                             accept="application/json"
                         >
                             {(props) => (
-                                <Menu.Item leftSection={<Upload />} {...props}>
+                                <Menu.Item
+                                    leftSection={<Upload />}
+                                    {...props}
+                                    className="hover:bg-gray-200 transition-colors duration-200 ease-in"
+                                >
                                     Import
                                 </Menu.Item>
                             )}
@@ -160,6 +167,7 @@ export function CreateProjectTemplateButton() {
                         <Menu.Item
                             leftSection={<Copy />}
                             onClick={onClickDuplicate}
+                            className="hover:bg-gray-200 transition-colors duration-200 ease-in"
                         >
                             Duplicate
                         </Menu.Item>
