@@ -13,10 +13,34 @@ const DEFAULT_SUCCESS_DATA = {
     icon: <CircleCheck />,
 };
 
-export function notifyError(notification: NotificationData) {
-    notifications.show({ ...DEFAULT_ERROR_DATA, ...notification });
+const AUTH_STYLE = {
+    autoClose: 8000,
+    position: "bottom-center",
+    withBorder: true,
+    style: {
+        bottom: "15vh",
+    },
+} as const;
+
+export function notifyError(
+    notification: NotificationData,
+    config?: { authStyle?: boolean },
+) {
+    notifications.show({
+        ...DEFAULT_ERROR_DATA,
+        ...(config?.authStyle ? AUTH_STYLE : {}),
+        ...notification,
+    });
 }
 
-export function notifySuccess(notification: NotificationData) {
-    notifications.show({ ...DEFAULT_SUCCESS_DATA, ...notification });
+export function notifySuccess(
+    notification: NotificationData,
+
+    config?: { authStyle?: boolean },
+) {
+    notifications.show({
+        ...DEFAULT_SUCCESS_DATA,
+        ...(config?.authStyle ? AUTH_STYLE : {}),
+        ...notification,
+    });
 }
