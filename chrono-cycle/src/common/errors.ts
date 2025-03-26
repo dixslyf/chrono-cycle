@@ -10,6 +10,22 @@ export function DoesNotExistError(): DoesNotExistError {
     return { _errorKind: "DoesNotExistError" };
 }
 
+export type UsernameTakenError = {
+    _errorKind: "UsernameTakenError";
+};
+
+export function UsernameTakenError(): UsernameTakenError {
+    return { _errorKind: "UsernameTakenError" };
+}
+
+export type EmailTakenError = {
+    _errorKind: "EmailTakenError";
+};
+
+export function EmailTakenError(): EmailTakenError {
+    return { _errorKind: "EmailTakenError" };
+}
+
 export type DuplicateNameError = {
     _errorKind: "DuplicateNameError";
 };
