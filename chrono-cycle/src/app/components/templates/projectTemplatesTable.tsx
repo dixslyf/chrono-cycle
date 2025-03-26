@@ -18,7 +18,7 @@ import { SplitModal } from "@/app/components/customComponent/splitModal";
 import { formatDate } from "@/app/utils/dates";
 import { listProjectTemplatesOptions } from "@/app/utils/queries/listProjectTemplates";
 
-import { ProjectTemplate } from "@/common/data/domain";
+import { ProjectTemplate, ProjectTemplateOverview } from "@/common/data/domain";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 
@@ -27,18 +27,8 @@ import {
     ProjectTemplateDetailsRight,
 } from "./projectTemplateDetails";
 
-// TODO
-// should put this somewhere else
-interface ProjecTemplateRecord {
-    id: string;
-    name: string;
-    description: string;
-    createdAt: string;
-    updatedAt: string;
-}
-
 type Column = {
-    accessor: keyof ProjecTemplateRecord;
+    accessor: keyof ProjectTemplateOverview;
     title: string;
 };
 
