@@ -11,9 +11,10 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronDown, Copy, Upload } from "lucide-react";
+import { ChevronDown, Copy, Import, Upload } from "lucide-react";
 import { useState } from "react";
 
+import { SingleModal } from "@/app/components/customComponent/singleModal";
 import splitButtonClasses from "@/app/split-button.module.css";
 import { notifyError } from "@/app/utils/notifications";
 import { listProjectTemplatesOptions } from "@/app/utils/queries/listProjectTemplates";
@@ -80,53 +81,26 @@ export function CreateProjectTemplateButton() {
 
     return (
         <>
-            <Modal
-                opened={createOpened}
-                onClose={closeCreate}
-                centered
-                size="50%"
-                padding={0}
-                withCloseButton={false}
-                radius="xl"
-                styles={{
-                    content: { height: "80%" },
-                }}
-            >
+            <SingleModal opened={createOpened} onClose={closeCreate}>
                 <CreateProjectTemplateForm
                     onSuccess={closeCreate}
                     onClose={closeCreate}
                 />
-            </Modal>
-            <Modal
-                opened={importOpened}
-                onClose={closeImport}
-                title="Import Project Template"
-                centered
-            >
+            </SingleModal>
+            <SingleModal opened={importOpened} onClose={closeImport}>
                 <ImportProjectTemplateForm
                     importData={importData ?? undefined}
                     onSuccess={closeImport}
                 />
-            </Modal>
-            <Modal
-                opened={duplicateOpened}
-                onClose={closeDuplicate}
-                size="50%"
-                padding={0}
-                withCloseButton={false}
-                radius="xl"
-                centered
-                styles={{
-                    content: { height: "95%" },
-                }}
-            >
+            </SingleModal>
+            <SingleModal opened={duplicateOpened} onClose={closeDuplicate}>
                 <DuplicateProjectTemplateForm
                     projectTemplates={listPtsQuery.data}
                     isPendingProjectTemplates={listPtsQuery.isPending}
                     onSuccess={closeDuplicate}
                     onClose={closeDuplicate}
                 />
-            </Modal>
+            </SingleModal>
             {/* Based on: https://ui.mantine.dev/category/buttons/#split-button */}
             <Group wrap="nowrap" gap={0}>
                 <Button

@@ -92,27 +92,20 @@ export function DuplicateProjectTemplateForm({
     });
 
     return (
-        <Stack className="p-6 w-full" justify="center">
+        <Stack className="p-6" justify="center">
             <Stack>
-                <Group justify="space-between">
-                    <Text className="text-3xl font-bold">
-                        Duplicate Project Template
-                    </Text>
-                    <X
-                        className="text-palette5 hover:text-gray-500 cursor-pointer w-8 h-8"
-                        onClick={onClose}
-                    />
-                </Group>
+                <Text className="text-3xl font-bold">
+                    Duplicate Project Template
+                </Text>
                 <form
                     onSubmit={form.onSubmit((values) =>
                         duplicateMutation.mutate(values),
                     )}
-                    className="py-10"
                 >
                     <Stack gap="xl" mt="md">
                         <Skeleton visible={isPendingProjectTemplates}>
                             <Select
-                                size="lg"
+                                size="md"
                                 label="Project Template"
                                 required
                                 description="The project template to duplicate"
@@ -128,7 +121,7 @@ export function DuplicateProjectTemplateForm({
                         </Skeleton>
                         <Skeleton visible={isPendingProjectTemplates}>
                             <TextInput
-                                size="lg"
+                                size="md"
                                 name="name"
                                 label="Name"
                                 required
@@ -141,7 +134,7 @@ export function DuplicateProjectTemplateForm({
                         </Skeleton>
                         <Skeleton visible={isPendingProjectTemplates}>
                             <Textarea
-                                size="lg"
+                                size="md"
                                 name="description"
                                 label="Description"
                                 required

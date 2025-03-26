@@ -104,22 +104,15 @@ export function CreateProjectTemplateForm({
     });
 
     return (
-        <Stack className="p-6 h-full" justify="center">
+        <Stack className="p-6" justify="center">
             <Stack>
-                <Group justify="space-between">
-                    <Text className="text-3xl font-bold">
-                        Create Project Template
-                    </Text>
-                    <X
-                        className="text-palette5 hover:text-gray-500 cursor-pointer w-8 h-8"
-                        onClick={onClose}
-                    />
-                </Group>
+                <Text className="text-3xl font-bold">
+                    Create Project Template
+                </Text>
                 <form
                     onSubmit={form.onSubmit((values) =>
                         createMutation.mutate(values),
                     )}
-                    className="py-10"
                 >
                     <Stack gap="xl" mt="md">
                         <TextInput
@@ -131,7 +124,6 @@ export function CreateProjectTemplateForm({
                             placeholder="Project template name"
                             disabled={createMutation.isPending}
                             {...form.getInputProps("name")}
-                            className="text-lg text-palette5 font-sembold"
                         />
                         <Textarea
                             size="md"
