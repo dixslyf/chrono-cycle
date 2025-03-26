@@ -2,7 +2,16 @@ import {
     EmailReminderRunHandle,
     emailReminderTask,
 } from "@/trigger/emailReminder";
-import { runs, tasks } from "@trigger.dev/sdk/v3";
+import { stubTriggerLog } from "@/trigger/log";
+import { encodeBase64 } from "@oslojs/encoding";
+import type { InferRunTypes, RunHandleFromTypes } from "@trigger.dev/core/v3";
+import {
+    runs,
+    tasks,
+    type AnyTask,
+    type TaskIdentifier,
+    type TaskPayload,
+} from "@trigger.dev/sdk/v3";
 import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
@@ -19,6 +28,52 @@ import {
 import { DbExpandedProject, DbReminder } from "@/db/schema";
 
 import { encodeEventId, encodeReminderId } from "./identifiers";
+
+// Implementation changes to a stub in `dev`.
+const cancelRun =
+    process.env.NODE_ENV === "development"
+        ? async (runId: string) => {
+              const ret = { id: runId };
+              stubTriggerLog.trace(
+                  {
+                      runId,
+                      returnValue: ret,
+                  },
+                  "Cancelled run",
+              );
+              return ret;
+          }
+        : runs.cancel;
+
+// Implementation changes to a stub in `dev`.
+const triggerTask =
+    process.env.NODE_ENV === "development"
+        ? async <TTask extends AnyTask>( // Stub
+              taskIdentifier: TaskIdentifier<TTask>,
+              payload: TaskPayload<TTask>,
+          ): Promise<RunHandleFromTypes<InferRunTypes<TTask>>> => {
+              // Generate random ID.
+              const bytes = new Uint8Array(16);
+              crypto.getRandomValues(bytes);
+              const id = `stub-run-${encodeBase64(bytes)}`;
+
+              // Safety: RunHandleFromTypes<InferRunTypes<TTask>> is a branded type.
+              // We've already satisfied the required attributes, just not the "hidden"
+              // brand properties.
+              const handle = {
+                  id,
+                  publicAccessToken: "stub-public-access-token",
+                  taskIdentifier,
+              } as unknown as RunHandleFromTypes<InferRunTypes<TTask>>;
+
+              stubTriggerLog.trace(
+                  { taskIdentifier, payload, returnValue: handle },
+                  "Triggered task",
+              );
+
+              return handle;
+          }
+        : tasks.trigger;
 
 export type TimeComponents = {
     hours: number;
@@ -52,7 +107,7 @@ export function cancelReminder(
     runId: string,
 ): TE.TaskEither<CancelReminderError, void> {
     return TE.tryCatch(
-        () => runs.cancel(runId).then(() => undefined),
+        () => cancelRun(runId).then(() => undefined),
         (err) =>
             CancelReminderError(
                 runId,
@@ -67,7 +122,7 @@ export function scheduleReminder(
     return pipe(
         TE.tryCatch(
             () =>
-                tasks.trigger<typeof emailReminderTask>("email-reminder", {
+                triggerTask<typeof emailReminderTask>("email-reminder", {
                     reminderId: encodeReminderId(dbReminder.id),
                     eventId: encodeEventId(dbReminder.eventId),
                     triggerTime: dbReminder.triggerTime,

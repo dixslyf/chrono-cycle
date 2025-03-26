@@ -2,7 +2,7 @@
 
 import { Modal, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
@@ -201,6 +201,8 @@ function Timeline({
     // each row's height is the header height plus additionnal height for expanded events.
     let cumulativeOffset = 0;
 
+    const queryClient = useQueryClient();
+
     // States for showing event details in a modal window.
     const [clickedEvent, setClickedEvent] = useState<Event | null>(null);
     const [
@@ -269,6 +271,12 @@ function Timeline({
                         project={clickedProject}
                         projectTemplate={retrieveProjectTemplateQuery.data}
                         isLoading={retrieveProjectTemplateQuery.isPending}
+                        onDeleteSuccess={() => {
+                            closeProjectDetailsModal();
+                            queryClient.invalidateQueries({
+                                queryKey: ["list-all-projects"],
+                            });
+                        }}
                     />
                 )}
             </Modal>
