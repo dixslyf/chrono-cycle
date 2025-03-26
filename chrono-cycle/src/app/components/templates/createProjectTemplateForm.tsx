@@ -123,7 +123,7 @@ export function CreateProjectTemplateForm({
                 >
                     <Stack gap="xl" mt="md">
                         <TextInput
-                            size="lg"
+                            size="md"
                             name="name"
                             label="Template Name"
                             required
@@ -134,7 +134,7 @@ export function CreateProjectTemplateForm({
                             className="text-lg text-palette5 font-sembold"
                         />
                         <Textarea
-                            size="lg"
+                            size="md"
                             name="description"
                             label="Description"
                             required
