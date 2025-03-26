@@ -2,12 +2,10 @@
 
 import {
     Box,
-    Center,
     Loader,
     Modal,
     ScrollArea,
     Stack,
-    Table,
     Text,
     useModalsStack,
 } from "@mantine/core";
@@ -23,7 +21,11 @@ import { ProjectTemplate } from "@/common/data/domain";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 
-import { ProjectTemplateDetails } from "./projectTemplateDetails";
+import { SplitModal } from "../generic/splitModal";
+import {
+    ProjectTemplateDetailsLeft,
+    ProjectTemplateDetailsRight,
+} from "./projectTemplateDetails";
 
 // TODO
 // should put this somewhere else
@@ -110,23 +112,24 @@ export function ProjectTemplatesTable(): React.ReactNode {
         <>
             <Modal.Stack>
                 {/* Modal window for showing the details of the clicked project template. */}
-                <Modal
-                    centered
-                    size="100%"
-                    radius="xl"
-                    withCloseButton={false}
-                    padding={0}
+                <SplitModal
                     {...modalStack.register("project-template-details")}
-                    // className="h-min-screen"
                 >
-                    {/* Template details */}
-                    <ProjectTemplateDetails
-                        modalStack={modalStack}
-                        projectTemplate={retrieveQuery.data}
-                        onClose={closeModal}
-                        isLoading={retrieveQuery.isPending}
-                    />
-                </Modal>
+                    <SplitModal.Left>
+                        <ProjectTemplateDetailsLeft
+                            modalStack={modalStack}
+                            projectTemplate={retrieveQuery.data}
+                            isLoading={retrieveQuery.isPending}
+                        />
+                    </SplitModal.Left>
+                    <SplitModal.Right>
+                        <ProjectTemplateDetailsRight
+                            projectTemplate={retrieveQuery.data}
+                            onDeleteSuccess={closeModal}
+                            isLoading={retrieveQuery.isPending}
+                        />
+                    </SplitModal.Right>
+                </SplitModal>
             </Modal.Stack>
             {/* Project Template Table */}
             <ScrollArea className="h-[80%]">
