@@ -23,7 +23,15 @@ export function DeleteProjectTemplateButton({
     const queryClient = useQueryClient();
     const deleteMutation = useMutation({
         mutationFn: async (projectTemplateId: string) => {
-            await deleteProjectTemplateAction(null, { projectTemplateId });
+            const result = await deleteProjectTemplateAction(null, {
+                projectTemplateId,
+            });
+            return pipe(
+                result,
+                E.getOrElseW((err) => {
+                    throw err;
+                }),
+            );
         },
         onSuccess: () => {
             notifySuccess({
