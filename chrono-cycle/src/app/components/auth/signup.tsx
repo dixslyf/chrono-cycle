@@ -12,6 +12,8 @@ import { notifyError, notifySuccess } from "@/app/utils/notifications";
 
 import { signUpAction } from "@/features/auth/signUp/action";
 import { Failure, payloadSchema } from "@/features/auth/signUp/data";
+import { AuthTextInput } from "./textInput";
+import { AuthButton } from "./button";
 
 function extractFormIssues(failure: Failure): {
     username?: string;
@@ -81,65 +83,37 @@ const SignupForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                 <div className="flex flex-col items-center gap-16">
                     <div className="w-full flex flex-col items-center gap-5">
                         {/* username input */}
-                        <TextInput
+                        <AuthTextInput
                             label="Username"
                             placeholder="Username"
-                            classNames={{
-                                root: "flex flex-col w-3/4",
-                                label: "text-base text-palette5 pl-1 pb-2",
-                                required: "text-red-600",
-                                error: "text-sm text-red-600 pl-1",
-                                wrapper: "w-full outline-none outline-hidden",
-                                input: "w-full rounded-xl bg-[#dfdfdf] placeholder-[#989898] p-1 pl-2 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1",
-                            }}
-                            unstyled
                             required
                             {...form.getInputProps("username")}
                         />
 
                         {/* email input */}
-                        <TextInput
+                        <AuthTextInput
                             label="Email"
                             placeholder="abc@example.com"
-                            classNames={{
-                                root: "flex flex-col w-3/4",
-                                label: "text-base text-palette5 pl-1 pb-2",
-                                required: "text-red-600",
-                                error: "text-sm text-red-600 pl-1",
-                                wrapper: "w-full outline-none outline-hidden",
-                                input: "w-full rounded-xl bg-[#dfdfdf] placeholder-[#989898] p-1 pl-2 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1",
-                            }}
-                            unstyled
                             required
                             {...form.getInputProps("email")}
                         />
 
                         {/* password input */}
-                        <TextInput
+                        <AuthTextInput
                             type="password"
                             label="Password"
                             placeholder="Password"
-                            classNames={{
-                                root: "flex flex-col w-3/4",
-                                label: "text-base text-palette5 pl-1 pb-2",
-                                required: "text-red-600",
-                                error: "text-sm text-red-600 pl-1",
-                                wrapper: "w-full outline-none outline-hidden",
-                                input: "w-full rounded-xl bg-[#dfdfdf] placeholder-[#989898] p-1 pl-2 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1",
-                            }}
-                            unstyled
                             required
                             {...form.getInputProps("password")}
                         />
                     </div>
-                    <Button
+                    <AuthButton
                         type="submit"
                         disabled={Object.keys(form.errors).length > 0}
                         loading={signUpMutation.isPending}
-                        className="w-3/4 p-1 rounded-xl bg-palette2 hover:bg-[#a08368] transition duration-300 text-palette3"
                     >
                         Sign Up
-                    </Button>
+                    </AuthButton>
                 </div>
             </form>
         </div>
