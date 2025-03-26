@@ -9,7 +9,7 @@ import {
     Stack,
     Text,
 } from "@mantine/core";
-import { Calendar, Clock, X } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
 
 import { formatReminderTemplateTime } from "@/app/utils/dates";
 
@@ -30,12 +30,6 @@ export function EventTemplateDetailsLeft({
             <Text className="text-3xl font-bold">{eventTemplate.name}</Text>
             {/* notes */}
             <Stack>
-                {/* <Text className="text-palette5 font-semibold text-xl">
-                    Note:
-                </Text>
-                <Text className="h-28 border border-gray-400 rounded-xl p-4">
-                    {eventTemplate.note || "No note attached"}
-                </Text> */}
                 <Fieldset legend="Note" className="border-gray-400 rounded-xl">
                     <Text className="text-gray-600">
                         {eventTemplate.note || "No note attached"}
