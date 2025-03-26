@@ -6,13 +6,12 @@ import { useForm, zodResolver } from "@mantine/form";
 import { useMutation } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
-import { startTransition, useActionState } from "react";
-import { match, P } from "ts-pattern";
+import { match } from "ts-pattern";
 
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 
 import { signUpAction } from "@/features/auth/signUp/action";
-import { Failure, payloadSchema, Result } from "@/features/auth/signUp/data";
+import { Failure, payloadSchema } from "@/features/auth/signUp/data";
 
 function extractFormIssues(failure: Failure): {
     username?: string;
@@ -29,7 +28,7 @@ function extractFormIssues(failure: Failure): {
         .otherwise(() => ({}));
 }
 
-const SignupForm = () => {
+const SignupForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     const form = useForm({
         mode: "controlled",
         validateInputOnChange: true,
@@ -53,11 +52,13 @@ const SignupForm = () => {
                 }),
             );
         },
-        onSuccess: () =>
+        onSuccess: () => {
             notifySuccess({
                 message:
                     "Your account has been successfully created! Please sign in.",
-            }),
+            });
+            if (onSuccess) onSuccess();
+        },
         onError: (failure: Failure) => {
             const formIssues = extractFormIssues(failure);
             form.setErrors(formIssues);
