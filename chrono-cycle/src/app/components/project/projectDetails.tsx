@@ -1,6 +1,6 @@
 "use client";
 
-import { Skeleton, Stack, Text } from "@mantine/core";
+import { Group, Skeleton, Stack, Text } from "@mantine/core";
 import { pipe } from "fp-ts/lib/function";
 import * as O from "fp-ts/Option";
 
@@ -8,16 +8,20 @@ import { formatDate } from "@/app/utils/dates";
 
 import { Project, ProjectTemplate } from "@/common/data/domain";
 
+import { DeleteProjectButton } from "./deleteProjectButton";
+
 interface ProjectDetailsProps {
     project: Project;
     projectTemplate?: O.Option<ProjectTemplate> | undefined;
     isLoading?: boolean | undefined;
+    onDeleteSuccess: () => void;
 }
 
 function ProjectDetails({
     project,
     projectTemplate,
     isLoading,
+    onDeleteSuccess,
 }: ProjectDetailsProps) {
     return (
         <Stack>
@@ -57,6 +61,13 @@ function ProjectDetails({
                     )}
                 </Text>
             </Skeleton>
+            <Group justify="flex-end">
+                <DeleteProjectButton
+                    projectId={project.id}
+                    onSuccess={onDeleteSuccess}
+                    disabled={isLoading}
+                />
+            </Group>
         </Stack>
     );
 }
