@@ -12,8 +12,9 @@ import { notifyError, notifySuccess } from "@/app/utils/notifications";
 
 import { signUpAction } from "@/features/auth/signUp/action";
 import { Failure, payloadSchema } from "@/features/auth/signUp/data";
-import { AuthTextInput } from "./textInput";
+
 import { AuthButton } from "./button";
+import { AuthTextInput } from "./textInput";
 
 function extractFormIssues(failure: Failure): {
     username?: string;
@@ -55,18 +56,25 @@ const SignupForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             );
         },
         onSuccess: () => {
-            notifySuccess({
-                message:
-                    "Your account has been successfully created! Please sign in.",
-            });
+            notifySuccess(
+                {
+                    message:
+                        "Your account has been successfully created! Please sign in.",
+                },
+                { authStyle: true },
+            );
             if (onSuccess) onSuccess();
         },
         onError: (failure: Failure) => {
             const formIssues = extractFormIssues(failure);
             form.setErrors(formIssues);
-            console.log(formIssues);
             if (Object.keys(formIssues).length === 0) {
-                notifyError({ message: "An internal error occurred." });
+                notifyError(
+                    {
+                        message: "An internal error occurred.",
+                    },
+                    { authStyle: true },
+                );
             }
         },
     });

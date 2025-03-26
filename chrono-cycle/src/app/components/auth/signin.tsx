@@ -55,7 +55,13 @@ const SigninForm = () => {
             );
         },
         onError: (failure: Failure) => {
-            notifyError({ title: "", message: getErrorMessage(failure) });
+            notifyError(
+                {
+                    title: "Incorrect credentials",
+                    message: getErrorMessage(failure),
+                },
+                { authStyle: true },
+            );
         },
     });
 
