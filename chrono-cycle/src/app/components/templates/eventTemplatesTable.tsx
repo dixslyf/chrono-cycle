@@ -10,10 +10,15 @@ import {
 } from "@mantine/core";
 import React, { useCallback, useState } from "react";
 
+import { SplitModal } from "@/app/components/generic/splitModal";
+
 import { EventTemplate } from "@/common/data/domain";
 
 import { CreateEventTemplateButton } from "./createEventButton";
-import EventTemplateDetails from "./eventTemplateDetails";
+import {
+    EventTemplateDetailsLeft,
+    EventTemplateDetailsRight,
+} from "./eventTemplateDetails";
 
 interface EventsTableProps<T extends string> {
     projectTemplateId: string;
@@ -146,7 +151,7 @@ export function EventTemplatesTable<T extends string>({
     return (
         <>
             {/* Modal to display event details */}
-            <Modal
+            {/* <Modal
                 centered
                 size="100%"
                 radius="xl"
@@ -162,7 +167,29 @@ export function EventTemplatesTable<T extends string>({
                 ) : (
                     <Box>Loading event details...</Box>
                 )}
-            </Modal>
+            </Modal> */}
+            <Modal.Stack>
+                <SplitModal {...modalStack.register("event-details")}>
+                    {selectedEventTemplate ? (
+                        <>
+                            <SplitModal.Left>
+                                <EventTemplateDetailsLeft
+                                    eventTemplate={selectedEventTemplate}
+                                    onClose={closeEventDetailsModal}
+                                />
+                            </SplitModal.Left>
+                            <SplitModal.Right>
+                                <EventTemplateDetailsRight
+                                    eventTemplate={selectedEventTemplate}
+                                    onClose={closeEventDetailsModal}
+                                />
+                            </SplitModal.Right>
+                        </>
+                    ) : (
+                        <Box>Loading event details...</Box>
+                    )}
+                </SplitModal>
+            </Modal.Stack>
 
             <InnerEventTemplatesTable
                 projectTemplateId={projectTemplateId}

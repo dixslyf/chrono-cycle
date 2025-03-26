@@ -38,7 +38,7 @@ function SplitModalLeft(props: { title?: string; children: ReactNode }) {
 
 function SplitModalRight(props: { children: ReactNode }) {
     return (
-        <Stack gap={0} bg="brown.9">
+        <Stack gap={0} className="bg-palette1">
             <Group justify="flex-end" px={20} py={16} style={{ flex: 1 }}>
                 <Modal.CloseButton
                     iconSize={30}
