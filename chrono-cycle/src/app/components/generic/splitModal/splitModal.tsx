@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Group, Modal, ModalProps, Stack } from "@mantine/core";
+import { Box, Group, Modal, Stack, type ModalProps } from "@mantine/core";
 import { ReactNode } from "react";
 
 import classes from "./split-modal.module.css";

@@ -14,6 +14,7 @@ import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { useCallback, useState } from "react";
 
+import { SplitModal } from "@/app/components/generic/splitModal";
 import { formatDate } from "@/app/utils/dates";
 import { listProjectTemplatesOptions } from "@/app/utils/queries/listProjectTemplates";
 
@@ -21,7 +22,6 @@ import { ProjectTemplate } from "@/common/data/domain";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 
-import { SplitModal } from "../generic/splitModal";
 import {
     ProjectTemplateDetailsLeft,
     ProjectTemplateDetailsRight,
