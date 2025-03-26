@@ -2,45 +2,37 @@
 "use client";
 
 import { useForm, zodResolver } from "@mantine/form";
+import { useMutation } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
-import { startTransition, useActionState } from "react";
 import { match } from "ts-pattern";
 
-import { signInAction } from "@/features/auth/signIn/action";
-import { payloadSchema, Result } from "@/features/auth/signIn/data";
+import { notifyError } from "@/app/utils/notifications";
 
-function getErrorMessage(formState: Result): string {
-    return pipe(
-        formState,
-        E.match(
-            (err) =>
-                match(err)
-                    .with(
-                        { _errorKind: "InvalidCredentialsError" },
-                        () => "Incorrect username or password",
-                    )
-                    .with(
-                        { _errorKind: "InternalError" },
-                        () => "An internal error occurred",
-                    )
-                    .with(
-                        { _errorKind: "ValidationError" },
-                        () => "Invalid or missing fields",
-                    )
-                    .exhaustive(),
-            () => "",
-        ),
-    );
+import { signInAction } from "@/features/auth/signIn/action";
+import { Failure, payloadSchema } from "@/features/auth/signIn/data";
+
+import { AuthButton } from "./button";
+import { AuthTextInput } from "./textInput";
+
+function getErrorMessage(failure: Failure): string {
+    return match(failure)
+        .with(
+            { _errorKind: "InvalidCredentialsError" },
+            () => "Incorrect username or password!",
+        )
+        .with(
+            { _errorKind: "InternalError" },
+            () => "An internal error occurred!",
+        )
+        .with(
+            { _errorKind: "ValidationError" },
+            () => "Invalid or missing fields!",
+        )
+        .exhaustive();
 }
 
 const SigninForm = () => {
-    // Server-side action for signing in.
-    const [formState, formAction, isPending] = useActionState(
-        signInAction,
-        null,
-    );
-
     const form = useForm({
         mode: "uncontrolled",
         initialValues: {
@@ -50,6 +42,22 @@ const SigninForm = () => {
         },
         validate: zodResolver(payloadSchema),
     });
+    type FormValues = typeof form.values;
+
+    const signInMutation = useMutation({
+        mutationFn: async (values: FormValues) => {
+            const result = await signInAction(null, values);
+            return pipe(
+                result,
+                E.getOrElseW((err) => {
+                    throw err;
+                }),
+            );
+        },
+        onError: (failure: Failure) => {
+            notifyError({ title: "", message: getErrorMessage(failure) });
+        },
+    });
 
     return (
         <div className="w-full h-full flex flex-col gap-10">
@@ -57,69 +65,41 @@ const SigninForm = () => {
             <h1 className="text-palette1 font-bold text-3xl p-5">Sign In</h1>
             <form
                 onSubmit={form.onSubmit((values) =>
-                    startTransition(() => formAction(values)),
+                    signInMutation.mutate(values),
                 )}
                 className="flex flex-col items-center gap-16"
             >
                 <div className="w-full flex flex-col items-center gap-5">
-                    {/* TODO: Style this properly. */}
-                    {/* Error message for login failure. */}
-                    <div className="w-full flex justify-center mb-4 font-semibold">
-                        {formState && (
-                            <p className="text-red-500 text-lg">
-                                {getErrorMessage(formState)}
-                            </p>
-                        )}
-                    </div>
                     {/* username input */}
-                    <div className="flex flex-col w-3/4 gap-2">
-                        <label
-                            htmlFor="username"
-                            className="text-palette5 pl-1"
-                        >
-                            Username<span className="text-red-600">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            className="rounded-xl bg-[#dfdfdf] placeholder-[#989898] p-1 pl-2 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1"
-                            placeholder="Username"
-                            required
-                            {...form.getInputProps("username")}
-                        />
-                    </div>
+                    <AuthTextInput
+                        type="text"
+                        id="username"
+                        label="Username"
+                        name="username"
+                        placeholder="Username"
+                        required
+                        {...form.getInputProps("username")}
+                    />
 
                     {/* password input */}
-                    <div className="flex flex-col w-3/4 gap-2">
-                        <label
-                            htmlFor="password"
-                            className="text-[#0a0906] pl-1"
-                        >
-                            Password<span className="text-red-600">*</span>
-                        </label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            className="rounded-xl bg-[#dfdfdf] placeholder-[#989898] p-1 pl-2 focus:outline-none focus:border-[#949494] focus:ring-[#949494] focus:ring-1"
-                            placeholder="Password"
-                            required
-                            {...form.getInputProps("password")}
-                        />
-                    </div>
+                    <AuthTextInput
+                        type="password"
+                        id="password"
+                        label="Password"
+                        name="password"
+                        placeholder="Password"
+                        required
+                        {...form.getInputProps("password")}
+                    />
                 </div>
 
                 <div className="w-full flex flex-col items-center gap-5">
-                    {/* button */}
-                    <button
+                    <AuthButton
                         type="submit"
-                        disabled={isPending}
-                        className="w-3/4 p-1 rounded-xl bg-palette2 hover:bg-[#a08368] transition duration-300 text-palette3"
+                        loading={signInMutation.isPending}
                     >
-                        {/* Sign In */}
-                        {isPending ? "Signing In..." : "Sign In"}
-                    </button>
+                        Sign In
+                    </AuthButton>
 
                     {/* remember me & forget password wrapper */}
                     <div className="w-3/4 flex justify-between text-sm">
