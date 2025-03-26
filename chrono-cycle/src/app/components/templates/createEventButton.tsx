@@ -4,7 +4,14 @@ import { Button, Modal, useModalsStack } from "@mantine/core";
 import { CalendarPlus } from "lucide-react";
 import { useCallback } from "react";
 
-import { CreateEventTemplateForm } from "./createEventForm";
+import { SplitModal } from "@/app/components/customComponent/splitModal";
+
+// import { CreateEventTemplateForm } from "./createEventForm";
+import {
+    CreateEventTemplateFormLeft,
+    CreateEventTemplateFormRight,
+    CreateEventTemplateFormState,
+} from "./createEventForm";
 
 export function CreateEventTemplateButton<T extends string>({
     projectTemplateId,
@@ -24,22 +31,30 @@ export function CreateEventTemplateButton<T extends string>({
         [modalStackClose],
     );
 
+    const { form, mutation, durationDisabled } = CreateEventTemplateFormState({
+        projectTemplateId: "add-event",
+        onSuccess: closeModal,
+    });
+
     return (
         <>
-            <Modal
-                size="100%"
-                radius="xl"
-                withCloseButton={false}
-                padding={0}
-                centered
-                {...modalStack.register("add-event")}
-            >
-                <CreateEventTemplateForm
-                    projectTemplateId={projectTemplateId}
-                    onSuccess={closeModal}
-                    onClose={closeModal}
-                />
-            </Modal>
+            <Modal.Stack>
+                <SplitModal {...modalStack.register("add-event")}>
+                    <SplitModal.Left>
+                        <CreateEventTemplateFormLeft
+                            form={form}
+                            mutation={mutation}
+                        />
+                    </SplitModal.Left>
+                    <SplitModal.Right>
+                        <CreateEventTemplateFormRight
+                            form={form}
+                            mutation={mutation}
+                            durationDisabled={durationDisabled}
+                        />
+                    </SplitModal.Right>
+                </SplitModal>
+            </Modal.Stack>
             <Button
                 className="text-palette3 hover:text-palette3 bg-palette2 hover:bg-palette1 transition-colors duration-300 ease-in"
                 onClick={openModal}
