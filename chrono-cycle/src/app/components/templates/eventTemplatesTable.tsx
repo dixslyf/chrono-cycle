@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import React, { useCallback, useState } from "react";
 
-import { SplitModal } from "@/app/components/generic/splitModal";
+import { SplitModal } from "@/app/components/customComponent/splitModal";
 
 import { EventTemplate } from "@/common/data/domain";
 
