@@ -135,6 +135,7 @@ export function ProjectTemplateDetails<T extends string>({
                 <Group justify="flex-end">
                     <ExportProjectTemplateButton
                         projectTemplate={projectTemplate}
+                        disabled={isLoading}
                     />
                     <DeleteProjectTemplateButton
                         projectTemplateId={projectTemplate?.id ?? ""}
