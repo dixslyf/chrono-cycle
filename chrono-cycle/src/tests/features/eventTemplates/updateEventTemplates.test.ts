@@ -108,58 +108,6 @@ describe("Update event template server action", () => {
         );
     });
 
-    // it("should return DuplicateNameError if event template name already exists", async () => {
-    //     const createProjectTemplateResult = await createProjectTemplateAction(
-    //         {
-    //             name: "New Project Name",
-    //             description: "Description of a new project",
-    //         },
-    //     );
-    //     if (E.isLeft(createProjectTemplateResult)) {
-    //         throw new Error(
-    //             "Create project template action is not implemented correctly!",
-    //         );
-    //     }
-    //     const projectTemplate = createProjectTemplateResult.right;
-    //     const projectTemplateIdFormTest = projectTemplate.id;
-    //     const createEventTemplateResult = await createEventTemplateAction({
-    //         name: "Event",
-    //         offsetDays: 1,
-    //         duration: 1,
-    //         note: "Note",
-    //         eventType: "task",
-    //         autoReschedule: true,
-    //         projectTemplateId: projectTemplateIdFormTest,
-    //         reminders: [],
-    //         tags: [],
-    //     });
-    //     if (E.isLeft(createEventTemplateResult)) {
-    //         throw new Error(
-    //             "Create event template action is not implemented correctly!",
-    //         );
-    //     }
-    //     const eventTemplate = createEventTemplateResult.right;
-    //     const eventTemplateIdFormTest = eventTemplate.id;
-    //     const result = await updateEventTemplateAction(null, {
-    //         id: eventTemplateIdFormTest,
-    //         name: "Event",
-    //         offsetDays: 1,
-    //         duration: 1,
-    //         note: "Note",
-    //         autoReschedule: true,
-    //         remindersDelete: [],
-    //         remindersInsert: [],
-    //         remindersUpdate: [],
-    //         tags: [],
-    //     });
-    //     expect(result).toEqualLeft(
-    //         ValidationError({
-    //             name: expect.any(Array),
-    //         }),
-    //     );
-    //     expect(result).toEqualLeft(DuplicateNameError());
-    // });
-
     it("should update an event template successfully", async () => {
         const createProjectTemplateResult = await createProjectTemplateAction({
             name: "New Project Name",
