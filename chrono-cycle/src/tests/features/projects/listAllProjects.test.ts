@@ -2,7 +2,6 @@ import { createInstantiableProjectTemplate } from "@/tests/utils";
 import * as E from "fp-ts/Either";
 import { describe, expect, it } from "vitest";
 
-import { createProjectTemplateAction } from "@/features/project-templates/create/action";
 import { createProjectAction } from "@/features/projects/create/action";
 import { listAllProjectsAction } from "@/features/projects/listAll/action";
 
