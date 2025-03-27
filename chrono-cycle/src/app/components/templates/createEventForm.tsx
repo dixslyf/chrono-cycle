@@ -24,6 +24,8 @@ import { useState } from "react";
 
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 
+import { tagNameSchema } from "@/common/data/domain";
+
 import { createEventTemplateAction } from "@/features/event-templates/create/action";
 import {
     Failure,
@@ -53,7 +55,26 @@ export function CreateEventTemplateForm({
             reminders: [] as ReminderData[],
             tags: [] as string[],
         },
-        validate: zodResolver(payloadSchema),
+        validate: {
+            ...zodResolver(payloadSchema),
+            tags: (tags) => {
+                const badTags = tags
+                    .filter((tag) => !tagNameSchema.safeParse(tag).success)
+                    .map((tag) => `"${tag}"`);
+
+                if (badTags.length > 0) {
+                    const badTagsString =
+                        badTags.length > 1
+                            ? badTags.slice(0, -1).join(", ") +
+                              " and " +
+                              badTags.at(-1)
+                            : badTags[0];
+                    return `Tags can only contain alphanumeric characters, dashes and underscores. Invalid tag(s): ${badTagsString}.`;
+                }
+
+                return null;
+            },
+        },
     });
     type FormValues = typeof form.values;
 
