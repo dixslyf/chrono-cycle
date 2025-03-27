@@ -6,6 +6,7 @@ import {
     DEFAULT_THEME,
     MantineProvider,
     mergeMantineTheme,
+    Textarea,
 } from "@mantine/core";
 import { DatesProvider } from "@mantine/dates";
 import {
@@ -55,6 +56,13 @@ const themeOverride = createTheme({
         Badge: Badge.extend({
             defaultProps: {
                 tt: "none",
+            },
+        }),
+        Textarea: Textarea.extend({
+            defaultProps: {
+                autosize: true,
+                minRows: 4,
+                maxRows: 4,
             },
         }),
     },
