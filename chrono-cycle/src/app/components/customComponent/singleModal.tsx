@@ -1,37 +1,44 @@
 "use client";
 
-import { Box, Group, Modal, Stack, type ModalProps } from "@mantine/core";
+import { Box, Modal, type ModalProps } from "@mantine/core";
 import { ReactNode } from "react";
 
 export function SingleModal({ children, ...props }: ModalProps): ReactNode {
     return (
         <Modal
             centered
-            size="60%"
-            radius="xl"
-            withCloseButton={false}
-            padding="md"
-            {...props}
+            radius="lg"
             styles={{
+                header: { padding: 0 },
+                title: { marginTop: 22, marginLeft: 30 },
+                close: { marginTop: 24, marginRight: 16 },
+                body: {
+                    paddingLeft: 32,
+                    paddingRight: 32,
+                    paddingTop: 30,
+                    paddingBottom: 24,
+                },
                 content: {
                     height: "auto",
+                    padding: 0,
                 },
             }}
+            classNames={{
+                header: "items-start",
+                title: "text-2xl font-bold",
+            }}
+            closeButtonProps={{
+                iconSize: 30,
+                style: {
+                    color: "var(--mantine-color-black)",
+                },
+            }}
+            padding={0}
+            {...props}
         >
-            <Stack gap={0} className="w-full h-full items-stretch">
-                <Group justify="flex-end" px={20} style={{ flex: 1 }}>
-                    <Modal.CloseButton
-                        iconSize={30}
-                        style={{
-                            color: "var(--mantine-color-black)",
-                        }}
-                        onClick={props.onClose}
-                    />
-                </Group>
-                <Box h="100%" w="100%">
-                    {children}
-                </Box>
-            </Stack>
+            <Box h="100%" w="100%">
+                {children}
+            </Box>
         </Modal>
     );
 }

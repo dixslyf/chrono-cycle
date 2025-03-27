@@ -26,8 +26,7 @@ import { useState } from "react";
 
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 
-import { EventTemplate } from "@/common/data/domain";
-import { tagNameSchema } from "@/common/data/domain";
+import { EventTemplate, tagNameSchema } from "@/common/data/domain";
 
 import { createEventTemplateAction } from "@/features/event-templates/create/action";
 import {

@@ -81,19 +81,28 @@ export function CreateProjectTemplateButton() {
 
     return (
         <>
-            <SingleModal opened={createOpened} onClose={closeCreate}>
-                <CreateProjectTemplateForm
-                    onSuccess={closeCreate}
-                    onClose={closeCreate}
-                />
+            <SingleModal
+                title="Create Project Template"
+                opened={createOpened}
+                onClose={closeCreate}
+            >
+                <CreateProjectTemplateForm onSuccess={closeCreate} />
             </SingleModal>
-            <SingleModal opened={importOpened} onClose={closeImport}>
+            <SingleModal
+                title="Import Project Template"
+                opened={importOpened}
+                onClose={closeImport}
+            >
                 <ImportProjectTemplateForm
                     importData={importData ?? undefined}
                     onSuccess={closeImport}
                 />
             </SingleModal>
-            <SingleModal opened={duplicateOpened} onClose={closeDuplicate}>
+            <SingleModal
+                title="Duplicate Project Template"
+                opened={duplicateOpened}
+                onClose={closeDuplicate}
+            >
                 <DuplicateProjectTemplateForm
                     projectTemplates={listPtsQuery.data}
                     isPendingProjectTemplates={listPtsQuery.isPending}
