@@ -4,6 +4,7 @@ import {
     Badge,
     createTheme,
     DEFAULT_THEME,
+    Fieldset,
     MantineProvider,
     mergeMantineTheme,
     Textarea,
@@ -65,10 +66,20 @@ const themeOverride = createTheme({
                 maxRows: 4,
             },
         }),
+        Fieldset: Fieldset.extend({
+            defaultProps: {
+                styles: {
+                    legend: {
+                        paddingLeft: 4,
+                        paddingRight: 4,
+                    },
+                },
+            },
+        }),
     },
 });
 
-const theme = mergeMantineTheme(DEFAULT_THEME, themeOverride);
+export const theme = mergeMantineTheme(DEFAULT_THEME, themeOverride);
 
 const queryClient = new QueryClient({
     queryCache: new QueryCache({

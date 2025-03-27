@@ -24,6 +24,7 @@ import { Calendar, Clock, Plus, Trash, X } from "lucide-react";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useState } from "react";
 
+import { theme } from "@/app/provider";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 
 import { EventTemplate, tagNameSchema } from "@/common/data/domain";
@@ -155,18 +156,31 @@ export function CreateEventTemplateFormLeft({
                         {...form.getInputProps("name")}
                         className="border-none"
                     />
-                    {/* notes */}
+                    {/* note */}
                     <Textarea
-                        label="Notes"
+                        label="Note"
                         size="md"
                         placeholder="Enter note"
                         disabled={mutation.isPending}
                         error="Invalid note"
+                        minRows={3}
+                        maxRows={3}
                         {...form.getInputProps("note")}
                     />
                     <Fieldset
                         legend="Reminders"
-                        className="border-gray-400 rounded-xl flex-1"
+                        unstyled
+                        styles={{
+                            root: {
+                                border: "1px solid",
+                                borderColor: theme.colors.gray[4],
+                            },
+                        }}
+                        classNames={{
+                            root: "relative mt-[26] pl-6 pr-6 pt-4 pb-4",
+                            legend: "absolute top-[-26] left-0 bg-none font-medium",
+                        }}
+                        className="border-gray-400 rounded-md flex-1"
                     >
                         <Stack gap="lg">
                             <SimpleGrid cols={2} className="w-full">
