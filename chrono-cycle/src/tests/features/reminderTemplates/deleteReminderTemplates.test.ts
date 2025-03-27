@@ -1,7 +1,7 @@
 import * as E from "fp-ts/Either";
 import { describe, expect, it } from "vitest";
 
-import { ValidationError } from "@/common/errors";
+import { DoesNotExistError, ValidationError } from "@/common/errors";
 
 import { createEventTemplateAction } from "@/features/event-templates/create/action";
 import { createProjectTemplateAction } from "@/features/project-templates/create/action";
@@ -29,6 +29,13 @@ describe("Delete reminder template server action", () => {
         if (E.isRight(result)) {
             expect(result.right).toEqual(undefined);
         }
+    });
+
+    it("should return DoesNotExistError if reminder template does not exist", async () => {
+        const result = await deleteReminderTemplatesAction(null, {
+            reminderTemplateIds: ["q8OHMOSlE9Czpy4k"],
+        });
+        expect(result).toEqualLeft(DoesNotExistError());
     });
 
     it("should delete a reminder template successfully", async () => {
