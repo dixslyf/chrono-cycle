@@ -2,11 +2,8 @@ import * as E from "fp-ts/Either";
 import { revalidatePath } from "next/cache";
 import { describe, expect, it } from "vitest";
 
-import {
-    DoesNotExistError,
-    DuplicateNameError,
-    ValidationError,
-} from "@/common/errors";
+import { EventTemplate } from "@/common/data/domain";
+import { DoesNotExistError, ValidationError } from "@/common/errors";
 
 import { createEventTemplateAction } from "@/features/event-templates/create/action";
 import { updateEventTemplateAction } from "@/features/event-templates/update/action";
@@ -108,7 +105,7 @@ describe("Update event template server action", () => {
         );
     });
 
-    it("should update an event template successfully", async () => {
+    it("should update an event template successfully when reminder and tag arrays are not specified", async () => {
         const createProjectTemplateResult = await createProjectTemplateAction({
             name: "New Project Name",
             description: "Description of a new project",
@@ -119,7 +116,6 @@ describe("Update event template server action", () => {
             );
         }
         const projectTemplate = createProjectTemplateResult.right;
-        const projectTemplateIdFormTest = projectTemplate.id;
         const createEventTemplateResult = await createEventTemplateAction({
             name: "Event",
             offsetDays: 1,
@@ -127,7 +123,60 @@ describe("Update event template server action", () => {
             note: "Note",
             eventType: "task",
             autoReschedule: true,
-            projectTemplateId: projectTemplateIdFormTest,
+            projectTemplateId: projectTemplate.id,
+            reminders: [],
+            tags: [],
+        });
+        if (E.isLeft(createEventTemplateResult)) {
+            throw new Error(
+                "Create event template action is not implemented correctly!",
+            );
+        }
+        const eventTemplate = createEventTemplateResult.right;
+        const eventTemplateIdFormTest = eventTemplate.id;
+        const result = await updateEventTemplateAction(null, {
+            id: eventTemplateIdFormTest,
+            name: "New Event Name",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            autoReschedule: true,
+        });
+        expect(result).toEqualRight({
+            id: eventTemplateIdFormTest,
+            name: "New Event Name",
+            eventType: "task",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            autoReschedule: true,
+            reminders: [],
+            updatedAt: expect.any(Date),
+            projectTemplateId: projectTemplate.id,
+            tags: [],
+        } satisfies EventTemplate);
+        expect(revalidatePath).toHaveBeenCalledWith("/templates");
+    });
+
+    it("should update an event template successfully when reminder arrays are empty", async () => {
+        const createProjectTemplateResult = await createProjectTemplateAction({
+            name: "New Project Name",
+            description: "Description of a new project",
+        });
+        if (E.isLeft(createProjectTemplateResult)) {
+            throw new Error(
+                "Create project template action is not implemented correctly!",
+            );
+        }
+        const projectTemplate = createProjectTemplateResult.right;
+        const createEventTemplateResult = await createEventTemplateAction({
+            name: "Event",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            eventType: "task",
+            autoReschedule: true,
+            projectTemplateId: projectTemplate.id,
             reminders: [],
             tags: [],
         });
@@ -150,7 +199,329 @@ describe("Update event template server action", () => {
             remindersUpdate: [],
             tags: [],
         });
-        expect(result).toBeRight();
+        expect(result).toEqualRight({
+            id: eventTemplateIdFormTest,
+            name: "New Event Name",
+            eventType: "task",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            autoReschedule: true,
+            reminders: [],
+            updatedAt: expect.any(Date),
+            projectTemplateId: projectTemplate.id,
+            tags: [],
+        } satisfies EventTemplate);
+        expect(revalidatePath).toHaveBeenCalledWith("/templates");
+    });
+
+    it("should update an event template successfully when deleting reminders", async () => {
+        const createProjectTemplateResult = await createProjectTemplateAction({
+            name: "New Project Name",
+            description: "Description of a new project",
+        });
+        if (E.isLeft(createProjectTemplateResult)) {
+            throw new Error(
+                "Create project template action is not implemented correctly!",
+            );
+        }
+        const projectTemplate = createProjectTemplateResult.right;
+        const createEventTemplateResult = await createEventTemplateAction({
+            name: "Event",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            eventType: "task",
+            autoReschedule: true,
+            projectTemplateId: projectTemplate.id,
+            reminders: [
+                { daysBeforeEvent: 0, time: "09:00" },
+                { daysBeforeEvent: 1, time: "09:00" },
+                { daysBeforeEvent: 2, time: "09:00" },
+            ],
+            tags: [],
+        });
+        if (E.isLeft(createEventTemplateResult)) {
+            throw new Error(
+                "Create event template action is not implemented correctly!",
+            );
+        }
+        const eventTemplate = createEventTemplateResult.right;
+        const result = await updateEventTemplateAction(null, {
+            id: eventTemplate.id,
+            remindersDelete: [
+                eventTemplate.reminders[0].id,
+                eventTemplate.reminders[1].id,
+                eventTemplate.reminders[2].id,
+            ],
+        });
+        expect(result).toEqualRight({
+            id: eventTemplate.id,
+            name: "Event",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            eventType: "task",
+            autoReschedule: true,
+            projectTemplateId: projectTemplate.id,
+            updatedAt: expect.any(Date),
+            reminders: [],
+            tags: [],
+        } satisfies EventTemplate);
+        expect(revalidatePath).toHaveBeenCalledWith("/templates");
+    });
+
+    it("should update an event template successfully when inserting reminders", async () => {
+        const createProjectTemplateResult = await createProjectTemplateAction({
+            name: "New Project Name",
+            description: "Description of a new project",
+        });
+        if (E.isLeft(createProjectTemplateResult)) {
+            throw new Error(
+                "Create project template action is not implemented correctly!",
+            );
+        }
+        const projectTemplate = createProjectTemplateResult.right;
+        const createEventTemplateResult = await createEventTemplateAction({
+            name: "Event",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            eventType: "task",
+            autoReschedule: true,
+            projectTemplateId: projectTemplate.id,
+            reminders: [],
+            tags: [],
+        });
+        if (E.isLeft(createEventTemplateResult)) {
+            throw new Error(
+                "Create event template action is not implemented correctly!",
+            );
+        }
+        const eventTemplate = createEventTemplateResult.right;
+        const result = await updateEventTemplateAction(null, {
+            id: eventTemplate.id,
+            remindersInsert: [
+                { daysBeforeEvent: 0, time: "09:00" },
+                { daysBeforeEvent: 1, time: "09:00" },
+                { daysBeforeEvent: 2, time: "09:00" },
+            ],
+        });
+        expect(result).toEqualRight({
+            id: eventTemplate.id,
+            name: "Event",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            eventType: "task",
+            autoReschedule: true,
+            projectTemplateId: projectTemplate.id,
+            updatedAt: expect.any(Date),
+            reminders: [
+                {
+                    id: expect.any(String),
+                    eventTemplateId: eventTemplate.id,
+                    daysBeforeEvent: 0,
+                    time: "09:00:00+00",
+                    emailNotifications: true,
+                    desktopNotifications: true,
+                },
+                {
+                    id: expect.any(String),
+                    eventTemplateId: eventTemplate.id,
+                    daysBeforeEvent: 1,
+                    time: "09:00:00+00",
+                    emailNotifications: true,
+                    desktopNotifications: true,
+                },
+                {
+                    id: expect.any(String),
+                    eventTemplateId: eventTemplate.id,
+                    daysBeforeEvent: 2,
+                    time: "09:00:00+00",
+                    emailNotifications: true,
+                    desktopNotifications: true,
+                },
+            ],
+            tags: [],
+        } satisfies EventTemplate);
+        expect(revalidatePath).toHaveBeenCalledWith("/templates");
+    });
+
+    it("should update an event template successfully when updating reminders", async () => {
+        const createProjectTemplateResult = await createProjectTemplateAction({
+            name: "New Project Name",
+            description: "Description of a new project",
+        });
+        if (E.isLeft(createProjectTemplateResult)) {
+            throw new Error(
+                "Create project template action is not implemented correctly!",
+            );
+        }
+        const projectTemplate = createProjectTemplateResult.right;
+        const createEventTemplateResult = await createEventTemplateAction({
+            name: "Event",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            eventType: "task",
+            autoReschedule: true,
+            projectTemplateId: projectTemplate.id,
+            reminders: [
+                { daysBeforeEvent: 0, time: "09:00" },
+                { daysBeforeEvent: 1, time: "09:00" },
+                { daysBeforeEvent: 2, time: "09:00" },
+            ],
+            tags: [],
+        });
+        if (E.isLeft(createEventTemplateResult)) {
+            throw new Error(
+                "Create event template action is not implemented correctly!",
+            );
+        }
+        const eventTemplate = createEventTemplateResult.right;
+        const result = await updateEventTemplateAction(null, {
+            id: eventTemplate.id,
+            remindersUpdate: [
+                {
+                    id: eventTemplate.reminders[0].id,
+                    daysBeforeEvent: 1,
+                    time: "10:00",
+                    emailNotifications: false,
+                    desktopNotifications: false,
+                },
+                {
+                    id: eventTemplate.reminders[1].id,
+                    daysBeforeEvent: 2,
+                    time: "11:00",
+                    emailNotifications: false,
+                    desktopNotifications: false,
+                },
+                {
+                    id: eventTemplate.reminders[2].id,
+                    daysBeforeEvent: 3,
+                    time: "12:00",
+                    emailNotifications: false,
+                    desktopNotifications: false,
+                },
+            ],
+        });
+        expect(result).toEqualRight({
+            id: eventTemplate.id,
+            name: "Event",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            eventType: "task",
+            autoReschedule: true,
+            projectTemplateId: projectTemplate.id,
+            updatedAt: expect.any(Date),
+            reminders: [
+                {
+                    id: eventTemplate.reminders[0].id,
+                    eventTemplateId: eventTemplate.id,
+                    daysBeforeEvent: 1,
+                    time: "10:00:00+00",
+                    emailNotifications: false,
+                    desktopNotifications: false,
+                },
+                {
+                    id: eventTemplate.reminders[1].id,
+                    eventTemplateId: eventTemplate.id,
+                    daysBeforeEvent: 2,
+                    time: "11:00:00+00",
+                    emailNotifications: false,
+                    desktopNotifications: false,
+                },
+                {
+                    id: eventTemplate.reminders[2].id,
+                    eventTemplateId: eventTemplate.id,
+                    daysBeforeEvent: 3,
+                    time: "12:00:00+00",
+                    emailNotifications: false,
+                    desktopNotifications: false,
+                },
+            ],
+            tags: [],
+        } satisfies EventTemplate);
+        expect(revalidatePath).toHaveBeenCalledWith("/templates");
+    });
+
+    it("should update an event template successfully when inserting, deleting and updating reminders", async () => {
+        const createProjectTemplateResult = await createProjectTemplateAction({
+            name: "New Project Name",
+            description: "Description of a new project",
+        });
+        if (E.isLeft(createProjectTemplateResult)) {
+            throw new Error(
+                "Create project template action is not implemented correctly!",
+            );
+        }
+        const projectTemplate = createProjectTemplateResult.right;
+        const createEventTemplateResult = await createEventTemplateAction({
+            name: "Event",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            eventType: "task",
+            autoReschedule: true,
+            projectTemplateId: projectTemplate.id,
+            reminders: [
+                { daysBeforeEvent: 0, time: "09:00" },
+                { daysBeforeEvent: 1, time: "09:00" },
+            ],
+            tags: [],
+        });
+        if (E.isLeft(createEventTemplateResult)) {
+            throw new Error(
+                "Create event template action is not implemented correctly!",
+            );
+        }
+        const eventTemplate = createEventTemplateResult.right;
+        const result = await updateEventTemplateAction(null, {
+            id: eventTemplate.id,
+            remindersDelete: [eventTemplate.reminders[0].id],
+            remindersUpdate: [
+                {
+                    id: eventTemplate.reminders[1].id,
+                    daysBeforeEvent: 1,
+                    time: "10:00",
+                    emailNotifications: false,
+                    desktopNotifications: false,
+                },
+            ],
+            remindersInsert: [{ daysBeforeEvent: 2, time: "09:00" }],
+        });
+        expect(result).toEqualRight({
+            id: eventTemplate.id,
+            name: "Event",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            eventType: "task",
+            autoReschedule: true,
+            projectTemplateId: projectTemplate.id,
+            updatedAt: expect.any(Date),
+            reminders: [
+                {
+                    id: eventTemplate.reminders[1].id,
+                    eventTemplateId: eventTemplate.id,
+                    daysBeforeEvent: 1,
+                    time: "10:00:00+00",
+                    emailNotifications: false,
+                    desktopNotifications: false,
+                },
+                {
+                    id: expect.any(String),
+                    eventTemplateId: eventTemplate.id,
+                    daysBeforeEvent: 2,
+                    time: "09:00:00+00",
+                    emailNotifications: true,
+                    desktopNotifications: true,
+                },
+            ],
+            tags: [],
+        } satisfies EventTemplate);
         expect(revalidatePath).toHaveBeenCalledWith("/templates");
     });
 });
