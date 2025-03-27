@@ -71,10 +71,10 @@ export type DbExpandedEventTemplateInsert = {
 } & DbEventTemplateInsert;
 
 export type DbExpandedEventTemplateUpdate = DbEventTemplateUpdate & {
-    remindersDelete: number[];
-    remindersUpdate: DbReminderTemplateUpdate[];
-    remindersInsert: Omit<DbReminderTemplateInsert, "eventTemplateId">[];
-    tags: DbTagInsert[];
+    remindersDelete?: number[];
+    remindersUpdate?: DbReminderTemplateUpdate[];
+    remindersInsert?: Omit<DbReminderTemplateInsert, "eventTemplateId">[];
+    tags?: DbTagInsert[];
 };
 
 export const eventTemplateSelectSchema = createSelectSchema(eventTemplates);
