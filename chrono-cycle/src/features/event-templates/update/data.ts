@@ -22,19 +22,24 @@ export const payloadSchema = z.object({
     duration: expandedEventTemplateUpdateSchema.shape.duration,
     note: expandedEventTemplateUpdateSchema.shape.note,
     autoReschedule: expandedEventTemplateUpdateSchema.shape.autoReschedule,
-    remindersDelete: z.array(encodedIdSchema),
-    remindersInsert: z.array(
-        reminderTemplateCreatePayloadSchema.omit({
-            eventTemplateId: true,
-        }),
-    ),
-    remindersUpdate: z.array(
-        expandedEventTemplateUpdateSchema.shape.remindersUpdate.element.setKey(
-            "id",
-            encodedIdSchema,
-        ),
-    ),
-    tags: z.array(tagNameSchema),
+    remindersDelete: z.array(encodedIdSchema).optional(),
+    remindersInsert: z
+        .array(
+            reminderTemplateCreatePayloadSchema.omit({
+                eventTemplateId: true,
+            }),
+        )
+        .optional(),
+    remindersUpdate: z
+        .array(
+            expandedEventTemplateUpdateSchema.shape.remindersUpdate.element.extend(
+                {
+                    id: encodedIdSchema,
+                },
+            ),
+        )
+        .optional(),
+    tags: z.array(tagNameSchema).optional(),
 });
 
 export type Payload = z.input<typeof payloadSchema>;

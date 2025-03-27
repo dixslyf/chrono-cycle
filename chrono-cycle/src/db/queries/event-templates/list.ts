@@ -1,4 +1,4 @@
-import { and, eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns, SQL } from "drizzle-orm";
 import { pipe } from "fp-ts/function";
 import * as NEA from "fp-ts/NonEmptyArray";
 import * as R from "fp-ts/Record";
@@ -7,7 +7,6 @@ import * as TE from "fp-ts/TaskEither";
 import { AssertionError, DoesNotExistError } from "@/common/errors";
 
 import { DbLike } from "@/db";
-import { retrieveProjectTemplate } from "@/db/queries/project-templates/retrieve";
 import {
     DbReminderTemplate,
     DbTag,
@@ -15,6 +14,7 @@ import {
     projectTemplates,
     reminderTemplates,
     tags,
+    users,
 } from "@/db/schema";
 import {
     DbEventTemplate,
@@ -34,70 +34,54 @@ type DbFatEventTemplate = {
     rtDesktopNotifications: boolean | null;
 } & DbEventTemplate;
 
-function retrieveFatEventTemplates(
-    db: DbLike,
-    userId: number,
-    projectTemplateId: number,
-): TE.TaskEither<AssertionError | DoesNotExistError, DbFatEventTemplate[]> {
-    return pipe(
-        // Check that the project template exists.
-        retrieveProjectTemplate(db, userId, projectTemplateId),
-        TE.chain(() =>
-            TE.fromTask(() =>
-                db
-                    .select({
-                        ...getTableColumns(eventTemplates),
+const fatColumns = {
+    ...getTableColumns(eventTemplates),
 
-                        // Tag attributes
-                        tagId: tags.id,
-                        tagName: tags.name,
+    userId: users.id,
 
-                        // Reminder template attributes
-                        rtId: reminderTemplates.id,
-                        rtDaysBeforeEvent: reminderTemplates.daysBeforeEvent,
-                        rtTime: reminderTemplates.time,
-                        rtEmailNotifications:
-                            reminderTemplates.emailNotifications,
-                        rtDesktopNotifications:
-                            reminderTemplates.desktopNotifications,
-                    })
-                    .from(eventTemplates)
+    // Tag attributes
+    tagId: tags.id,
+    tagName: tags.name,
 
-                    // Join with tag tables.
-                    // Must be a left join since we want to get the event template even if it doesn't have any tags.
-                    .leftJoin(
-                        eventTemplateTags,
-                        eq(
-                            eventTemplates.id,
-                            eventTemplateTags.eventTemplateId,
-                        ),
-                    )
-                    .leftJoin(tags, eq(eventTemplateTags.tagId, tags.id))
+    // Reminder template attributes
+    rtId: reminderTemplates.id,
+    rtDaysBeforeEvent: reminderTemplates.daysBeforeEvent,
+    rtTime: reminderTemplates.time,
+    rtEmailNotifications: reminderTemplates.emailNotifications,
+    rtDesktopNotifications: reminderTemplates.desktopNotifications,
+};
 
-                    // Join with reminder template table.
-                    .leftJoin(
-                        reminderTemplates,
-                        eq(
-                            reminderTemplates.eventTemplateId,
-                            eventTemplates.id,
-                        ),
-                    )
-                    .where(
-                        eq(eventTemplates.projectTemplateId, projectTemplateId),
-                    ),
-            ),
-        ),
-        // Add the userId.
-        TE.map((rows) =>
-            rows.map(
-                (row) =>
-                    ({
-                        userId,
-                        ...row,
-                    }) satisfies DbFatEventTemplate,
-            ),
-        ),
-    );
+async function retrieveFatEventTemplates<
+    Where extends
+        | ((aliases: typeof fatColumns) => SQL | undefined)
+        | SQL
+        | undefined,
+>(db: DbLike, where: Where): Promise<DbFatEventTemplate[]> {
+    return await db
+        .select(fatColumns)
+        .from(eventTemplates)
+
+        // Find the user.
+        .innerJoin(
+            projectTemplates,
+            eq(projectTemplates.id, eventTemplates.projectTemplateId),
+        )
+        .innerJoin(users, eq(users.id, projectTemplates.userId))
+
+        // Join with tag tables.
+        // Must be a left join since we want to get the event template even if it doesn't have any tags.
+        .leftJoin(
+            eventTemplateTags,
+            eq(eventTemplates.id, eventTemplateTags.eventTemplateId),
+        )
+        .leftJoin(tags, eq(eventTemplateTags.tagId, tags.id))
+
+        // Join with reminder template table.
+        .leftJoin(
+            reminderTemplates,
+            eq(reminderTemplates.eventTemplateId, eventTemplates.id),
+        )
+        .where(where);
 }
 
 // Process the rows returned by the `retrieveFatEventTemplates()`.
@@ -172,17 +156,57 @@ function processFatEventTemplates(
     return Object.values(etMap);
 }
 
-export function listExpandedEventTemplates(
+async function retrieveExpandedEventTemplates<
+    Where extends
+        | ((aliases: typeof fatColumns) => SQL | undefined)
+        | SQL
+        | undefined,
+>(db: DbLike, where: Where): Promise<DbExpandedEventTemplate[]> {
+    const rows = await retrieveFatEventTemplates(db, where);
+    return processFatEventTemplates(rows);
+}
+
+export async function retrieveExpandedEventTemplatesByProjectTemplateId(
     db: DbLike,
-    userId: number,
     projectTemplateId: number,
-): TE.TaskEither<
-    AssertionError | DoesNotExistError,
-    DbExpandedEventTemplate[]
-> {
+): Promise<DbExpandedEventTemplate[]> {
+    return await retrieveExpandedEventTemplates(
+        db,
+        eq(eventTemplates.projectTemplateId, projectTemplateId),
+    );
+}
+
+export function retrieveExpandedEventTemplateById(
+    db: DbLike,
+    eventTemplateId: number,
+): TE.TaskEither<DoesNotExistError | AssertionError, DbExpandedEventTemplate> {
     return pipe(
-        retrieveFatEventTemplates(db, userId, projectTemplateId),
-        TE.map((rows) => processFatEventTemplates(rows)),
+        TE.fromTask(() =>
+            retrieveFatEventTemplates(
+                db,
+                eq(eventTemplates.id, eventTemplateId),
+            ),
+        ),
+        TE.map((fatEventTemplates) =>
+            processFatEventTemplates(fatEventTemplates),
+        ),
+        TE.chain((rows) => {
+            if (rows.length < 1) {
+                return TE.left(
+                    DoesNotExistError() as DoesNotExistError | AssertionError,
+                );
+            }
+
+            if (rows.length > 1) {
+                return TE.left(
+                    AssertionError(
+                        "Unexpected multiple matching event templates",
+                    ),
+                );
+            }
+
+            return TE.right(rows[0]);
+        }),
     );
 }
 

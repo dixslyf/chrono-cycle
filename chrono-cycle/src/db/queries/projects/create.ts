@@ -15,7 +15,8 @@ import {
 import { extractTimeStringComponents } from "@/lib/reminders";
 
 import { DbLike } from "@/db";
-import { listExpandedEventTemplates } from "@/db/queries/event-templates/list";
+import { retrieveExpandedEventTemplatesByProjectTemplateId } from "@/db/queries/event-templates/list";
+import { retrieveProjectTemplate } from "@/db/queries/project-templates/retrieve";
 import { wrapWithTransaction } from "@/db/queries/utils/transaction";
 import {
     DbEventInsert,
@@ -244,28 +245,40 @@ export function createProject(
 > {
     return pipe(
         checkDuplicateProjectName(db, toInsert.userId, toInsert.name),
-        TE.chainW(() =>
-            toInsert.projectTemplateId
-                ? // Creating with a template.
-                  pipe(
-                      listExpandedEventTemplates(
-                          db,
-                          toInsert.userId,
-                          toInsert.projectTemplateId,
-                      ),
-                      TE.chainW((ets) =>
-                          wrapWithTransaction(db, (tx) =>
-                              rawExpandedInsert(tx, toInsert, ets),
-                          ),
-                      ),
-                  )
-                : // Creating without a template, so no events.
-                  TE.fromTask(() =>
-                      insertProject(db, toInsert).then((proj) => ({
-                          events: [],
-                          ...proj,
-                      })),
-                  ),
-        ),
+        TE.chainW(() => {
+            const projectTemplateId = toInsert.projectTemplateId ?? null;
+            // Creating with a template.
+            if (projectTemplateId) {
+                return pipe(
+                    // Check that the project template exists and is owned by the user.
+                    retrieveProjectTemplate(
+                        db,
+                        toInsert.userId,
+                        projectTemplateId,
+                    ),
+                    TE.chain(() =>
+                        TE.fromTask(() =>
+                            retrieveExpandedEventTemplatesByProjectTemplateId(
+                                db,
+                                projectTemplateId,
+                            ),
+                        ),
+                    ),
+                    TE.chainW((ets) =>
+                        wrapWithTransaction(db, (tx) =>
+                            rawExpandedInsert(tx, toInsert, ets),
+                        ),
+                    ),
+                );
+            }
+
+            // Creating without a template, so no events.
+            return TE.fromTask(() =>
+                insertProject(db, toInsert).then((proj) => ({
+                    events: [],
+                    ...proj,
+                })),
+            );
+        }),
     );
 }
