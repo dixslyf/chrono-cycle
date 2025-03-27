@@ -81,6 +81,157 @@ describe("Create event template server action", () => {
         );
     });
 
+    it("should return validation error if tags have wrong types", async () => {
+        const createProjectTemplateResult = await createProjectTemplateAction({
+            name: "New Project Name",
+            description: "Description of a new project",
+        });
+        if (E.isLeft(createProjectTemplateResult)) {
+            throw new Error(
+                "Create project template action is not implemented correctly!",
+            );
+        }
+        const projectTemplate = createProjectTemplateResult.right;
+        const projectTemplateIdFormTest = projectTemplate.id;
+        const result = await createEventTemplateAction({
+            name: "Event",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            eventType: "task",
+            autoReschedule: true,
+            projectTemplateId: projectTemplateIdFormTest,
+            reminders: [],
+            tags: [1234 as unknown as string, 5678 as unknown as string],
+        });
+
+        expect(result).toEqualLeft(
+            ValidationError({
+                tags: expect.any(Array),
+            }),
+        );
+    });
+
+    it("should return validation error if tag name is empty", async () => {
+        const createProjectTemplateResult = await createProjectTemplateAction({
+            name: "New Project",
+            description: "Description",
+        });
+        if (E.isLeft(createProjectTemplateResult)) {
+            throw new Error(
+                "Create project template action is not implemented correctly!",
+            );
+        }
+        const projectTemplate = createProjectTemplateResult.right;
+        const projectTemplateIdFormTest = projectTemplate.id;
+        const result = await createEventTemplateAction({
+            name: "Event",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            eventType: "task",
+            autoReschedule: true,
+            projectTemplateId: projectTemplateIdFormTest,
+            reminders: [],
+            tags: [""],
+        });
+        expect(result).toEqualLeft(
+            ValidationError({
+                tags: expect.any(Array),
+            }),
+        );
+    });
+
+    it("should return validation error if tag name contains special characters other than dashes and underscores", async () => {
+        const createProjectTemplateResult = await createProjectTemplateAction({
+            name: "New Project",
+            description: "Description",
+        });
+        if (E.isLeft(createProjectTemplateResult)) {
+            throw new Error(
+                "Create project template action is not implemented correctly!",
+            );
+        }
+        const projectTemplate = createProjectTemplateResult.right;
+        const projectTemplateIdFormTest = projectTemplate.id;
+        const result = await createEventTemplateAction({
+            name: "Event",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            eventType: "task",
+            autoReschedule: true,
+            projectTemplateId: projectTemplateIdFormTest,
+            reminders: [],
+            tags: ["@#@$"],
+        });
+        expect(result).toEqualLeft(
+            ValidationError({
+                tags: expect.any(Array),
+            }),
+        );
+    });
+
+    it("should return validation error if tag name contains spaces", async () => {
+        const createProjectTemplateResult = await createProjectTemplateAction({
+            name: "New Project",
+            description: "Description",
+        });
+        if (E.isLeft(createProjectTemplateResult)) {
+            throw new Error(
+                "Create project template action is not implemented correctly!",
+            );
+        }
+        const projectTemplate = createProjectTemplateResult.right;
+        const projectTemplateIdFormTest = projectTemplate.id;
+        const result = await createEventTemplateAction({
+            name: "Event",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            eventType: "task",
+            autoReschedule: true,
+            projectTemplateId: projectTemplateIdFormTest,
+            reminders: [],
+            tags: ["tag 1", "tag 2"],
+        });
+        expect(result).toEqualLeft(
+            ValidationError({
+                tags: expect.any(Array),
+            }),
+        );
+    });
+
+    it("should create a event template with tags successfully", async () => {
+        const createProjectTemplateResult = await createProjectTemplateAction({
+            name: "New Project",
+            description: "Description",
+        });
+        if (E.isLeft(createProjectTemplateResult)) {
+            throw new Error(
+                "Create project template action is not implemented correctly!",
+            );
+        }
+        const projectTemplate = createProjectTemplateResult.right;
+        const projectTemplateIdFormTest = projectTemplate.id;
+        const result = await createEventTemplateAction({
+            name: "New Event",
+            offsetDays: 1,
+            duration: 1,
+            note: "Note",
+            eventType: "task",
+            autoReschedule: true,
+            projectTemplateId: projectTemplateIdFormTest,
+            reminders: [],
+            tags: [
+                "assignment",
+                "school",
+                "abcdefghjiklmnopqrstuvwxyz1234567890-_",
+            ],
+        });
+        expect(result).toBeRight();
+    });
+
     it("should create a event template successfully", async () => {
         const createProjectTemplateResult = await createProjectTemplateAction({
             name: "New Project",
