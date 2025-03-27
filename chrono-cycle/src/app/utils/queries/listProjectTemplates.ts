@@ -4,9 +4,11 @@ import { pipe } from "fp-ts/function";
 
 import { listProjectTemplatesAction } from "@/features/project-templates/list/action";
 
+import { queryKeys } from "./keys";
+
 export function listProjectTemplatesOptions(params?: { onError?: () => void }) {
     return queryOptions({
-        queryKey: ["list-project-templates"],
+        queryKey: queryKeys.projectTemplates.list(),
         queryFn: async function () {
             const listProjectTemplatesResult =
                 await listProjectTemplatesAction();

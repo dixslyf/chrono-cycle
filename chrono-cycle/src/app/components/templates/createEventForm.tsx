@@ -23,6 +23,7 @@ import { zodResolver } from "mantine-form-zod-resolver";
 import { useState } from "react";
 
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
+import { queryKeys } from "@/app/utils/queries/keys";
 
 import { tagNameSchema } from "@/common/data/domain";
 
@@ -92,7 +93,7 @@ export function CreateEventTemplateForm({
         onSuccess: () => {
             // Call `onSuccess` whenever creation is successful + show notifications.
             queryClient.invalidateQueries({
-                queryKey: ["retrieve-project-template"],
+                queryKey: queryKeys.projectTemplates.retrieveBase(),
             });
             notifySuccess({
                 message: "Successfully created event.",

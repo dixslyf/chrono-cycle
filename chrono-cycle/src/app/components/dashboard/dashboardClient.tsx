@@ -7,6 +7,7 @@ import { pipe } from "fp-ts/function";
 import { useState } from "react";
 
 import { generateDaysInRange } from "@/app/utils/dates";
+import { queryKeys } from "@/app/utils/queries/keys";
 
 import { Project } from "@/common/data/domain";
 
@@ -29,7 +30,7 @@ function DashboardClient({
     months,
 }: DashboardProps) {
     const projectsQuery = useQuery({
-        queryKey: ["list-all-projects"],
+        queryKey: queryKeys.projects.listAll(),
         queryFn: async (): Promise<Project[]> => {
             const result = await listAllProjectsAction();
             return pipe(

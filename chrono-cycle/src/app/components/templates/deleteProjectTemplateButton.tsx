@@ -8,6 +8,7 @@ import { Trash } from "lucide-react";
 import { startTransition, useActionState, useEffect } from "react";
 
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
+import { queryKeys } from "@/app/utils/queries/keys";
 
 import { deleteProjectTemplateAction } from "@/features/project-templates/delete/action";
 
@@ -39,7 +40,7 @@ export function DeleteProjectTemplateButton({
             });
             // Refresh the project template for project details.
             queryClient.invalidateQueries({
-                queryKey: ["retrieve-project-template-of-project"],
+                queryKey: queryKeys.projects.retrieveProjectTemplateBase(),
             });
             onSuccess();
         },

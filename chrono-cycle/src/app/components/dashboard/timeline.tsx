@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import DisplayEventDetails from "@/app/components/event/eventDetails";
 import ProjectDetails from "@/app/components/project/projectDetails";
 import { areSameDay } from "@/app/utils/dates";
+import { queryKeys } from "@/app/utils/queries/keys";
 
 import { Event, Project } from "@/common/data/domain";
 
@@ -217,7 +218,9 @@ function Timeline({
         { open: openProjectDetailsModal, close: closeProjectDetailsModal },
     ] = useDisclosure(false);
     const retrieveProjectTemplateQuery = useQuery({
-        queryKey: ["retrieve-project-template-of-project", clickedProject?.id],
+        queryKey: queryKeys.projects.retrieveProjectTemplate(
+            clickedProject?.id ?? null,
+        ),
         queryFn: async () => {
             // Type cast. Guaranteed to not be null since this query is only enabled
             // when it is set.
@@ -274,7 +277,7 @@ function Timeline({
                         onDeleteSuccess={() => {
                             closeProjectDetailsModal();
                             queryClient.invalidateQueries({
-                                queryKey: ["list-all-projects"],
+                                queryKey: queryKeys.projects.listAll(),
                             });
                         }}
                     />
