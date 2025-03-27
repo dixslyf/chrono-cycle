@@ -5,8 +5,8 @@ import { ReactNode } from "react";
 
 import classes from "./split-modal.module.css";
 
-const SECTION_PX = 36;
-const SECTION_PY = 24;
+const SECTION_PX = 30;
+const SECTION_PY = 22;
 
 export type SplitModalProps = Omit<ModalProps, "withCloseButton" | "title">;
 
@@ -16,7 +16,7 @@ export function SplitModal(props: SplitModalProps): ReactNode {
         <Modal
             centered
             size="100%"
-            radius="xl"
+            radius="lg"
             withCloseButton={false}
             padding={0}
             {...passedProps}
