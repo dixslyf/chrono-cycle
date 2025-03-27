@@ -2,8 +2,9 @@ import * as E from "fp-ts/Either";
 import { z } from "zod";
 
 import {
-    DuplicateNameError,
+    EmailTakenError,
     InternalError,
+    UsernameTakenError,
     ValidationError,
 } from "@/common/errors";
 
@@ -27,7 +28,8 @@ export type ParsedPayload = z.output<typeof payloadSchema>;
 
 export type Failure =
     | ValidationError<"username" | "email" | "password">
-    | DuplicateNameError
+    | UsernameTakenError
+    | EmailTakenError
     | InternalError;
 
 export type Result = E.Either<Failure, void>;

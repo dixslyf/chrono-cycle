@@ -30,7 +30,7 @@ const Auth = () => {
                             : "opacity-0 z-10"
                     }`}
                 >
-                    <SignupForm />
+                    <SignupForm onSuccess={() => setSignUpActive(false)} />
                 </div>
 
                 {/* overlay section */}
