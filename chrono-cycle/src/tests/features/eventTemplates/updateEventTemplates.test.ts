@@ -12,7 +12,7 @@ import { createEventTemplateAction } from "@/features/event-templates/create/act
 import { updateEventTemplateAction } from "@/features/event-templates/update/action";
 import { createProjectTemplateAction } from "@/features/project-templates/create/action";
 
-describe("Create event template server action", () => {
+describe("Update event template server action", () => {
     it("should return validation error if payload has wrong types", async () => {
         const result = await updateEventTemplateAction(null, {
             id: 1234 as unknown as string,
@@ -108,7 +108,7 @@ describe("Create event template server action", () => {
         );
     });
 
-    // it("should return DuplicateNameError if project template name already exists", async () => {
+    // it("should return DuplicateNameError if event template name already exists", async () => {
     //     const createProjectTemplateResult = await createProjectTemplateAction(
     //         {
     //             name: "New Project Name",

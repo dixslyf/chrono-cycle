@@ -1,7 +1,7 @@
 import * as E from "fp-ts/Either";
 import { describe, expect, it } from "vitest";
 
-import { DoesNotExistError, ValidationError } from "@/common/errors";
+import { ValidationError } from "@/common/errors";
 
 import { createEventTemplateAction } from "@/features/event-templates/create/action";
 import { createProjectTemplateAction } from "@/features/project-templates/create/action";
@@ -21,7 +21,7 @@ describe("Delete reminder template server action", () => {
         );
     });
 
-    it("should return validation error if event template id is empty", async () => {
+    it("should return validation error if reminder template id is empty", async () => {
         const result = await deleteReminderTemplatesAction(null, {
             reminderTemplateIds: [],
         });

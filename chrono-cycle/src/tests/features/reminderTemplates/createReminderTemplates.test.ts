@@ -1,17 +1,13 @@
 import * as E from "fp-ts/Either";
 import { describe, expect, it } from "vitest";
 
-import {
-    DoesNotExistError,
-    DuplicateReminderError,
-    ValidationError,
-} from "@/common/errors";
+import { ValidationError } from "@/common/errors";
 
 import { createEventTemplateAction } from "@/features/event-templates/create/action";
 import { createProjectTemplateAction } from "@/features/project-templates/create/action";
 import { createReminderTemplateAction } from "@/features/reminder-templates/create/action";
 
-describe("Create event template server action", () => {
+describe("Create reminder template server action", () => {
     it("should return validation error if payload has wrong types", async () => {
         const result = await createReminderTemplateAction(null, {
             eventTemplateId: 1234 as unknown as string,
