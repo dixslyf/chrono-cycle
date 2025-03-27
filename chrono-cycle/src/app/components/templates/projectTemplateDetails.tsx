@@ -126,6 +126,7 @@ export function ProjectTemplateDetailsRight({
             <Group justify="flex-end">
                 <ExportProjectTemplateButton
                     projectTemplate={projectTemplate}
+                    disabled={isLoading}
                 />
                 <DeleteProjectTemplateButton
                     projectTemplateId={projectTemplate?.id ?? ""}

@@ -2,7 +2,12 @@ import { pipe } from "fp-ts/lib/function";
 import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 
-import { AssertionError, DuplicateNameError } from "@/common/errors";
+import {
+    AssertionError,
+    DuplicateNameError,
+    EmailTakenError,
+    UsernameTakenError,
+} from "@/common/errors";
 
 import { hashPassword } from "@/lib/auth/passwords";
 
@@ -33,11 +38,29 @@ function createUserBridge(
 
 export function bridge(
     payloadP: ParsedPayload,
-): TE.TaskEither<DuplicateNameError | AssertionError, void> {
+): TE.TaskEither<UsernameTakenError | EmailTakenError | AssertionError, void> {
     return pipe(
         TE.fromTask(getDb),
-        TE.tap((db) => checkDuplicateUsername(db, payloadP.username)),
-        TE.tap((db) => checkDuplicateEmail(db, payloadP.email)),
+        TE.tap((db) =>
+            pipe(
+                checkDuplicateUsername(db, payloadP.username),
+                TE.mapError((err) =>
+                    err._errorKind === "DuplicateNameError"
+                        ? UsernameTakenError()
+                        : err,
+                ),
+            ),
+        ),
+        TE.tap((db) =>
+            pipe(
+                checkDuplicateEmail(db, payloadP.email),
+                TE.mapError((err) =>
+                    err._errorKind === "DuplicateNameError"
+                        ? EmailTakenError()
+                        : err,
+                ),
+            ),
+        ),
         TE.chain((db) => TE.fromTask(createUserBridge(db, payloadP))),
         TE.map(() => undefined),
     );
