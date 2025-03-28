@@ -19,7 +19,8 @@
   border-color: var(--bg-palette2);
 }
 
-.mantine-Modal-content, .mantine-Modal-body {
+.mantine-Modal-content,
+.mantine-Modal-body {
   height: 100%;
   width: 100%;
 }

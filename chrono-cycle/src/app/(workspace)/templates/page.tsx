@@ -9,7 +9,9 @@ export default async function Templates() {
     return (
         <>
             {/* header section */}
-            <Text className="text-4xl font-bold p-4">Manage Project Templates</Text>
+            <Text className="text-4xl font-bold p-4">
+                Manage Project Templates
+            </Text>
 
             {/* create template section */}
             <Stack className="w-full pl-12 px-4 flex-1">
