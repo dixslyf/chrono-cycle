@@ -105,14 +105,14 @@ export function ProjectTemplatesTable(): React.ReactNode {
                 <SplitModal
                     {...modalStack.register("project-template-details")}
                 >
-                    <SplitModal.Left>
+                    <SplitModal.Left title={retrieveQuery.data?.name}>
                         <ProjectTemplateDetailsLeft
                             modalStack={modalStack}
                             projectTemplate={retrieveQuery.data}
                             isLoading={retrieveQuery.isPending}
                         />
                     </SplitModal.Left>
-                    <SplitModal.Right>
+                    <SplitModal.Right title="Metadata">
                         <ProjectTemplateDetailsRight
                             projectTemplate={retrieveQuery.data}
                             onDeleteSuccess={closeModal}

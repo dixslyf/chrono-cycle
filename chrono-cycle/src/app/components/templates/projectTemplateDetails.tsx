@@ -35,11 +35,6 @@ export function ProjectTemplateDetailsLeft<T extends string>({
         // This part will eventually change to form. Data will be the value for inputs
         <Stack className="h-full overflow-y-auto" align="stretch" gap="xl">
             <Skeleton visible={isLoading}>
-                <Text className="text-3xl font-bold h-1/8">
-                    {projectTemplate?.name}
-                </Text>
-            </Skeleton>
-            <Skeleton visible={isLoading}>
                 <Stack className="h-1/4" align="stretch">
                     <Text className="text-palette5 font-semibold text-xl">
                         Description:
