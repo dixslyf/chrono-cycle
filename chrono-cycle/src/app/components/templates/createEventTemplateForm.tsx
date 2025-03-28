@@ -212,16 +212,6 @@ export function CreateEventTemplateFormLeft({
                             {...form.getInputProps("duration")}
                         />
                     </Group>
-                    {/* auto reschedule */}
-                    <Group justify="flex-end">
-                        <Checkbox
-                            size="md"
-                            label="Automatically Reschedule"
-                            defaultChecked
-                            disabled={mutation.isPending}
-                            {...form.getInputProps("autoReschedule")}
-                        />
-                    </Group>
                     <Stack gap="sm">
                         <TagsInput
                             size="md"
@@ -314,14 +304,6 @@ function RemindersInput({
                                             disabled={mutation.isPending}
                                             {...form.getInputProps(
                                                 `reminders.${index}.emailNotifications`,
-                                                { type: "checkbox" },
-                                            )}
-                                        />
-                                        <Checkbox
-                                            label="Desktop notification"
-                                            disabled={mutation.isPending}
-                                            {...form.getInputProps(
-                                                `reminders.${index}.desktopNotifications`,
                                                 { type: "checkbox" },
                                             )}
                                         />
