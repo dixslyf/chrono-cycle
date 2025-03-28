@@ -5,12 +5,10 @@ import {
     Button,
     Checkbox,
     Fieldset,
-    Flex,
     Group,
     NumberInput,
     ScrollArea,
     Select,
-    SimpleGrid,
     Stack,
     TagsInput,
     Text,
@@ -157,19 +155,6 @@ export function CreateEventTemplateFormLeft({
                         {...form.getInputProps("name")}
                         className="border-none"
                     />
-                    {/* note */}
-                    <Textarea
-                        label="Note"
-                        description="An optional note to attach to the event"
-                        size="md"
-                        placeholder="Enter note"
-                        disabled={mutation.isPending}
-                        error="Invalid note"
-                        minRows={3}
-                        maxRows={3}
-                        {...form.getInputProps("note")}
-                    />
-                    {/* offset days, auto reschedule, event type, duration */}
                     {/* event type */}
                     <Select
                         size="md"
@@ -212,16 +197,26 @@ export function CreateEventTemplateFormLeft({
                             {...form.getInputProps("duration")}
                         />
                     </Group>
-                    <Stack gap="sm">
-                        <TagsInput
-                            size="md"
-                            label="Tags"
-                            description="Tags to attach to the event"
-                            placeholder="Add a Tag"
-                            {...form.getInputProps("tags")}
-                            classNames={{ pill: "bg-gray-200" }}
-                        />
-                    </Stack>
+                    {/* note */}
+                    <Textarea
+                        label="Note"
+                        description="An optional note to attach to the event"
+                        size="md"
+                        placeholder="Enter note"
+                        disabled={mutation.isPending}
+                        error="Invalid note"
+                        minRows={3}
+                        maxRows={3}
+                        {...form.getInputProps("note")}
+                    />
+                    <TagsInput
+                        size="md"
+                        label="Tags"
+                        description="Tags to attach to the event"
+                        placeholder="Add a Tag"
+                        {...form.getInputProps("tags")}
+                        classNames={{ pill: "bg-gray-200" }}
+                    />
                 </Stack>
             </form>
         </Stack>
