@@ -4,8 +4,10 @@ import {
     Badge,
     createTheme,
     DEFAULT_THEME,
+    Fieldset,
     MantineProvider,
     mergeMantineTheme,
+    Textarea,
 } from "@mantine/core";
 import { DatesProvider } from "@mantine/dates";
 import {
@@ -57,10 +59,27 @@ const themeOverride = createTheme({
                 tt: "none",
             },
         }),
+        Textarea: Textarea.extend({
+            defaultProps: {
+                autosize: true,
+                minRows: 4,
+                maxRows: 4,
+            },
+        }),
+        Fieldset: Fieldset.extend({
+            defaultProps: {
+                styles: {
+                    legend: {
+                        paddingLeft: 4,
+                        paddingRight: 4,
+                    },
+                },
+            },
+        }),
     },
 });
 
-const theme = mergeMantineTheme(DEFAULT_THEME, themeOverride);
+export const theme = mergeMantineTheme(DEFAULT_THEME, themeOverride);
 
 const queryClient = new QueryClient({
     queryCache: new QueryCache({

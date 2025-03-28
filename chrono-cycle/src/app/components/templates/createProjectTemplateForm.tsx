@@ -1,6 +1,14 @@
 "use client";
 
-import { Button, Group, Textarea, TextInput } from "@mantine/core";
+import {
+    Box,
+    Button,
+    Group,
+    List,
+    Stack,
+    Textarea,
+    TextInput,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
@@ -93,53 +101,73 @@ export function CreateProjectTemplateForm({
     });
 
     return (
-        <form
-            onSubmit={form.onSubmit((values) => createMutation.mutate(values))}
-        >
-            <TextInput
-                name="name"
-                label="Name"
-                required
-                description="Name of the project template"
-                error="Invalid project template name"
-                placeholder="Project template name"
-                disabled={createMutation.isPending}
-                {...form.getInputProps("name")}
-            />
-            <Textarea
-                name="description"
-                label="Description"
-                required
-                description="Enter description"
-                error="Invalid description"
-                placeholder="Add description"
-                disabled={createMutation.isPending}
-                {...form.getInputProps("description")}
-            />
-            <div className="relative mb-4">
-                <ul className="text-red-500">
-                    {createMutation.isError &&
-                        getCreateErrorMessage(createMutation.error)}
-                    {createMutation.isError &&
-                        Object.entries(
-                            extractValidationIssues(createMutation.error),
-                        ).flatMap(([fieldName, errors]) =>
-                            errors.map((err, idx) => (
-                                <li
-                                    key={`${fieldName}-${idx}`}
-                                    className="px-4 py-3"
-                                >
-                                    {err || ""}
-                                </li>
-                            )),
-                        )}
-                </ul>
-            </div>
-            <Group justify="flex-end">
-                <Button type="submit" loading={createMutation.isPending}>
-                    Create
-                </Button>
-            </Group>
-        </form>
+        <Stack>
+            <form
+                onSubmit={form.onSubmit((values) =>
+                    createMutation.mutate(values),
+                )}
+            >
+                <Stack gap="xl">
+                    <TextInput
+                        size="md"
+                        name="name"
+                        label="Name"
+                        required
+                        description="Name of the new project template"
+                        placeholder="Project template name"
+                        disabled={createMutation.isPending}
+                        {...form.getInputProps("name")}
+                    />
+                    <Textarea
+                        size="md"
+                        name="description"
+                        label="Description"
+                        required
+                        description="A description of the new project template"
+                        error="Invalide description"
+                        placeholder="Add description"
+                        disabled={createMutation.isPending}
+                        {...form.getInputProps("description")}
+                    />
+                    {createMutation.isError && (
+                        <Box className="relative mb-4">
+                            <List
+                                spacing="xs"
+                                size="sm"
+                                className="text-red-500"
+                            >
+                                <List.Item>
+                                    {getCreateErrorMessage(
+                                        createMutation.error,
+                                    )}
+                                </List.Item>
+                                {Object.entries(
+                                    extractValidationIssues(
+                                        createMutation.error,
+                                    ),
+                                ).flatMap(([fieldName, errors]) =>
+                                    errors.map((err, idx) => (
+                                        <List.Item
+                                            key={`${fieldName}-${idx}`}
+                                            className="px-4 py-3"
+                                        >
+                                            {err || ""}
+                                        </List.Item>
+                                    )),
+                                )}
+                            </List>
+                        </Box>
+                    )}
+                    <Group justify="flex-end">
+                        <Button
+                            type="submit"
+                            loading={createMutation.isPending}
+                        >
+                            Create Template
+                        </Button>
+                    </Group>
+                </Stack>
+            </form>
+        </Stack>
     );
 }

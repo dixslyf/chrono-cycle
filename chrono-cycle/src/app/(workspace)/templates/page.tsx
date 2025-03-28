@@ -1,28 +1,29 @@
 // template page
 
-import { Group, Stack } from "@mantine/core";
+import { Divider, Group, Space, Stack, Title } from "@mantine/core";
 
 import { CreateProjectTemplateButton } from "@/app/components/templates/createProjectTemplateButton";
 import { ProjectTemplatesTable } from "@/app/components/templates/projectTemplatesTable";
 
 export default async function Templates() {
     return (
-        <>
-            {/* <h1>This is the template page</h1> */}
-            {/* header section */}
-            <section>
-                <h1>Manage Templates</h1>
-            </section>
+        <Group justify="center" className="w-full">
+            <Stack className="w-1/2" mt={24}>
+                {/* header section */}
+                <Title order={1} className="text-2xl font-bold" pl={12} pr={12}>
+                    Manage Project Templates
+                </Title>
 
-            {/* create template section */}
-            <section className="w-full flex justify-center">
-                <Stack>
+                <Divider />
+                <Space />
+
+                <Stack pl={12} pr={12}>
                     <ProjectTemplatesTable />
                     <Group justify="flex-end">
                         <CreateProjectTemplateButton />
                     </Group>
                 </Stack>
-            </section>
-        </>
+            </Stack>
+        </Group>
     );
 }

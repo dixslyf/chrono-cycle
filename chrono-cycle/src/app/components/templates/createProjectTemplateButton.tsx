@@ -6,7 +6,6 @@ import {
     FileButton,
     Group,
     Menu,
-    Modal,
     Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -14,6 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronUp, Copy, Upload } from "lucide-react";
 import { useState } from "react";
 
+import { SingleModal } from "@/app/components/customComponent/singleModal";
 import splitButtonClasses from "@/app/split-button.module.css";
 import { notifyError } from "@/app/utils/notifications";
 import { listProjectTemplatesOptions } from "@/app/utils/queries/listProjectTemplates";
@@ -80,37 +80,34 @@ export function CreateProjectTemplateButton() {
 
     return (
         <>
-            <Modal
+            <SingleModal
+                title="Create Project Template"
                 opened={createOpened}
                 onClose={closeCreate}
-                title="Create Project Template"
-                centered
             >
                 <CreateProjectTemplateForm onSuccess={closeCreate} />
-            </Modal>
-            <Modal
+            </SingleModal>
+            <SingleModal
+                title="Import Project Template"
                 opened={importOpened}
                 onClose={closeImport}
-                title="Import Project Template"
-                centered
             >
                 <ImportProjectTemplateForm
                     importData={importData ?? undefined}
                     onSuccess={closeImport}
                 />
-            </Modal>
-            <Modal
+            </SingleModal>
+            <SingleModal
+                title="Duplicate Project Template"
                 opened={duplicateOpened}
                 onClose={closeDuplicate}
-                title="Duplicate Project Template"
-                centered
             >
                 <DuplicateProjectTemplateForm
                     projectTemplates={listPtsQuery.data}
                     isPendingProjectTemplates={listPtsQuery.isPending}
                     onSuccess={closeDuplicate}
                 />
-            </Modal>
+            </SingleModal>
             {/* Based on: https://ui.mantine.dev/category/buttons/#split-button */}
             <Group wrap="nowrap" gap={0}>
                 <Button
@@ -130,13 +127,20 @@ export function CreateProjectTemplateButton() {
                             <ChevronUp />
                         </ActionIcon>
                     </Menu.Target>
-                    <Menu.Dropdown>
+                    <Menu.Dropdown className="rounded-lg overflow-hidden shadow-lg p-0">
+                        <Text className="px-4 py-2 font-semibold text-palette3 bg-palette2 border-b">
+                            Template Actions
+                        </Text>
                         <FileButton
                             onChange={fileOnChange}
                             accept="application/json"
                         >
                             {(props) => (
-                                <Menu.Item leftSection={<Upload />} {...props}>
+                                <Menu.Item
+                                    leftSection={<Upload />}
+                                    {...props}
+                                    className="hover:bg-gray-200 transition-colors duration-200 ease-in"
+                                >
                                     Import
                                 </Menu.Item>
                             )}
@@ -144,6 +148,7 @@ export function CreateProjectTemplateButton() {
                         <Menu.Item
                             leftSection={<Copy />}
                             onClick={onClickDuplicate}
+                            className="hover:bg-gray-200 transition-colors duration-200 ease-in"
                         >
                             Duplicate
                         </Menu.Item>

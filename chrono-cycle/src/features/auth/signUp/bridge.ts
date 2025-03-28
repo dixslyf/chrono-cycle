@@ -4,7 +4,6 @@ import * as TE from "fp-ts/TaskEither";
 
 import {
     AssertionError,
-    DuplicateNameError,
     EmailTakenError,
     UsernameTakenError,
 } from "@/common/errors";

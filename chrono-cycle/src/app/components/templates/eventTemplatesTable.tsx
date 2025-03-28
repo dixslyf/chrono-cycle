@@ -1,19 +1,17 @@
 "use client";
 
-import {
-    Box,
-    Group,
-    Modal,
-    Pagination,
-    Table,
-    useModalsStack,
-} from "@mantine/core";
+import { Box, Group, Pagination, Table, useModalsStack } from "@mantine/core";
 import React, { useCallback, useState } from "react";
+
+import { SplitModal } from "@/app/components/customComponent/splitModal";
 
 import { EventTemplate } from "@/common/data/domain";
 
-import { CreateEventTemplateButton } from "./createEventButton";
-import EventTemplateDetails from "./eventTemplateDetails";
+import { CreateEventTemplateButton } from "./createEventTemplateButton";
+import {
+    EventTemplateDetailsLeft,
+    EventTemplateDetailsRight,
+} from "./eventTemplateDetails";
 
 interface EventsTableProps<T extends string> {
     projectTemplateId: string;
@@ -55,7 +53,7 @@ function InnerEventTemplatesTable<T extends string>({
 
     return (
         <>
-            <Table highlightOnHover>
+            <Table>
                 <Table.Thead>
                     <Table.Tr>
                         <Table.Th className="font-semibold">Name</Table.Th>
@@ -71,7 +69,7 @@ function InnerEventTemplatesTable<T extends string>({
                         <Table.Tr
                             key={eventTemplate.id}
                             onClick={() => handleRowClick(eventTemplate)}
-                            className="cursor-pointer"
+                            className="cursor-pointer hover:bg-gray-200"
                         >
                             <Table.Td className="w-2/5">
                                 {eventTemplate.name}
@@ -131,7 +129,7 @@ export function EventTemplatesTable<T extends string>({
     projectTemplateId,
     modalStack,
     eventTemplates,
-    rowsPerPage = 10,
+    rowsPerPage = 7,
 }: EventsTableProps<T>): React.ReactNode {
     const { close: modalStackClose } = modalStack;
     const closeEventDetailsModal = useCallback(
@@ -145,24 +143,26 @@ export function EventTemplatesTable<T extends string>({
 
     return (
         <>
-            {/* Modal to display event details */}
-            <Modal
-                centered
-                size="80%"
-                radius="xl"
-                withCloseButton={false}
-                padding={0}
-                {...modalStack.register("event-details")}
-            >
+            <SplitModal {...modalStack.register("event-details")}>
                 {selectedEventTemplate ? (
-                    <EventTemplateDetails
-                        eventTemplate={selectedEventTemplate}
-                        onClose={closeEventDetailsModal}
-                    />
+                    <>
+                        <SplitModal.Left title={selectedEventTemplate.name}>
+                            <EventTemplateDetailsLeft
+                                eventTemplate={selectedEventTemplate}
+                                onClose={closeEventDetailsModal}
+                            />
+                        </SplitModal.Left>
+                        <SplitModal.Right>
+                            <EventTemplateDetailsRight
+                                eventTemplate={selectedEventTemplate}
+                                onClose={closeEventDetailsModal}
+                            />
+                        </SplitModal.Right>
+                    </>
                 ) : (
                     <Box>Loading event details...</Box>
                 )}
-            </Modal>
+            </SplitModal>
 
             <InnerEventTemplatesTable
                 projectTemplateId={projectTemplateId}

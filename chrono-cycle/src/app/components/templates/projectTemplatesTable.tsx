@@ -1,12 +1,20 @@
 "use client";
 
-import { Modal, useModalsStack } from "@mantine/core";
+import {
+    Group,
+    Loader,
+    Modal,
+    ScrollArea,
+    Stack,
+    Text,
+    useModalsStack,
+} from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
-import { DataTable } from "mantine-datatable";
 import { useCallback, useState } from "react";
 
+import { SplitModal } from "@/app/components/customComponent/splitModal";
 import { formatDate } from "@/app/utils/dates";
 import { queryKeys } from "@/app/utils/queries/keys";
 import { listProjectTemplatesOptions } from "@/app/utils/queries/listProjectTemplates";
@@ -15,14 +23,10 @@ import { ProjectTemplate } from "@/common/data/domain";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 
-import { ProjectTemplateDetails } from "./projectTemplateDetails";
-
-const columns = [
-    { accessor: "name", title: "Name" },
-    { accessor: "description", title: "Description" },
-    { accessor: "createdAt", title: "Created at" },
-    { accessor: "updatedAt", title: "Updated at" },
-];
+import {
+    ProjectTemplateDetailsLeft,
+    ProjectTemplateDetailsRight,
+} from "./projectTemplateDetails";
 
 export function ProjectTemplatesTable(): React.ReactNode {
     const listPtsQuery = useQuery(listProjectTemplatesOptions());
@@ -87,38 +91,58 @@ export function ProjectTemplatesTable(): React.ReactNode {
         <>
             <Modal.Stack>
                 {/* Modal window for showing the details of the clicked project template. */}
-                <Modal
-                    centered
-                    size="100%"
-                    radius="xl"
-                    withCloseButton={false}
-                    padding={0}
+                <SplitModal
                     {...modalStack.register("project-template-details")}
                 >
-                    {/* Template details */}
-                    <ProjectTemplateDetails
-                        modalStack={modalStack}
-                        projectTemplate={retrieveQuery.data}
-                        onClose={closeModal}
-                        isLoading={retrieveQuery.isPending}
-                    />
-                </Modal>
+                    <SplitModal.Left title={retrieveQuery.data?.name}>
+                        <ProjectTemplateDetailsLeft
+                            modalStack={modalStack}
+                            projectTemplate={retrieveQuery.data}
+                            isLoading={retrieveQuery.isPending}
+                        />
+                    </SplitModal.Left>
+                    <SplitModal.Right title="Metadata">
+                        <ProjectTemplateDetailsRight
+                            projectTemplate={retrieveQuery.data}
+                            onDeleteSuccess={closeModal}
+                            isLoading={retrieveQuery.isPending}
+                        />
+                    </SplitModal.Right>
+                </SplitModal>
             </Modal.Stack>
-
-            {/* Table to show available project templates. */}
-            <DataTable
-                highlightOnHover
-                withTableBorder
-                columns={columns}
-                records={records}
-                fetching={listPtsQuery.isPending}
-                minHeight={150}
-                noRecordsText="No project templates"
-                onRowClick={async ({ record: { id } }) => {
-                    modalStack.open("project-template-details");
-                    setClickedId(id);
-                }}
-            />
+            {/* Project Template Table */}
+            <ScrollArea className="h-[80%] w-full">
+                <Group>
+                    <Stack className="w-full">
+                        {listPtsQuery.isPending ? (
+                            <Loader size="md" />
+                        ) : records.length === 0 ? (
+                            <Text className="text-lg">
+                                No Project Templates
+                            </Text>
+                        ) : (
+                            <Stack>
+                                {records.map((record) => (
+                                    <Group
+                                        key={record.id}
+                                        className="cursor-pointer border border-gray-300 rounded-xl p-4 hover:bg-gray-200 transition-colors duration-200 ease-in"
+                                        onClick={() => {
+                                            modalStack.open(
+                                                "project-template-details",
+                                            );
+                                            setClickedId(record.id);
+                                        }}
+                                    >
+                                        <Text className="text-xl font-semibold text-palette5">
+                                            {record.name}
+                                        </Text>
+                                    </Group>
+                                ))}
+                            </Stack>
+                        )}
+                    </Stack>
+                </Group>
+            </ScrollArea>
         </>
     );
 }

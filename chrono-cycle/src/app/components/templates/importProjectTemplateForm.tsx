@@ -6,11 +6,9 @@ import { useMutation } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { match, P } from "ts-pattern";
+import { match } from "ts-pattern";
 
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
-
-import { ValidationIssues } from "@/common/errors";
 
 import { importProjectTemplateAction } from "@/features/project-templates/import/action";
 import {
@@ -77,36 +75,45 @@ export function ImportProjectTemplateForm({
     });
 
     return (
-        <form
-            onSubmit={form.onSubmit((values) => importMutation.mutate(values))}
-        >
-            <Stack>
-                <TextInput
-                    name="name"
-                    label="Name"
-                    required
-                    description="Name of the project template"
-                    error="Invalid project template name"
-                    placeholder="Project template name"
-                    disabled={importMutation.isPending}
-                    {...form.getInputProps("name")}
-                />
-                <Textarea
-                    name="description"
-                    label="Description"
-                    required
-                    description="Enter description"
-                    error="Invalid description"
-                    placeholder="Add description"
-                    disabled={importMutation.isPending}
-                    {...form.getInputProps("description")}
-                />
-                <Group justify="flex-end">
-                    <Button type="submit" loading={importMutation.isPending}>
-                        Import
-                    </Button>
-                </Group>
-            </Stack>
-        </form>
+        <Stack>
+            <form
+                onSubmit={form.onSubmit((values) =>
+                    importMutation.mutate(values),
+                )}
+            >
+                <Stack gap="xl">
+                    <TextInput
+                        size="md"
+                        name="name"
+                        label="Name"
+                        required
+                        description="Name of the new project template"
+                        error="Invalid project template name"
+                        placeholder="Project template name"
+                        disabled={importMutation.isPending}
+                        {...form.getInputProps("name")}
+                    />
+                    <Textarea
+                        size="md"
+                        name="description"
+                        label="Description"
+                        required
+                        description="A description of the new project template"
+                        error="Invalid description"
+                        placeholder="Add description"
+                        disabled={importMutation.isPending}
+                        {...form.getInputProps("description")}
+                    />
+                    <Group justify="flex-end">
+                        <Button
+                            type="submit"
+                            loading={importMutation.isPending}
+                        >
+                            Import
+                        </Button>
+                    </Group>
+                </Stack>
+            </form>
+        </Stack>
     );
 }
