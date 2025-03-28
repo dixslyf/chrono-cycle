@@ -150,28 +150,26 @@ export function EventTemplatesTable<T extends string>({
 
     return (
         <>
-            <Modal.Stack>
-                <SplitModal {...modalStack.register("event-details")}>
-                    {selectedEventTemplate ? (
-                        <>
-                            <SplitModal.Left>
-                                <EventTemplateDetailsLeft
-                                    eventTemplate={selectedEventTemplate}
-                                    onClose={closeEventDetailsModal}
-                                />
-                            </SplitModal.Left>
-                            <SplitModal.Right>
-                                <EventTemplateDetailsRight
-                                    eventTemplate={selectedEventTemplate}
-                                    onClose={closeEventDetailsModal}
-                                />
-                            </SplitModal.Right>
-                        </>
-                    ) : (
-                        <Box>Loading event details...</Box>
-                    )}
-                </SplitModal>
-            </Modal.Stack>
+            <SplitModal {...modalStack.register("event-details")}>
+                {selectedEventTemplate ? (
+                    <>
+                        <SplitModal.Left>
+                            <EventTemplateDetailsLeft
+                                eventTemplate={selectedEventTemplate}
+                                onClose={closeEventDetailsModal}
+                            />
+                        </SplitModal.Left>
+                        <SplitModal.Right>
+                            <EventTemplateDetailsRight
+                                eventTemplate={selectedEventTemplate}
+                                onClose={closeEventDetailsModal}
+                            />
+                        </SplitModal.Right>
+                    </>
+                ) : (
+                    <Box>Loading event details...</Box>
+                )}
+            </SplitModal>
 
             <InnerEventTemplatesTable
                 projectTemplateId={projectTemplateId}
