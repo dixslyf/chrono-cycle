@@ -107,12 +107,12 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
             <Paper
                 withBorder
                 p={0}
-                className="absolute bg-gray-100 shadow-md rounded-md flex items-center justify-center text-sm font-bold text-gray-800 cursor-pointer"
+                className="bg-gray-100 shadow-md rounded-md flex items-center justify-center text-sm font-bold text-gray-800 cursor-pointer"
                 style={{
-                    left: `${leftOffset}px`,
+                    marginLeft: `${leftOffset}px`,
                     width: `${width}px`,
-                    height: `${headerHeight}px`,
-                    lineHeight: `${headerHeight}px`,
+                    // height: `${headerHeight}px`,
+                    // lineHeight: `${headerHeight}px`,
                 }}
                 onClick={() => onProjectClick(project)}
             >

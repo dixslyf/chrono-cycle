@@ -128,10 +128,6 @@ function Timeline({
             const centerPosition = scrollLeft + containerWidth / 2;
             const index = Math.floor(centerPosition / cellWidth);
             if (days[index]) {
-                // const monthName = days[index].date.toLocaleDateString("en-US", {
-                //     month: "long",
-                // });
-                // onMonthChange(monthName);
                 if (onMonthChange) {
                     const monthName = days[index].date.toLocaleDateString(
                         "en-US",
