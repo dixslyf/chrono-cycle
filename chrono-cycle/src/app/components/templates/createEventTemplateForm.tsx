@@ -5,8 +5,10 @@ import {
     Button,
     Checkbox,
     Fieldset,
+    Flex,
     Group,
     NumberInput,
+    ScrollArea,
     Select,
     SimpleGrid,
     Stack,
@@ -129,9 +131,11 @@ export function CreateEventTemplateFormState({
 export function CreateEventTemplateFormLeft({
     form,
     mutation,
+    durationDisabled,
 }: {
     form: CreateEventTemplateFormState["form"];
     mutation: CreateEventTemplateFormState["mutation"];
+    durationDisabled: CreateEventTemplateFormState["durationDisabled"];
 }): React.ReactNode {
     return (
         <Stack className="h-full overflow-y-auto" align="stretch" gap="xl">
@@ -141,13 +145,10 @@ export function CreateEventTemplateFormLeft({
                 className="h-full"
             >
                 <Stack gap="xl" className="h-full">
-                    {/* header */}
-                    <Text className="text-3xl font-bold">
-                        Create Event Template
-                    </Text>
                     {/* name input */}
                     <TextInput
                         label="Event Name"
+                        description="The name of the event"
                         size="md"
                         placeholder="Event name"
                         disabled={mutation.isPending}
@@ -159,6 +160,7 @@ export function CreateEventTemplateFormLeft({
                     {/* note */}
                     <Textarea
                         label="Note"
+                        description="An optional note to attach to the event"
                         size="md"
                         placeholder="Enter note"
                         disabled={mutation.isPending}
@@ -167,131 +169,69 @@ export function CreateEventTemplateFormLeft({
                         maxRows={3}
                         {...form.getInputProps("note")}
                     />
-                    <Fieldset
-                        legend="Reminders"
-                        unstyled
-                        styles={{
-                            root: {
-                                border: "1px solid",
-                                borderColor: theme.colors.gray[4],
+                    {/* offset days, auto reschedule, event type, duration */}
+                    {/* event type */}
+                    <Select
+                        size="md"
+                        name="eventType"
+                        label="Event Type"
+                        description="The type of the event (task or activity)"
+                        data={[
+                            { label: "Task", value: "task" },
+                            {
+                                label: "Activity",
+                                value: "activity",
                             },
-                        }}
-                        classNames={{
-                            root: "relative mt-[26] pl-6 pr-6 pt-4 pb-4",
-                            legend: "absolute top-[-26] left-0 bg-none font-medium",
-                        }}
-                        className="border-gray-400 rounded-md flex-1"
-                    >
-                        <Stack gap="lg">
-                            <SimpleGrid cols={2} className="w-full">
-                                {form.getValues().reminders.length > 0 ? (
-                                    form
-                                        .getValues()
-                                        .reminders.map((reminder, index) => (
-                                            <Stack
-                                                key={`reminder-${index}`}
-                                                className="border border-gray-400 rounded-lg p-4"
-                                                justify="center"
-                                            >
-                                                {/* days before event */}
-                                                <Group gap="xl">
-                                                    <Group gap="md">
-                                                        <Calendar className="w-8 h-8" />
-                                                        <Text>
-                                                            Days before event:
-                                                        </Text>
-                                                    </Group>
-                                                    <NumberInput
-                                                        label=""
-                                                        min={0}
-                                                        disabled={
-                                                            mutation.isPending
-                                                        }
-                                                        required
-                                                        {...form.getInputProps(
-                                                            `reminders.${index}.daysBeforeEvent`,
-                                                        )}
-                                                    />
-                                                </Group>
-                                                {/* trigger time */}
-                                                <Group gap="xl">
-                                                    <Group gap="md">
-                                                        <Clock className="w-8 h-8" />
-                                                        <Text>
-                                                            Trigger time:
-                                                        </Text>
-                                                    </Group>
-                                                    <TimeInput
-                                                        disabled={
-                                                            mutation.isPending
-                                                        }
-                                                        leftSection={
-                                                            <Clock size={16} />
-                                                        }
-                                                        required
-                                                        {...form.getInputProps(
-                                                            `reminders.${index}.time`,
-                                                        )}
-                                                    />
-                                                </Group>
-                                                {/* notification */}
-                                                <Group>
-                                                    <Checkbox
-                                                        label="Email notification"
-                                                        disabled={
-                                                            mutation.isPending
-                                                        }
-                                                        {...form.getInputProps(
-                                                            `reminders.${index}.emailNotifications`,
-                                                        )}
-                                                    />
-                                                    <Checkbox
-                                                        label="Desktop notification"
-                                                        disabled={
-                                                            mutation.isPending
-                                                        }
-                                                        {...form.getInputProps(
-                                                            `reminders.${index}.desktopNotifications`,
-                                                        )}
-                                                    />
-                                                </Group>
-                                                {/* delete button */}
-                                                <Group justify="flex-end">
-                                                    <ActionIcon
-                                                        color="red"
-                                                        onClick={() =>
-                                                            form.removeListItem(
-                                                                "reminders",
-                                                                index,
-                                                            )
-                                                        }
-                                                    >
-                                                        <Trash />
-                                                    </ActionIcon>
-                                                </Group>
-                                            </Stack>
-                                        ))
-                                ) : (
-                                    <Text>No reminders set</Text>
-                                )}
-                            </SimpleGrid>
-                            <Group>
-                                <Button
-                                    leftSection={<Plus />}
-                                    onClick={() =>
-                                        form.insertListItem("reminders", {
-                                            daysBeforeEvent: 1,
-                                            time: "09:00",
-                                            emailNotifications: true,
-                                            desktopNotifications: true,
-                                        })
-                                    }
-                                >
-                                    Add Reminder
-                                </Button>
-                            </Group>
-                        </Stack>
-                    </Fieldset>
+                        ]}
+                        placeholder="Event type"
+                        error="Invalid event type"
+                        disabled={mutation.isPending}
+                        {...form.getInputProps("eventType")}
+                    />
+                    <Group grow>
+                        {/* offset days */}
+                        <NumberInput
+                            size="md"
+                            label="Offset days"
+                            description="The number of days from the project start date"
+                            error="Invalid number of offset days"
+                            disabled={mutation.isPending}
+                            required
+                            {...form.getInputProps("offsetDays")}
+                        />
+                        {/* duration */}
+                        <NumberInput
+                            size="md"
+                            key={form.key("duration")}
+                            label="Duration (days)"
+                            description="The duration of the event in days"
+                            min={1}
+                            error="Invalid duration"
+                            disabled={durationDisabled}
+                            required
+                            {...form.getInputProps("duration")}
+                        />
+                    </Group>
+                    {/* auto reschedule */}
+                    <Group justify="flex-end">
+                        <Checkbox
+                            size="md"
+                            label="Automatically Reschedule"
+                            defaultChecked
+                            disabled={mutation.isPending}
+                            {...form.getInputProps("autoReschedule")}
+                        />
+                    </Group>
+                    <Stack gap="sm">
+                        <TagsInput
+                            size="md"
+                            label="Tags"
+                            description="Tags to attach to the event"
+                            placeholder="Add a Tag"
+                            {...form.getInputProps("tags")}
+                            classNames={{ pill: "bg-gray-200" }}
+                        />
+                    </Stack>
                 </Stack>
             </form>
         </Stack>
@@ -301,92 +241,135 @@ export function CreateEventTemplateFormLeft({
 export function CreateEventTemplateFormRight({
     form,
     mutation,
-    durationDisabled,
 }: {
     form: CreateEventTemplateFormState["form"];
     mutation: CreateEventTemplateFormState["mutation"];
-    durationDisabled: boolean;
 }): React.ReactNode {
     return (
         <Stack className="h-full" justify="space-between">
-            <Stack>
-                {/* offset days, auto reschedule, event type, duration */}
-                <SimpleGrid cols={2}>
-                    {/* offset days */}
-                    <Group className="pb-4">
-                        <NumberInput
-                            size="md"
-                            label="Offset days"
-                            error="Invalid number of offset days"
-                            disabled={mutation.isPending}
-                            required
-                            {...form.getInputProps("offsetDays")}
-                            className="text-palette3"
-                        />
-                    </Group>
-                    {/* auto reschedule */}
-                    <Group className="py-4">
-                        <Checkbox
-                            size="md"
-                            label="Automatically Reschedule"
-                            defaultChecked
-                            disabled={mutation.isPending}
-                            {...form.getInputProps("autoReschedule")}
-                            className="text-palette3"
-                        />
-                    </Group>
-                    {/* event type */}
-                    <Group className="py-4">
-                        <Select
-                            size="md"
-                            name="eventType"
-                            label="Event Type"
-                            data={[
-                                { label: "Task", value: "task" },
-                                { label: "Activity", value: "activity" },
-                            ]}
-                            placeholder="Event type"
-                            error="Invalid event type"
-                            disabled={mutation.isPending}
-                            {...form.getInputProps("eventType")}
-                            className="text-palette3"
-                        />
-                    </Group>
-                    {/* duration */}
-                    <Group className="py-4">
-                        <NumberInput
-                            size="md"
-                            key={form.key("duration")}
-                            label="Duration (days)"
-                            min={1}
-                            error="Invalid duration"
-                            disabled={durationDisabled}
-                            required
-                            {...form.getInputProps("duration")}
-                            className="text-palette3"
-                        />
-                    </Group>
-                </SimpleGrid>
-                <Stack gap="sm" className="py-4">
-                    <TagsInput
-                        size="md"
-                        label="Tags"
-                        placeholder="Add a Tag"
-                        {...form.getInputProps("tags")}
-                        className="text-palette3"
-                        classNames={{ pill: "bg-gray-200" }}
-                    />
-                </Stack>
-            </Stack>
+            <RemindersInput form={form} mutation={mutation} />
             <Group justify="flex-end">
                 <Button
                     type="submit"
                     form="create-event-form"
                     loading={mutation.isPending}
                 >
-                    Add
+                    Create
                 </Button>
             </Group>
         </Stack>
+    );
+}
+
+function RemindersInput({
+    form,
+    mutation,
+}: {
+    form: CreateEventTemplateFormState["form"];
+    mutation: CreateEventTemplateFormState["mutation"];
+}) {
+    return (
+        <Fieldset c="white" unstyled style={{ display: "flex" }} h={670}>
+            <Stack gap="lg" w="100%">
+                <ScrollArea style={{ root: { flex: 1 } }}>
+                    <Stack gap="lg" style={{ flex: 1 }}>
+                        {form.values.reminders.length > 0 ? (
+                            form.values.reminders.map((_reminder, index) => (
+                                <Stack
+                                    key={`reminder-${index}`}
+                                    styles={{
+                                        root: {
+                                            border: "1px solid",
+                                            borderColor: theme.white,
+                                        },
+                                    }}
+                                    className="rounded-lg p-4"
+                                    justify="center"
+                                >
+                                    <Group gap="xl" grow>
+                                        <NumberInput
+                                            label="Days before event"
+                                            leftSection={<Calendar />}
+                                            min={0}
+                                            disabled={mutation.isPending}
+                                            required
+                                            {...form.getInputProps(
+                                                `reminders.${index}.daysBeforeEvent`,
+                                            )}
+                                        />
+                                        <TimeInput
+                                            label="Trigger time"
+                                            leftSection={<Clock />}
+                                            disabled={mutation.isPending}
+                                            required
+                                            {...form.getInputProps(
+                                                `reminders.${index}.time`,
+                                            )}
+                                        />
+                                    </Group>
+                                    {/* notification */}
+                                    <Group>
+                                        <Checkbox
+                                            label="Email notification"
+                                            disabled={mutation.isPending}
+                                            {...form.getInputProps(
+                                                `reminders.${index}.emailNotifications`,
+                                                { type: "checkbox" },
+                                            )}
+                                        />
+                                        <Checkbox
+                                            label="Desktop notification"
+                                            disabled={mutation.isPending}
+                                            {...form.getInputProps(
+                                                `reminders.${index}.desktopNotifications`,
+                                                { type: "checkbox" },
+                                            )}
+                                        />
+                                        {/* delete button */}
+                                        <Group
+                                            justify="flex-end"
+                                            className="flex-grow"
+                                        >
+                                            <ActionIcon
+                                                color="red"
+                                                onClick={() =>
+                                                    form.removeListItem(
+                                                        "reminders",
+                                                        index,
+                                                    )
+                                                }
+                                            >
+                                                <Trash />
+                                            </ActionIcon>
+                                        </Group>
+                                    </Group>
+                                </Stack>
+                            ))
+                        ) : (
+                            <Text c="white">No reminders set</Text>
+                        )}
+                    </Stack>
+                </ScrollArea>
+                <Group justify="flex-end">
+                    <Button
+                        leftSection={<Plus />}
+                        onClick={() =>
+                            form.insertListItem(
+                                "reminders",
+                                {
+                                    daysBeforeEvent: 0,
+                                    time: "09:00",
+                                    emailNotifications: true,
+                                    desktopNotifications: true,
+                                },
+                                0,
+                            )
+                        }
+                    >
+                        Add Reminder
+                    </Button>
+                </Group>
+            </Stack>
+        </Fieldset>
     );
 }

@@ -39,17 +39,17 @@ export function CreateEventTemplateButton<T extends string>({
         <>
             <Modal.Stack>
                 <SplitModal {...modalStack.register("add-event")}>
-                    <SplitModal.Left>
+                    <SplitModal.Left title="Create Event Template">
                         <CreateEventTemplateFormLeft
                             form={form}
                             mutation={mutation}
+                            durationDisabled={durationDisabled}
                         />
                     </SplitModal.Left>
-                    <SplitModal.Right>
+                    <SplitModal.Right title="Reminders">
                         <CreateEventTemplateFormRight
                             form={form}
                             mutation={mutation}
-                            durationDisabled={durationDisabled}
                         />
                     </SplitModal.Right>
                 </SplitModal>
