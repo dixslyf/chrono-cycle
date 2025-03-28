@@ -19,7 +19,7 @@ import { formatDate } from "@/app/utils/dates";
 import { queryKeys } from "@/app/utils/queries/keys";
 import { listProjectTemplatesOptions } from "@/app/utils/queries/listProjectTemplates";
 
-import { ProjectTemplate, ProjectTemplateOverview } from "@/common/data/domain";
+import { ProjectTemplate } from "@/common/data/domain";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 
@@ -27,18 +27,6 @@ import {
     ProjectTemplateDetailsLeft,
     ProjectTemplateDetailsRight,
 } from "./projectTemplateDetails";
-
-type Column = {
-    accessor: keyof ProjectTemplateOverview;
-    title: string;
-};
-
-const columns: Column[] = [
-    { accessor: "name", title: "Name" },
-    { accessor: "description", title: "Description" },
-    { accessor: "createdAt", title: "Created at" },
-    { accessor: "updatedAt", title: "Updated at" },
-];
 
 export function ProjectTemplatesTable(): React.ReactNode {
     const listPtsQuery = useQuery(listProjectTemplatesOptions());

@@ -1,16 +1,14 @@
 "use client";
 
-import { Button, Group, Stack, Text, Textarea, TextInput } from "@mantine/core";
+import { Button, Group, Stack, Textarea, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useMutation } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { match, P } from "ts-pattern";
+import { match } from "ts-pattern";
 
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
-
-import { ValidationIssues } from "@/common/errors";
 
 import { importProjectTemplateAction } from "@/features/project-templates/import/action";
 import {

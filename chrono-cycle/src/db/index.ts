@@ -1,4 +1,4 @@
-import { ExtractTablesWithRelations, sql } from "drizzle-orm";
+import { ExtractTablesWithRelations } from "drizzle-orm";
 import {
     type NodePgDatabase,
     type NodePgQueryResultHKT,

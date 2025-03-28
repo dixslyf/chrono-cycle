@@ -1,13 +1,6 @@
 "use client";
 
-import {
-    Box,
-    Group,
-    Modal,
-    Pagination,
-    Table,
-    useModalsStack,
-} from "@mantine/core";
+import { Box, Group, Pagination, Table, useModalsStack } from "@mantine/core";
 import React, { useCallback, useState } from "react";
 
 import { SplitModal } from "@/app/components/customComponent/splitModal";

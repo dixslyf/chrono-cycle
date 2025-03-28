@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Modal, useModalsStack } from "@mantine/core";
+import { Button, useModalsStack } from "@mantine/core";
 import { CalendarPlus } from "lucide-react";
 import { useCallback } from "react";
 

@@ -6,7 +6,6 @@ import {
     Group,
     List,
     Stack,
-    Text,
     Textarea,
     TextInput,
 } from "@mantine/core";
@@ -14,7 +13,6 @@ import { useForm } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
-import { X } from "lucide-react";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { match, P } from "ts-pattern";
 

@@ -5,9 +5,9 @@ import {
     Group,
     Modal,
     Stack,
-    StackProps,
     Text,
     type ModalProps,
+    type StackProps,
 } from "@mantine/core";
 import { ReactNode } from "react";
 

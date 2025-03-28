@@ -1,6 +1,6 @@
 // template page
 
-import { Divider, Group, Space, Stack, Text, Title } from "@mantine/core";
+import { Divider, Group, Space, Stack, Title } from "@mantine/core";
 
 import { CreateProjectTemplateButton } from "@/app/components/templates/createProjectTemplateButton";
 import { ProjectTemplatesTable } from "@/app/components/templates/projectTemplatesTable";

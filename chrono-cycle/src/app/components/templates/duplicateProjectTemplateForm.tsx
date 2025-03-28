@@ -6,7 +6,6 @@ import {
     Select,
     Skeleton,
     Stack,
-    Text,
     Textarea,
     TextInput,
 } from "@mantine/core";
@@ -14,7 +13,6 @@ import { useForm } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
-import { X } from "lucide-react";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { match } from "ts-pattern";
 
@@ -45,12 +43,10 @@ export function DuplicateProjectTemplateForm({
     onSuccess,
     projectTemplates,
     isPendingProjectTemplates,
-    onClose,
 }: {
     onSuccess: () => void;
     projectTemplates?: ProjectTemplateOverview[];
     isPendingProjectTemplates?: boolean;
-    onClose: () => void;
 }): React.ReactNode {
     const form = useForm({
         mode: "uncontrolled",
