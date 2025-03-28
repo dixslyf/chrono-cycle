@@ -112,9 +112,9 @@ export function CreateProjectTemplateForm({
                     <TextInput
                         size="md"
                         name="name"
-                        label="Template Name"
+                        label="Name"
                         required
-                        description="Name of the project template"
+                        description="Name of the new project template"
                         placeholder="Project template name"
                         disabled={createMutation.isPending}
                         {...form.getInputProps("name")}
@@ -124,7 +124,7 @@ export function CreateProjectTemplateForm({
                         name="description"
                         label="Description"
                         required
-                        description="Enter description"
+                        description="A description of the new project template"
                         error="Invalide description"
                         placeholder="Add description"
                         disabled={createMutation.isPending}

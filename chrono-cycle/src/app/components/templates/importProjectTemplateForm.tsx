@@ -87,9 +87,9 @@ export function ImportProjectTemplateForm({
                     <TextInput
                         size="md"
                         name="name"
-                        label="Template Name"
+                        label="Name"
                         required
-                        description="Name of the project template"
+                        description="Name of the new project template"
                         error="Invalid project template name"
                         placeholder="Project template name"
                         disabled={importMutation.isPending}
@@ -100,7 +100,7 @@ export function ImportProjectTemplateForm({
                         name="description"
                         label="Description"
                         required
-                        description="Enter description"
+                        description="A description of the new project template"
                         error="Invalid description"
                         placeholder="Add description"
                         disabled={importMutation.isPending}

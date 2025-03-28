@@ -134,7 +134,7 @@ export function DuplicateProjectTemplateForm({
                             name="description"
                             label="Description"
                             required
-                            description="A description of a new project template"
+                            description="A description of the new project template"
                             error="Invalid description"
                             placeholder="Add description"
                             disabled={duplicateMutation.isPending}
