@@ -6,12 +6,11 @@ import {
     FileButton,
     Group,
     Menu,
-    Modal,
     Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronDown, Copy, Import, Upload } from "lucide-react";
+import { ChevronUp, Copy, Upload } from "lucide-react";
 import { useState } from "react";
 
 import { SingleModal } from "@/app/components/customComponent/singleModal";
@@ -120,13 +119,13 @@ export function CreateProjectTemplateButton() {
                 </Button>
                 {/* keepMounted is required for FileButton to work correctly.
                     See: https://help.mantine.dev/q/file-button-in-menu */}
-                <Menu position="bottom-end" keepMounted withinPortal>
+                <Menu position="top-end" keepMounted withinPortal>
                     <Menu.Target>
                         <ActionIcon
                             size={36}
                             className={splitButtonClasses.menuControl}
                         >
-                            <ChevronDown />
+                            <ChevronUp />
                         </ActionIcon>
                     </Menu.Target>
                     <Menu.Dropdown className="rounded-lg overflow-hidden shadow-lg p-0">

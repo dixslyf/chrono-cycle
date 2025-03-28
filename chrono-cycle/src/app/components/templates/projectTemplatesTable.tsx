@@ -122,9 +122,9 @@ export function ProjectTemplatesTable(): React.ReactNode {
                 </SplitModal>
             </Modal.Stack>
             {/* Project Template Table */}
-            <ScrollArea className="h-[80%]">
-                <Group justify="center">
-                    <Stack className="py-2 px-4 w-4/6">
+            <ScrollArea className="h-[80%] w-full">
+                <Group>
+                    <Stack className="w-full">
                         {listPtsQuery.isPending ? (
                             <Loader size="md" />
                         ) : records.length === 0 ? (
@@ -143,7 +143,6 @@ export function ProjectTemplatesTable(): React.ReactNode {
                                             );
                                             setClickedId(record.id);
                                         }}
-                                        justify="center"
                                     >
                                         <Text className="text-xl font-semibold text-palette5">
                                             {record.name}
