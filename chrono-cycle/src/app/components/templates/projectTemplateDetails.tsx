@@ -220,7 +220,6 @@ export function ProjectTemplateDetailsModal<T extends string>({
     const queryClient = useQueryClient();
     const mutation = useMutation({
         mutationFn: async (values: FormValues) => {
-            console.log(values);
             const result = await updateProjectTemplateAction(null, {
                 id: projectTemplate?.id as string,
                 name: values.name,
@@ -263,7 +262,6 @@ export function ProjectTemplateDetailsModal<T extends string>({
                     onSubmit={(ev) => {
                         if (form.getValues().name === projectTemplate?.name) {
                             form.setValues({ name: undefined });
-                            console.log("set undefined");
                         }
                         const submit = form.onSubmit((values) =>
                             mutation.mutate(values),
