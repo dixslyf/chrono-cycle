@@ -106,7 +106,6 @@ export function CreateProjectTemplateButton() {
                     projectTemplates={listPtsQuery.data}
                     isPendingProjectTemplates={listPtsQuery.isPending}
                     onSuccess={closeDuplicate}
-                    onClose={closeDuplicate}
                 />
             </SingleModal>
             {/* Based on: https://ui.mantine.dev/category/buttons/#split-button */}
