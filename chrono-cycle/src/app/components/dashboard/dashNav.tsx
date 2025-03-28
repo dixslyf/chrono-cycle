@@ -1,25 +1,17 @@
 "use client";
 
-import {
-    ActionIcon,
-    Button,
-    Group,
-    Menu,
-    Modal,
-    Select,
-    Text,
-} from "@mantine/core";
+import { ActionIcon, Button, Group, Menu, Select, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
 import {
     ArrowBigLeft,
     ArrowBigRight,
-    Calendar,
     ChartNoAxesGantt,
     ChevronDown,
     ClipboardList,
 } from "lucide-react";
 
+import { SingleModal } from "@/app/components/customComponent/singleModal";
 import { CreateProjectForm } from "@/app/components/templates/createProjectForm";
 import { notifyError } from "@/app/utils/notifications";
 import { listProjectTemplatesOptions } from "@/app/utils/queries/listProjectTemplates";
@@ -78,9 +70,7 @@ function DashNav({ months, selectedMonth, onSelectMonth, year }: DashNavProps) {
 
     return (
         <>
-            <Modal
-                title="Create Project"
-                centered
+            <SingleModal
                 opened={createProjectModalOpened}
                 onClose={closeCreateProjectModal}
             >
@@ -89,7 +79,7 @@ function DashNav({ months, selectedMonth, onSelectMonth, year }: DashNavProps) {
                     projectTemplates={listPtsQuery.data}
                     isPendingProjectTemplates={listPtsQuery.isPending}
                 />
-            </Modal>
+            </SingleModal>
             <nav className="flex h-12 border-b-2 border-gray-300">
                 {/* year arrows and month select */}
                 <div className="ml-4 flex items-center gap-2 w-1/3">
@@ -153,7 +143,7 @@ function DashNav({ months, selectedMonth, onSelectMonth, year }: DashNavProps) {
                                 Create
                             </Button>
                         </Menu.Target>
-                        <Menu.Dropdown className="p-0 rounded-lg overflow-hidden">
+                        <Menu.Dropdown className="p-0 rounded-lg overflow-hidden shadow-xl">
                             <Text className="bg-palette2 flex justify-between p-2">
                                 <span className="text-palette3 text-xl font-semibold">
                                     Create

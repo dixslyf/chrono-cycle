@@ -285,8 +285,6 @@ function Timeline({
             </Modal>
             <div className="flex h-full flex-1 relative">
                 {days.map((day, i) => {
-                    // const isToday =
-                    //     new Date().toDateString() === day.date.toDateString();
                     const isToday = areSameDay(new Date(), day.date);
                     return (
                         <div
@@ -307,7 +305,6 @@ function Timeline({
                             {/* vertical line below label */}
                             <div
                                 className={`w-[0.1rem] h-[90%] mx-auto mt-2 ${
-                                    // isToday ? "bg-palette2" : "bg-gray-700"
                                     isToday
                                         ? "bg-palette2"
                                         : day.date < new Date()

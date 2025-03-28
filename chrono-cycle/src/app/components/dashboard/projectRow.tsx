@@ -1,6 +1,6 @@
 "use client";
 
-import { Paper } from "@mantine/core";
+import { Paper, Text } from "@mantine/core";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import React from "react";
 
@@ -53,14 +53,6 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
         toggleProject(project.id);
     }
 
-    // For the end index, determine the farthest day among the events in this project.
-    // const eventEndIndexes = events.map((event) => {
-    //     const endDate = new Date(projectStartDate);
-    //     endDate.setDate(
-    //         endDate.getDate() + event.offsetDays + event.duration - 1,
-    //     );
-    //     return days.findIndex((d) => d.date.getTime() === endDate.getTime());
-    // });
     const eventEndIndexes = project.events
         .map((event) => {
             const endDate = new Date(event.startDate);
@@ -110,11 +102,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
     const width = (maxEndIndex - projectStartIndex + 1) * cellWidth;
 
     return (
-        <div
-            className="relative w-full"
-            // style={{ top: `${topOffset}px`, position: "absolute" }}
-            style={{ top: `${topOffset}px` }}
-        >
+        <div className="relative w-full" style={{ top: `${topOffset}px` }}>
             {/* Project Header */}
             <Paper
                 withBorder
@@ -128,7 +116,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
                 }}
                 onClick={() => onProjectClick(project)}
             >
-                {project.name}
+                <Text>{project.name}</Text>
                 {expanded ? (
                     <ChevronUp
                         size={16}
