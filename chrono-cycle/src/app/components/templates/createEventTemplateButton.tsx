@@ -31,7 +31,7 @@ export function CreateEventTemplateButton<T extends string>({
     );
 
     const { form, mutation, durationDisabled } = CreateEventTemplateFormState({
-        projectTemplateId: "add-event",
+        projectTemplateId,
         onSuccess: closeModal,
     });
 
