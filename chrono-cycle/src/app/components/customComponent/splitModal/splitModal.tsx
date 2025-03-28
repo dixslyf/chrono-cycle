@@ -16,10 +16,17 @@ import classes from "./split-modal.module.css";
 const SECTION_PX = 30;
 const SECTION_PY = 24;
 
-export type SplitModalProps = Omit<ModalProps, "withCloseButton" | "title">;
+export type SplitModalProps = Omit<ModalProps, "withCloseButton" | "title"> & {
+    wrapper?: (children: ReactNode) => ReactNode;
+};
 
 export function SplitModal(props: SplitModalProps): ReactNode {
-    const { children, ...passedProps } = props;
+    const { children, wrapper, ...passedProps } = props;
+    const root = (
+        <Group gap={0} className="w-full h-full items-stretch">
+            {children}
+        </Group>
+    );
     return (
         <Modal
             centered
@@ -29,15 +36,14 @@ export function SplitModal(props: SplitModalProps): ReactNode {
             padding={0}
             {...passedProps}
         >
-            <Group gap={0} className="w-full h-full items-stretch">
-                {children}
-            </Group>
+            {wrapper ? wrapper(root) : root}
         </Modal>
     );
 }
 
 function SplitModalLeft(props: {
     title?: string;
+    titleComponent?: (title?: string) => ReactNode;
     stackProps?: StackProps;
     flexRatio?: number;
     children: ReactNode;
@@ -50,7 +56,11 @@ function SplitModalLeft(props: {
             style={{ flex: props.flexRatio ?? 5 }}
             {...props.stackProps}
         >
-            <Text className="text-3xl font-bold h-1/8">{props.title}</Text>
+            {props.titleComponent ? (
+                props.titleComponent(props.title)
+            ) : (
+                <Text className="text-3xl font-bold h-1/8">{props.title}</Text>
+            )}
             <Box h="100%" w="100%">
                 {props.children}
             </Box>
@@ -60,6 +70,7 @@ function SplitModalLeft(props: {
 
 function SplitModalRight(props: {
     title?: string;
+    titleComponent?: (title?: string) => ReactNode;
     stackProps?: StackProps;
     flexRatio?: number;
     children: ReactNode;
@@ -73,9 +84,13 @@ function SplitModalRight(props: {
         >
             <Group justify="flex-end" align="flex-start">
                 <Box pl={SECTION_PX} pt={SECTION_PY} style={{ flex: 1 }}>
-                    <Text c="white" className="text-2xl font-bold h-1/8">
-                        {props.title}
-                    </Text>
+                    {props.titleComponent ? (
+                        props.titleComponent(props.title)
+                    ) : (
+                        <Text c="white" className="text-2xl font-bold h-1/8">
+                            {props.title}
+                        </Text>
+                    )}
                 </Box>
                 <Box pr={20} pt={16}>
                     <Modal.CloseButton
