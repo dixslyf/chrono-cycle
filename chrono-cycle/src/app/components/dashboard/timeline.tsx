@@ -45,9 +45,6 @@ function Timeline({
 }: TimelineProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const cellWidth = 96; // fixed width for each day
-    const headerHeight = 24; // height for project header
-    const eventHeight = 32; // might be able to change this later on
-    const rowSpacing = 4; // space between row
 
     const events = projects.map((p) => p.events).flat();
 
@@ -196,7 +193,6 @@ function Timeline({
 
     // calculate a cumulative vertical offset for each project row.
     // each row's height is the header height plus additionnal height for expanded events.
-    const cumulativeOffset = 0;
 
     const queryClient = useQueryClient();
 
