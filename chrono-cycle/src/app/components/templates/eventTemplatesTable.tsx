@@ -153,7 +153,7 @@ export function EventTemplatesTable<T extends string>({
             <SplitModal {...modalStack.register("event-details")}>
                 {selectedEventTemplate ? (
                     <>
-                        <SplitModal.Left>
+                        <SplitModal.Left title={selectedEventTemplate.name}>
                             <EventTemplateDetailsLeft
                                 eventTemplate={selectedEventTemplate}
                                 onClose={closeEventDetailsModal}

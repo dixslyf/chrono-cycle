@@ -27,7 +27,6 @@ export function EventTemplateDetailsLeft({
 }: DisplayEventDetailsProps) {
     return (
         <Stack className="w-full h-full">
-            <Text className="text-3xl font-bold">{eventTemplate.name}</Text>
             {/* notes */}
             <Stack>
                 <Fieldset legend="Note" className="border-gray-400 rounded-xl">
