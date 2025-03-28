@@ -37,10 +37,16 @@ export function DeleteProjectTemplateButton({
             notifySuccess({
                 message: "Successfully deleted project template.",
             });
+
             // Refresh the project template for project details.
             queryClient.invalidateQueries({
                 queryKey: queryKeys.projects.retrieveProjectTemplateBase(),
             });
+
+            queryClient.invalidateQueries({
+                queryKey: queryKeys.projectTemplates.list(),
+            });
+
             onSuccess();
         },
         onError: () =>
