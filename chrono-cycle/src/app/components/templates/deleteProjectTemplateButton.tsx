@@ -52,10 +52,10 @@ export function DeleteProjectTemplateButton({
         <CriticalButton
             disabled={disabled}
             loading={deleteMutation.isPending}
+            leftSection={<Trash />}
             onClick={() => deleteMutation.mutate(projectTemplateId)}
         >
-            <Trash className="mr-2" />
-            Delete Template
+            Delete
         </CriticalButton>
     );
 }

@@ -53,10 +53,10 @@ export function DeleteEventTemplateButton({
         <CriticalButton
             disabled={deleteMutation.isPending || disabled}
             loading={deleteMutation.isPending}
+            leftSection={<Trash />}
             onClick={() => deleteMutation.mutate(eventTemplateId)}
         >
-            <Trash className="mr-2" />
-            Delete Template
+            Delete
         </CriticalButton>
     );
 }

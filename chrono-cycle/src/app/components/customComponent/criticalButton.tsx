@@ -9,7 +9,7 @@ export function CriticalButton(
 ) {
     return (
         <Button
-            className="p-1 bg-red-500 hover:bg-red-600 transition-colors duration-300 text-palette3"
+            className="bg-red-500 hover:bg-red-600 transition-colors duration-300 text-palette3"
             {...props}
         >
             {props.children}
