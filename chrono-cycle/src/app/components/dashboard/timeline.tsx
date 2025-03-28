@@ -196,7 +196,7 @@ function Timeline({
 
     // calculate a cumulative vertical offset for each project row.
     // each row's height is the header height plus additionnal height for expanded events.
-    let cumulativeOffset = 0;
+    const cumulativeOffset = 0;
 
     const queryClient = useQueryClient();
 
@@ -316,36 +316,18 @@ function Timeline({
                     {projects.map((project) => {
                         const projectEvents = eventMap.get(project.id) || [];
                         if (projectEvents.length === 0) return null;
-
-                        // determine the current project's top offset
-                        const topOffset = cumulativeOffset;
-
-                        // determine additional height if expanded:
-                        const isExpanded = !!expandedProjects[project.id];
-                        const extraHeight = isExpanded
-                            ? projectEvents.length * (eventHeight + rowSpacing)
-                            : 0;
-
-                        // updated cumulative offset: header height + extra height + rowspacing for gap
-                        cumulativeOffset +=
-                            headerHeight + extraHeight + rowSpacing;
-
                         return (
                             <ProjectRow
                                 key={project.id}
                                 project={project}
                                 days={days}
                                 cellWidth={cellWidth}
-                                eventHeight={eventHeight}
-                                rowSpacing={rowSpacing}
                                 expanded={!!expandedProjects[project.id]}
                                 onProjectClick={(project) => {
                                     setClickedProject(project);
                                     openProjectDetailsModal();
                                 }}
                                 toggleProject={toggleProject}
-                                topOffset={topOffset}
-                                headerHeight={headerHeight}
                                 onEventClick={(event) => {
                                     setClickedEvent(event);
                                     openEventDetailsModal();
