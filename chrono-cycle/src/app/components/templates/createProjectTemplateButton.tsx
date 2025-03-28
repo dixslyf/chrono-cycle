@@ -129,7 +129,7 @@ export function CreateProjectTemplateButton() {
                         </ActionIcon>
                     </Menu.Target>
                     <Menu.Dropdown className="rounded-lg overflow-hidden shadow-lg p-0">
-                        <Text className="px-4 py-2 text-lg font-semibold text-palette3 bg-palette2 border-b">
+                        <Text className="px-4 py-2 font-semibold text-palette3 bg-palette2 border-b">
                             Template Actions
                         </Text>
                         <FileButton
