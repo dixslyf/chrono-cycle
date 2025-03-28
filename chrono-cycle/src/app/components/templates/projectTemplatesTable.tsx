@@ -12,9 +12,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
-import { SplitModal } from "@/app/components/customComponent/splitModal";
 import { formatDate } from "@/app/utils/dates";
 import { queryKeys } from "@/app/utils/queries/keys";
 import { listProjectTemplatesOptions } from "@/app/utils/queries/listProjectTemplates";
@@ -23,11 +22,7 @@ import { ProjectTemplate } from "@/common/data/domain";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 
-import {
-    ProjectTemplateDetailsLeft,
-    ProjectTemplateDetailsModal,
-    ProjectTemplateDetailsRight,
-} from "./projectTemplateDetails";
+import { ProjectTemplateDetailsModal } from "./projectTemplateDetails";
 
 export function ProjectTemplatesTable(): React.ReactNode {
     const listPtsQuery = useQuery(listProjectTemplatesOptions());

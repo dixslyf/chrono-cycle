@@ -11,7 +11,7 @@ import {
     TextInput,
     useModalsStack,
 } from "@mantine/core";
-import { useForm, UseFormReturnType, zodResolver } from "@mantine/form";
+import { useForm, zodResolver, type UseFormReturnType } from "@mantine/form";
 import {
     useMutation,
     UseMutationResult,
@@ -21,6 +21,7 @@ import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
 import { useEffect } from "react";
 
+import { SplitModal } from "@/app/components/customComponent/splitModal";
 import brownSkeletonClasses from "@/app/skeleton-brown-bg.module.css";
 import { formatDate } from "@/app/utils/dates";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
@@ -34,7 +35,6 @@ import {
     payloadSchema,
 } from "@/features/project-templates/update/data";
 
-import { SplitModal } from "../customComponent/splitModal";
 import { DeleteProjectTemplateButton } from "./deleteProjectTemplateButton";
 import { EventTemplatesTable } from "./eventTemplatesTable";
 import { ExportProjectTemplateButton } from "./exportProjectTemplateButton";
