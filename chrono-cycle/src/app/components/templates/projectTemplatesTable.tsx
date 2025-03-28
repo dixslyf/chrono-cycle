@@ -16,6 +16,7 @@ import { useCallback, useState } from "react";
 
 import { SplitModal } from "@/app/components/customComponent/splitModal";
 import { formatDate } from "@/app/utils/dates";
+import { queryKeys } from "@/app/utils/queries/keys";
 import { listProjectTemplatesOptions } from "@/app/utils/queries/listProjectTemplates";
 
 import { ProjectTemplate, ProjectTemplateOverview } from "@/common/data/domain";
@@ -73,7 +74,7 @@ export function ProjectTemplatesTable(): React.ReactNode {
 
     // Query for retrieving project template data.
     const retrieveQuery = useQuery({
-        queryKey: ["retrieve-project-template", clickedId],
+        queryKey: queryKeys.projectTemplates.retrieve(clickedId),
         queryFn: async (): Promise<ProjectTemplate> => {
             // Safety: This query is only called when clicked ID is set.
             const projectTemplateId = clickedId as string;

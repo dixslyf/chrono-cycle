@@ -31,7 +31,7 @@ async function createReminderTemplateActionImpl(
 }
 
 export const createReminderTemplateAction: (
-    _prevState: Result,
+    _prevState: Result | null,
     payload: Payload,
 ) => Promise<Result> = wrapServerAction(
     "createReminderTemplate",

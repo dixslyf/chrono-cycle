@@ -9,7 +9,6 @@ import {
     ValidationError,
 } from "@/common/errors";
 
-import { createProjectTemplateAction } from "@/features/project-templates/create/action";
 import { createProjectAction } from "@/features/projects/create/action";
 import { updateProjectAction } from "@/features/projects/update/action";
 

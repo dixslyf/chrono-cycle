@@ -7,6 +7,7 @@ import { Trash } from "lucide-react";
 
 import { CriticalButton } from "@/app/components/customComponent/criticalButton";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
+import { queryKeys } from "@/app/utils/queries/keys";
 
 import { deleteEventTemplatesAction } from "@/features/event-templates/delete/action";
 import { Failure } from "@/features/event-templates/delete/data";
@@ -43,7 +44,7 @@ export function DeleteEventTemplateButton({
                 message: "Successfully deleted event template.",
             });
             queryClient.invalidateQueries({
-                queryKey: ["retrieve-project-template"],
+                queryKey: queryKeys.projectTemplates.retrieveBase(),
             });
             onSuccess();
         },

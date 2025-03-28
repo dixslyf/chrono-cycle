@@ -26,6 +26,7 @@ import { useState } from "react";
 
 import { theme } from "@/app/provider";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
+import { queryKeys } from "@/app/utils/queries/keys";
 
 import { EventTemplate, tagNameSchema } from "@/common/data/domain";
 
@@ -101,7 +102,7 @@ export function CreateEventTemplateFormState({
         onSuccess: () => {
             // Call `onSuccess` whenever creation is successful + show notifications.
             queryClient.invalidateQueries({
-                queryKey: ["retrieve-project-template"],
+                queryKey: queryKeys.projectTemplates.retrieveBase(),
             });
             notifySuccess({
                 message: "Successfully created event.",

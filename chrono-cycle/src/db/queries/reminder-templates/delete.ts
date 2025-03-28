@@ -15,6 +15,10 @@ export function rawDeleteReminderTemplates(
     db: DbLike,
     ids: Set<number>,
 ): TE.TaskEither<DoesNotExistError, void> {
+    if (ids.size === 0) {
+        return TE.of(undefined);
+    }
+
     return pipe(
         TE.fromTask(() =>
             db
@@ -49,13 +53,19 @@ export function deleteReminderTemplates(
 
     return pipe(
         checkUserOwnsReminderTemplates(db, userId, ids),
-        TE.chainW(() => rawDeleteReminderTemplates(db, ids)),
-        TE.mapError((err) =>
-            err._errorKind === "DoesNotExistError"
-                ? AssertionError(
-                      "Unexpected number of deleted reminder templates",
-                  )
-                : err,
+        TE.chainW(() =>
+            pipe(
+                rawDeleteReminderTemplates(db, ids),
+                // `checkUserOwnsReminderTemplates()` should already have checked
+                // if the reminder templates exist.
+                TE.mapError((err) =>
+                    err._errorKind === "DoesNotExistError"
+                        ? AssertionError(
+                              "Unexpected number of deleted reminder templates",
+                          )
+                        : err,
+                ),
+            ),
         ),
     );
 }

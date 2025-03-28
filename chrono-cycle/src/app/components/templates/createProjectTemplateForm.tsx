@@ -19,6 +19,7 @@ import { zodResolver } from "mantine-form-zod-resolver";
 import { match, P } from "ts-pattern";
 
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
+import { queryKeys } from "@/app/utils/queries/keys";
 
 import { ValidationIssues } from "@/common/errors";
 
@@ -90,7 +91,7 @@ export function CreateProjectTemplateForm({
                 message: "Successfully created project template.",
             });
             queryClient.invalidateQueries({
-                queryKey: ["list-project-templates"],
+                queryKey: queryKeys.projectTemplates.list(),
             });
             onSuccess();
         },

@@ -26,17 +26,17 @@ export function bridge(
 
             return updateEventTemplate(db, userId, {
                 id: decodeEventTemplateId(id),
-                remindersDelete: remindersDelete.map((id) =>
+                remindersDelete: remindersDelete?.map((id) =>
                     decodeReminderTemplateId(id),
                 ),
-                remindersUpdate: remindersUpdate.map((rt) => {
+                remindersUpdate: remindersUpdate?.map((rt) => {
                     const { id, ...rest } = rt;
                     return {
                         id: decodeReminderTemplateId(id),
                         ...rest,
                     };
                 }),
-                tags: tags.map((name) => ({
+                tags: tags?.map((name) => ({
                     userId,
                     name,
                 })),

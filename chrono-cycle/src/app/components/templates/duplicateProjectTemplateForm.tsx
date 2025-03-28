@@ -19,6 +19,7 @@ import { zodResolver } from "mantine-form-zod-resolver";
 import { match } from "ts-pattern";
 
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
+import { queryKeys } from "@/app/utils/queries/keys";
 
 import { ProjectTemplateOverview } from "@/common/data/domain";
 
@@ -78,7 +79,7 @@ export function DuplicateProjectTemplateForm({
                 message: "Successfully duplicated project template.",
             });
             queryClient.invalidateQueries({
-                queryKey: ["list-project-templates"],
+                queryKey: queryKeys.projectTemplates.list(),
             });
             onSuccess();
         },

@@ -44,6 +44,43 @@ vi.mock("next/navigation", () => ({
     redirect: vi.fn(),
 }));
 
+// Mock reminder lib functions.
+vi.mock(import("@/lib/reminders"), async (importOriginal) => {
+    const libRemindersMod = await importOriginal();
+    return {
+        ...libRemindersMod,
+        cancelReminder: vi.fn(),
+        scheduleReminder: vi.fn(),
+    };
+});
+
+// Mock trigger.dev functions.
+vi.mock(import("@trigger.dev/sdk/v3"), async (importOriginal) => {
+    const sdkMod = await importOriginal();
+    return {
+        ...sdkMod,
+        runs: {
+            replay: vi.fn(),
+            cancel: vi.fn(),
+            retrieve: vi.fn(),
+            list: vi.fn(),
+            reschedule: vi.fn(),
+            poll: vi.fn(),
+            subscribeToRun: vi.fn(),
+            subscribeToRunsWithTag: vi.fn(),
+            subscribeToBatch: vi.fn(),
+            fetchStream: vi.fn(),
+        },
+        tasks: {
+            trigger: vi.fn(),
+            triggerAndPoll: vi.fn(),
+            batchTrigger: vi.fn(),
+            triggerAndWait: vi.fn(),
+            batchTriggerAndWait: vi.fn(),
+        },
+    };
+});
+
 beforeAll(async () => {
     // Mock database.
     const client = new PGlite();

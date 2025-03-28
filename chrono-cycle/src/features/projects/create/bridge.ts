@@ -17,7 +17,6 @@ import { scheduleRemindersForProject } from "@/lib/reminders";
 
 import { getDb } from "@/db";
 import { listEventTemplates } from "@/db/queries/event-templates/list";
-import { retrieveProjectTemplate } from "@/db/queries/project-templates/retrieve";
 import { createProject } from "@/db/queries/projects/create";
 import { updateReminder } from "@/db/queries/reminders/update";
 import { wrapWithTransaction } from "@/db/queries/utils/transaction";

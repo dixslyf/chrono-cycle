@@ -4,7 +4,6 @@ import { describe, expect, it } from "vitest";
 
 import { DoesNotExistError, ValidationError } from "@/common/errors";
 
-import { createProjectTemplateAction } from "@/features/project-templates/create/action";
 import { createProjectAction } from "@/features/projects/create/action";
 import { retrieveProjectAction } from "@/features/projects/retrieve/action";
 

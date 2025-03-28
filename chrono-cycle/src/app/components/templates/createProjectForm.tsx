@@ -19,6 +19,7 @@ import { match } from "ts-pattern";
 import { z } from "zod";
 
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
+import { queryKeys } from "@/app/utils/queries/keys";
 
 import { ProjectTemplateOverview } from "@/common/data/domain";
 
@@ -114,14 +115,9 @@ export function CreateProjectForm({
             );
         },
         onSuccess: () => {
-            // Re-fetch the project template data so that the projects table is updated.
-            queryClient.invalidateQueries({
-                queryKey: ["retrieve-project-template"],
-            });
-
             // Also re-fetch the projects data for the dashboard.
             queryClient.invalidateQueries({
-                queryKey: ["list-all-projects"],
+                queryKey: queryKeys.projects.listAll(),
             });
 
             notifySuccess({
