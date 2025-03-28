@@ -1,6 +1,14 @@
 "use client";
 
-import { ActionIcon, Button, Menu, Modal, Select, Text } from "@mantine/core";
+import {
+    ActionIcon,
+    Button,
+    Group,
+    Menu,
+    Modal,
+    Select,
+    Text,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -26,18 +34,9 @@ interface DashNavProps {
     selectedMonth: string;
     onSelectMonth: (month: string) => void;
     year: number;
-    activeView: "timeline" | "calendar";
-    onViewChange: (view: "timeline" | "calendar") => void;
 }
 
-function DashNav({
-    months,
-    selectedMonth,
-    onSelectMonth,
-    year,
-    activeView,
-    onViewChange,
-}: DashNavProps) {
+function DashNav({ months, selectedMonth, onSelectMonth, year }: DashNavProps) {
     // handle back and forth arrow changes
     const handleMonthChange = (delta: number) => {
         if (!months || months.length === 0) return;
@@ -132,32 +131,12 @@ function DashNav({
                 </div>
 
                 {/* calendar / timeline button */}
-                <div className="flex gap-2 w-1/3 justify-center items-center">
-                    <Button
-                        variant="transparent"
-                        onClick={() => onViewChange("timeline")}
-                        className={`text-lg font-semibold h-full hover:text-palette2 ${
-                            activeView === "timeline"
-                                ? "text-palette2 border-b-2 border-b-palette2 p-0 rounded-none"
-                                : "text-palette1"
-                        }`}
-                    >
+                <Group className="w-1/3 items-center" justify="center">
+                    <Group className="text-lg font-semibold h-full text-palette2 border-b-2 border-b-palette2 p-0 gap-0">
                         <ChartNoAxesGantt />
                         Timeline
-                    </Button>
-                    <Button
-                        variant="transparent"
-                        onClick={() => onViewChange("calendar")}
-                        className={`text-lg font-semibold h-full  hover:text-palette2 ${
-                            activeView === "calendar"
-                                ? "text-palette2 border-b-2 border-b-palette2 p-0 rounded-none"
-                                : "text-palette1"
-                        }`}
-                    >
-                        <Calendar />
-                        Calendar
-                    </Button>
-                </div>
+                    </Group>
+                </Group>
 
                 {/* Choose template button */}
                 <div className="mr-4 w-1/3 flex justify-end items-center">

@@ -49,9 +49,6 @@ function DashboardClient({
     const [selectedMonth, setSelectedMonth] = useState(initialMonth);
     const [currentYear, setCurrentYear] = useState(year);
     const [scrollToMonth, setScrollToMonth] = useState<string | null>(null);
-    const [activeView, setActiveView] = useState<"timeline" | "calendar">(
-        "timeline",
-    );
 
     // extend the days array when the user scrolls
     const extendDays = (direction: "left" | "right") => {
@@ -74,7 +71,6 @@ function DashboardClient({
 
     // update the month from the nav from scrolling
     const handleSelectMonth = (month: string, scroll: boolean = false) => {
-        // setScrollToMonth(month);
         if (scroll) {
             setScrollToMonth(month);
         }
@@ -93,29 +89,21 @@ function DashboardClient({
                     selectedMonth={selectedMonth}
                     onSelectMonth={(month) => handleSelectMonth(month, true)}
                     year={currentYear}
-                    activeView={activeView}
-                    onViewChange={setActiveView}
                 />
-                {activeView === "timeline" ? (
-                    <Timeline
-                        days={days}
-                        projects={projectsQuery.data ?? []}
-                        selectedMonth={selectedMonth}
-                        scrollToMonth={scrollToMonth}
-                        onMonthChange={(month) => {
-                            setSelectedMonth(month.toLowerCase());
-                        }}
-                        onYearChange={(year) => {
-                            setCurrentYear(year);
-                        }}
-                        onScrolled={() => setScrollToMonth(null)}
-                        onExtendDays={extendDays}
-                    />
-                ) : (
-                    <div className="flex flex-1 items-center justify-center">
-                        <h2>Calendar view</h2>
-                    </div>
-                )}
+                <Timeline
+                    days={days}
+                    projects={projectsQuery.data ?? []}
+                    selectedMonth={selectedMonth}
+                    scrollToMonth={scrollToMonth}
+                    onMonthChange={(month) => {
+                        setSelectedMonth(month.toLowerCase());
+                    }}
+                    onYearChange={(year) => {
+                        setCurrentYear(year);
+                    }}
+                    onScrolled={() => setScrollToMonth(null)}
+                    onExtendDays={extendDays}
+                />
             </div>
         </div>
     );
