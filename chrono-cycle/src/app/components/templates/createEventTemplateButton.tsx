@@ -6,12 +6,11 @@ import { useCallback } from "react";
 
 import { SplitModal } from "@/app/components/customComponent/splitModal";
 
-// import { CreateEventTemplateForm } from "./createEventForm";
 import {
     CreateEventTemplateFormLeft,
     CreateEventTemplateFormRight,
     CreateEventTemplateFormState,
-} from "./createEventForm";
+} from "./createEventTemplateForm";
 
 export function CreateEventTemplateButton<T extends string>({
     projectTemplateId,

@@ -14,7 +14,7 @@ import { SplitModal } from "@/app/components/customComponent/splitModal";
 
 import { EventTemplate } from "@/common/data/domain";
 
-import { CreateEventTemplateButton } from "./createEventButton";
+import { CreateEventTemplateButton } from "./createEventTemplateButton";
 import {
     EventTemplateDetailsLeft,
     EventTemplateDetailsRight,
