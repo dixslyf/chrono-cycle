@@ -8,8 +8,12 @@ import { pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
 import { useEffect, useRef, useState } from "react";
 
+import { SplitModal } from "@/app/components/customComponent/splitModal";
 import DisplayEventDetails from "@/app/components/event/eventDetails";
-import ProjectDetails from "@/app/components/project/projectDetails";
+import {
+    ProjectDetailsLeft,
+    ProjectDetailsRight,
+} from "@/app/components/project/projectDetails";
 import { areSameDay } from "@/app/utils/dates";
 import { queryKeys } from "@/app/utils/queries/keys";
 
@@ -256,7 +260,42 @@ function Timeline({
             >
                 {clickedEvent && <DisplayEventDetails event={clickedEvent} />}
             </Modal>
-            <Modal
+            {/* project details modal */}
+            <SplitModal
+                opened={projectDetailsModalOpened}
+                onClose={closeProjectDetailsModal}
+            >
+                {clickedProject && (
+                    <>
+                        <SplitModal.Left>
+                            <ProjectDetailsLeft
+                                project={clickedProject}
+                                projectTemplate={
+                                    retrieveProjectTemplateQuery.data
+                                }
+                                isLoading={
+                                    retrieveProjectTemplateQuery.isPending
+                                }
+                            />
+                        </SplitModal.Left>
+                        <SplitModal.Right>
+                            <ProjectDetailsRight
+                                project={clickedProject}
+                                isLoading={
+                                    retrieveProjectTemplateQuery.isPending
+                                }
+                                onDeleteSuccess={() => {
+                                    closeProjectDetailsModal();
+                                    queryClient.invalidateQueries({
+                                        queryKey: queryKeys.projects.listAll(),
+                                    });
+                                }}
+                            />
+                        </SplitModal.Right>
+                    </>
+                )}
+            </SplitModal>
+            {/* <Modal
                 opened={projectDetailsModalOpened}
                 onClose={closeProjectDetailsModal}
                 title="Project Details"
@@ -274,7 +313,7 @@ function Timeline({
                         }}
                     />
                 )}
-            </Modal>
+            </Modal> */}
             <div className="flex h-full flex-1 relative">
                 {days.map((day, i) => {
                     const isToday = areSameDay(new Date(), day.date);

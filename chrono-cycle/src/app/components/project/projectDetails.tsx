@@ -1,8 +1,9 @@
 "use client";
 
-import { Group, Skeleton, Stack, Text } from "@mantine/core";
+import { Badge, Group, Skeleton, Stack, Text } from "@mantine/core";
 import { pipe } from "fp-ts/lib/function";
 import * as O from "fp-ts/Option";
+import React from "react";
 
 import { formatDate } from "@/app/utils/dates";
 
@@ -10,57 +11,110 @@ import { Project, ProjectTemplate } from "@/common/data/domain";
 
 import { DeleteProjectButton } from "./deleteProjectButton";
 
-interface ProjectDetailsProps {
-    project: Project;
-    projectTemplate?: O.Option<ProjectTemplate> | undefined;
-    isLoading?: boolean | undefined;
-    onDeleteSuccess: () => void;
-}
-
-function ProjectDetails({
+export function ProjectDetailsLeft({
     project,
     projectTemplate,
     isLoading,
-    onDeleteSuccess,
-}: ProjectDetailsProps) {
+}: {
+    project: Project;
+    projectTemplate?: O.Option<ProjectTemplate>;
+    isLoading?: boolean;
+}): React.ReactNode {
     return (
-        <Stack>
+        <Stack className="h-full overflow-y-auto" align="stretch" gap="xl">
+            {/* project name */}
             <Skeleton visible={isLoading}>
-                <Text>ID: {project.id}</Text>
+                <Stack align="stretch">
+                    <Text className="text-palette5 font-semibold text-xl">
+                        Name:
+                    </Text>
+                    <Text className="flex-1 border border-gray-400 rounded-xl p-4">
+                        {project.name}
+                    </Text>
+                </Stack>
             </Skeleton>
+            {/* description */}
             <Skeleton visible={isLoading}>
-                <Text>Name: {project.name}</Text>
+                <Stack align="stretch">
+                    <Text className="text-palette5 font-semibold text-xl">
+                        Description
+                    </Text>
+                    <Text className="flex-1 border border-gray-400 rounded-xl p-4">
+                        {project.description}
+                    </Text>
+                </Stack>
             </Skeleton>
-            <Skeleton visible={isLoading}>
-                <Text>Description: {project.description}</Text>
+            <Skeleton>
+                <Stack>
+                    <Text>Project Template:</Text>
+                    <Text>
+                        {pipe(
+                            projectTemplate,
+                            O.fromNullable,
+                            O.flatten,
+                            O.map((pt) => `${pt.name} (${pt.id})`),
+                            O.getOrElse(() => "None"),
+                        )}
+                    </Text>
+                </Stack>
             </Skeleton>
-            <Skeleton visible={isLoading}>
-                <Text>Starts at: {formatDate(project.startsAt)}</Text>
-            </Skeleton>
-            <Skeleton visible={isLoading}>
-                <Text>
-                    Created at:{" "}
-                    {formatDate(project.createdAt, { withTime: true })}
-                </Text>
-            </Skeleton>
-            <Skeleton visible={isLoading}>
-                <Text>
-                    Updated at:{" "}
-                    {formatDate(project.updatedAt, { withTime: true })}
-                </Text>
-            </Skeleton>
-            <Skeleton visible={isLoading}>
-                <Text>
-                    Project template:{" "}
-                    {pipe(
-                        projectTemplate,
-                        O.fromNullable,
-                        O.flatten,
-                        O.map((pt) => `${pt.name} (${pt.id})`),
-                        O.getOrElse(() => "None"),
-                    )}
-                </Text>
-            </Skeleton>
+        </Stack>
+    );
+}
+
+export function ProjectDetailsRight({
+    project,
+    isLoading,
+    onDeleteSuccess,
+}: {
+    project: Project;
+    isLoading?: boolean;
+    onDeleteSuccess: () => void;
+}): React.ReactNode {
+    return (
+        <Stack h="100%" justify="space-between">
+            <Stack>
+                <Skeleton visible={isLoading}>
+                    <Group>
+                        <Text className="font-semibold text-xl text-palette3">
+                            Project ID:
+                        </Text>
+                        <Badge size="lg" color="brown">
+                            {project.id}
+                        </Badge>
+                    </Group>
+                </Skeleton>
+                <Skeleton visible={isLoading}>
+                    <Group>
+                        <Text className="text-palette3 font-semibold text-xl">
+                            Starts At:
+                        </Text>
+                        <Text className="text-lg font-medium text-gray-300">
+                            {formatDate(project.startsAt)}
+                        </Text>
+                    </Group>
+                </Skeleton>
+                <Skeleton visible={isLoading}>
+                    <Group>
+                        <Text className="text-palette3 font-semibold text-xl">
+                            Created At:
+                        </Text>
+                        <Text className="text-lg font-medium text-gray-300">
+                            {formatDate(project.createdAt, { withTime: true })}
+                        </Text>
+                    </Group>
+                </Skeleton>
+                <Skeleton visible={isLoading}>
+                    <Group>
+                        <Text className="text-palette3 font-semibold text-xl">
+                            Updated At:
+                        </Text>
+                        <Text className="text-lg font-medium text-gray-300">
+                            {formatDate(project.updatedAt, { withTime: true })}
+                        </Text>
+                    </Group>
+                </Skeleton>
+            </Stack>
             <Group justify="flex-end">
                 <DeleteProjectButton
                     projectId={project.id}
@@ -71,5 +125,3 @@ function ProjectDetails({
         </Stack>
     );
 }
-
-export default ProjectDetails;
