@@ -278,11 +278,9 @@ export function ProjectTemplateDetailsModal<T extends string>({
                 title={projectTemplate?.name}
                 titleComponent={() => (
                     <TextInput
-                        styles={{
-                            input: { border: "none", padding: 0 },
-                        }}
+                        variant="unstyled"
                         classNames={{
-                            input: "text-3xl font-bold",
+                            input: "text-3xl font-bold hover:bg-gray-200 focus:border focus:border-gray-400 focus:bg-gray-200",
                         }}
                         {...form.getInputProps("name")}
                     />
