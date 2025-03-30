@@ -9,7 +9,10 @@ import * as O from "fp-ts/Option";
 import { useEffect, useRef, useState } from "react";
 
 import { SplitModal } from "@/app/components/customComponent/splitModal";
-import DisplayEventDetails from "@/app/components/event/eventDetails";
+import {
+    DisplayEventDetailsLeft,
+    DisplayEventDetailsRight,
+} from "@/app/components/event/eventDetails";
 import {
     ProjectDetailsLeft,
     ProjectDetailsRight,
@@ -253,13 +256,29 @@ function Timeline({
             ref={containerRef}
             className="overflow-x-auto w-full flex-1 h-full flex flex-col relative z-0"
         >
-            <Modal
+            {/* <Modal
                 opened={eventDetailsModalOpened}
                 onClose={closeEventDetailsModal}
                 title="Event Details"
             >
                 {clickedEvent && <DisplayEventDetails event={clickedEvent} />}
-            </Modal>
+            </Modal> */}
+            {/* event details modal */}
+            <SplitModal
+                opened={eventDetailsModalOpened}
+                onClose={closeEventDetailsModal}
+            >
+                {clickedEvent && (
+                    <>
+                        <SplitModal.Left title={`${clickedEvent.name}`}>
+                            <DisplayEventDetailsLeft event={clickedEvent} />
+                        </SplitModal.Left>
+                        <SplitModal.Right>
+                            <DisplayEventDetailsRight event={clickedEvent} />
+                        </SplitModal.Right>
+                    </>
+                )}
+            </SplitModal>
             {/* project details modal */}
             <SplitModal
                 opened={projectDetailsModalOpened}
@@ -267,7 +286,7 @@ function Timeline({
             >
                 {clickedProject && (
                     <>
-                        <SplitModal.Left>
+                        <SplitModal.Left title={`${clickedProject.name}`}>
                             <ProjectDetailsLeft
                                 project={clickedProject}
                                 projectTemplate={

@@ -22,17 +22,6 @@ export function ProjectDetailsLeft({
 }): React.ReactNode {
     return (
         <Stack className="h-full overflow-y-auto" align="stretch" gap="xl">
-            {/* project name */}
-            <Skeleton visible={isLoading}>
-                <Stack align="stretch">
-                    <Text className="text-palette5 font-semibold text-xl">
-                        Name:
-                    </Text>
-                    <Text className="flex-1 border border-gray-400 rounded-xl p-4">
-                        {project.name}
-                    </Text>
-                </Stack>
-            </Skeleton>
             {/* description */}
             <Skeleton visible={isLoading}>
                 <Stack align="stretch">

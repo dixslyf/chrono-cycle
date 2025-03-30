@@ -6,6 +6,7 @@ import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { Trash } from "lucide-react";
 
+import { CriticalButton } from "@/app/components/customComponent/criticalButton";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 
 import { deleteProjectAction } from "@/features/projects/delete/action";
@@ -43,15 +44,13 @@ export function DeleteProjectButton({
     });
 
     return (
-        <Button
-            variant="filled"
-            color="red"
+        <CriticalButton
             disabled={disabled}
             loading={deleteMutation.isPending}
             onClick={() => deleteMutation.mutate(projectId)}
         >
             <Trash className="mr-2" />
             Delete
-        </Button>
+        </CriticalButton>
     );
 }
