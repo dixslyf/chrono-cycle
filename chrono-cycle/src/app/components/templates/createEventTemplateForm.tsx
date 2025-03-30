@@ -275,7 +275,7 @@ function RemindersInput({
     mutation: CreateEventTemplateFormState["mutation"];
 }) {
     return (
-        <Fieldset c="white" unstyled style={{ display: "flex" }} h={670}>
+        <Fieldset c="white" unstyled style={{ display: "flex" }}>
             <Stack gap="lg" w="100%">
                 <ScrollArea style={{ root: { flex: 1 } }}>
                     <Stack gap="lg" style={{ flex: 1 }}>

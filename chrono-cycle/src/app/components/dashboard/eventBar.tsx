@@ -1,5 +1,7 @@
 "use client";
 
+import { Box, Text } from "@mantine/core";
+
 import { Event } from "@/common/data/domain";
 
 interface EventBarProps {
@@ -8,7 +10,6 @@ interface EventBarProps {
     endIndex: number;
     cellWidth: number;
     color: string;
-    topOffset: number;
     onEventClick: (event: Event) => void;
 }
 
@@ -18,25 +19,24 @@ function EventBar({
     endIndex,
     color,
     cellWidth,
-    topOffset,
     onEventClick,
 }: EventBarProps) {
     const leftOffset = startIndex * cellWidth;
     const width = (endIndex - startIndex + 1) * cellWidth;
 
     return (
-        <div
-            className={`absolute rounded-lg text-palette3 font-bold flex items-center justify-center text-sm ${color} mt-2`}
+        <Box
+            className={`rounded-lg flex items-center justify-center ${color} mt-2 cursor-pointer`}
             style={{
-                left: `${leftOffset}px`,
+                marginLeft: `${leftOffset}px`,
                 width: `${width}px`,
-                height: "24px",
-                top: `${topOffset}px`,
             }}
             onClick={() => onEventClick(event)}
         >
-            {event.name}
-        </div>
+            <Text className="text-md font-medium text-palette3">
+                {event.name}
+            </Text>
+        </Box>
     );
 }
 

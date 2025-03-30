@@ -3,13 +3,16 @@
 import {
     Badge,
     Checkbox,
-    Divider,
+    Fieldset,
     Group,
-    Paper,
+    ScrollArea,
     Stack,
     Text,
 } from "@mantine/core";
 import { Clock } from "lucide-react";
+import React from "react";
+
+import { theme } from "@/app/provider";
 
 import { Event, Reminder, Tag } from "@/common/data/domain";
 
@@ -17,152 +20,152 @@ interface DisplayEventDetailsProps {
     event: Event;
 }
 
-function DisplayEventDetails({ event }: DisplayEventDetailsProps) {
+export function DisplayEventDetailsLeft({
+    event,
+}: {
+    event: Event;
+}): React.ReactNode {
     return (
-        <Paper p="md" radius="md" withBorder>
-            {/* Basic Information Section */}
-            <Stack gap="md">
-                <Text fw={700} size="lg">
-                    Basic Information
-                </Text>
-
-                <Group justify="apart">
-                    <Stack gap="xs" style={{ flex: 1 }}>
-                        <Text fw={500}>Name</Text>
-                        <Text>{event.name}</Text>
-                    </Stack>
-
-                    <Stack gap="xs" style={{ flex: 1 }}>
-                        <Text fw={500}>Start date</Text>
-                        <Text>{event.startDate.toString()}</Text>
-                    </Stack>
-                </Group>
-
-                <Group justify="apart">
-                    <Stack gap="xs" style={{ flex: 1 }}>
-                        <Text fw={500}>Event type</Text>
-                        <Text>
-                            {event.eventType === "task" ? "Task" : "Activity"}
-                        </Text>
-                    </Stack>
-
-                    <Stack gap="xs" style={{ flex: 1 }}>
-                        <Text fw={500}>Duration (days)</Text>
-                        <Text>{event.duration}</Text>
-                    </Stack>
-                </Group>
-
-                <Stack gap="xs">
-                    <Text fw={500}>Auto Reschedule</Text>
-                    <Checkbox
-                        checked={event.autoReschedule}
-                        readOnly
-                        label="Automatically reschedule the event when a dependency event is delayed"
-                    />
-                </Stack>
-            </Stack>
-
-            <Divider my="md" />
-
-            {/* Reminders Section */}
-            <Stack gap="md">
-                <Text fw={700} size="lg">
-                    Reminders
-                </Text>
-
-                {event.reminders.length > 0 ? (
-                    event.reminders.map((reminder: Reminder, _index) => (
-                        <Paper key={reminder.id} p="sm" withBorder>
-                            <Stack gap="xs">
-                                <Group justify="apart">
-                                    <Stack gap={0}>
-                                        <Group gap="xs">
-                                            <Clock size={16} />
-                                            <Text fw={500}>Trigger time</Text>
-                                        </Group>
-                                        <Text>
-                                            {reminder.triggerTime.toString()}
-                                        </Text>
-                                    </Stack>
-                                </Group>
-
-                                <Group mt="xs">
-                                    <Checkbox
-                                        checked={reminder.emailNotifications}
-                                        readOnly
-                                        label="Email notification"
-                                    />
-                                    <Checkbox
-                                        checked={reminder.desktopNotifications}
-                                        readOnly
-                                        label="Desktop notification"
-                                    />
-                                </Group>
-                            </Stack>
-                        </Paper>
-                    ))
-                ) : (
-                    <Text c="dimmed" style={{ fontStyle: "italic" }}>
-                        No reminders set
+        <Stack className="h-full overflow-y-auto" align="stretch" gap="xl">
+            {/* Event type */}
+            <Group className="py-4" gap="lg" grow={true}>
+                <Group>
+                    <Text className="text-md font-semibold text-palette5">
+                        Event Type
                     </Text>
-                )}
+                    <Text
+                        className={`text-md font-semibold ${
+                            event.eventType === "task"
+                                ? "text-fuchsia-500"
+                                : "text-blue-400"
+                        }`}
+                    >
+                        {event.eventType === "task" ? "Task" : "Activity"}
+                    </Text>
+                </Group>
+                <Group>
+                    <Text className="text-md font-semibold text-palette5">
+                        Status
+                    </Text>
+                    <Badge
+                        tt="uppercase"
+                        color={
+                            event.status === "completed"
+                                ? "green"
+                                : event.status === "in progress"
+                                  ? "blue"
+                                  : event.status === "not started"
+                                    ? "yellow"
+                                    : "gray"
+                        }
+                    >
+                        {event.status}
+                    </Badge>
+                </Group>
+            </Group>
+            <Group className="py-4" gap="lg" grow={true}>
+                {/* start date */}
+                <Group gap={0}>
+                    <Text className="text-md font-semibold text-palette5 w-1/2">
+                        Start Date
+                    </Text>
+                    <Text className="text-md font-semibold text-red-500 w-1/2">
+                        {event.startDate.toString()}
+                    </Text>
+                </Group>
+                <Group>
+                    <Text className="text-md font-semibold text-palette5">
+                        Duration (days)
+                    </Text>
+                    <Text className="text-md font-semibold text-green-400">
+                        {event.eventType === "activity"
+                            ? event.duration !== null
+                                ? event.duration
+                                : "-"
+                            : "-"}
+                    </Text>
+                </Group>
+            </Group>
+            {/* note */}
+            <Stack>
+                <Fieldset legend="Note" className="border-gray-400 rounded-xl">
+                    <Text className="text-gray-600">
+                        {event.note || "No note attached"}{" "}
+                    </Text>
+                </Fieldset>
             </Stack>
-
-            <Divider my="md" />
-
-            {/* Miscellaneous Section */}
-            <Stack gap="md">
-                <Text fw={700} size="lg">
-                    Miscellaneous
-                </Text>
-
-                <Stack gap="xs">
-                    <Text fw={500}>Note</Text>
-                    <Text>{event.note || "No notes attached"}</Text>
-                </Stack>
-
-                <Stack gap="xs">
-                    <Text fw={500}>Tags</Text>
+            {/* tags */}
+            <Stack gap="sm" className="py-4">
+                <Text>Tags</Text>
+                <Group>
                     {event.tags.length > 0 ? (
-                        <Group gap="xs">
+                        <Group>
                             {event.tags.map((tag: Tag) => (
                                 <Badge key={tag.id}>{tag.name}</Badge>
                             ))}
                         </Group>
                     ) : (
-                        <Text c="dimmed" style={{ fontStyle: "italic" }}>
-                            No tags assigned
-                        </Text>
+                        <Text className="text-gray-300">No tags assigned</Text>
                     )}
-                </Stack>
-
-                <Group justify="apart">
-                    <Stack gap="xs">
-                        <Text fw={500}>Status</Text>
-                        <Badge
-                            tt="uppercase"
-                            color={
-                                event.status === "completed"
-                                    ? "green"
-                                    : event.status === "in progress"
-                                      ? "blue"
-                                      : event.status === "not started"
-                                        ? "yellow"
-                                        : "gray"
-                            }
-                        >
-                            {event.status}
-                        </Badge>
-                    </Stack>
-
-                    <Stack gap="xs">
-                        <Text fw={500}>Last Updated</Text>
-                        <Text>{event.updatedAt.toLocaleDateString()}</Text>
-                    </Stack>
                 </Group>
             </Stack>
-        </Paper>
+        </Stack>
     );
 }
 
-export default DisplayEventDetails;
+export function DisplayEventDetailsRight({ event }: DisplayEventDetailsProps) {
+    return (
+        <Stack className="h-full">
+            <Fieldset c="white" unstyled className="flex">
+                <Stack gap="lg" w="100%">
+                    <ScrollArea style={{ root: { flex: 1 } }}>
+                        {event.reminders.length > 0 ? (
+                            event.reminders.map((reminder: Reminder, index) => (
+                                <Stack
+                                    key={`reminder-${index}`}
+                                    styles={{
+                                        root: {
+                                            border: "1px solid",
+                                            borderColor: theme.white,
+                                        },
+                                    }}
+                                    className="rounded-lg p-4"
+                                    justify="center"
+                                >
+                                    <Group>
+                                        <Group>
+                                            <Clock className="w-8 h-8" />
+                                            <Text>Trigger time:</Text>
+                                        </Group>
+                                        <Text>
+                                            {reminder.triggerTime.toString()}
+                                        </Text>
+                                    </Group>
+
+                                    <Group>
+                                        <Checkbox
+                                            checked={
+                                                reminder.emailNotifications
+                                            }
+                                            readOnly
+                                            label="Email Notification"
+                                        />
+                                        <Checkbox
+                                            checked={
+                                                reminder.desktopNotifications
+                                            }
+                                            readOnly
+                                            label="Desktop Notification"
+                                        />
+                                    </Group>
+                                </Stack>
+                            ))
+                        ) : (
+                            <Text>No reminders set</Text>
+                        )}
+                    </ScrollArea>
+                </Stack>
+            </Fieldset>
+        </Stack>
+    );
+}

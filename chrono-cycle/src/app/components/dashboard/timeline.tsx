@@ -8,8 +8,15 @@ import { pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
 import { useEffect, useRef, useState } from "react";
 
-import DisplayEventDetails from "@/app/components/event/eventDetails";
-import ProjectDetails from "@/app/components/project/projectDetails";
+import { SplitModal } from "@/app/components/customComponent/splitModal";
+import {
+    DisplayEventDetailsLeft,
+    DisplayEventDetailsRight,
+} from "@/app/components/event/eventDetails";
+import {
+    ProjectDetailsLeft,
+    ProjectDetailsRight,
+} from "@/app/components/project/projectDetails";
 import { areSameDay } from "@/app/utils/dates";
 import { queryKeys } from "@/app/utils/queries/keys";
 
@@ -45,9 +52,6 @@ function Timeline({
 }: TimelineProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const cellWidth = 96; // fixed width for each day
-    const headerHeight = 24; // height for project header
-    const eventHeight = 32; // might be able to change this later on
-    const rowSpacing = 4; // space between row
 
     const events = projects.map((p) => p.events).flat();
 
@@ -128,10 +132,6 @@ function Timeline({
             const centerPosition = scrollLeft + containerWidth / 2;
             const index = Math.floor(centerPosition / cellWidth);
             if (days[index]) {
-                // const monthName = days[index].date.toLocaleDateString("en-US", {
-                //     month: "long",
-                // });
-                // onMonthChange(monthName);
                 if (onMonthChange) {
                     const monthName = days[index].date.toLocaleDateString(
                         "en-US",
@@ -200,7 +200,6 @@ function Timeline({
 
     // calculate a cumulative vertical offset for each project row.
     // each row's height is the header height plus additionnal height for expanded events.
-    let cumulativeOffset = 0;
 
     const queryClient = useQueryClient();
 
@@ -257,40 +256,61 @@ function Timeline({
             ref={containerRef}
             className="overflow-x-auto w-full flex-1 h-full flex flex-col relative z-0"
         >
-            <Modal
+            <SplitModal
                 opened={eventDetailsModalOpened}
                 onClose={closeEventDetailsModal}
-                title="Event Details"
             >
-                {clickedEvent && <DisplayEventDetails event={clickedEvent} />}
-            </Modal>
-            <Modal
+                {clickedEvent && (
+                    <>
+                        <SplitModal.Left title={`${clickedEvent.name}`}>
+                            <DisplayEventDetailsLeft event={clickedEvent} />
+                        </SplitModal.Left>
+                        <SplitModal.Right>
+                            <DisplayEventDetailsRight event={clickedEvent} />
+                        </SplitModal.Right>
+                    </>
+                )}
+            </SplitModal>
+            {/* project details modal */}
+            <SplitModal
                 opened={projectDetailsModalOpened}
                 onClose={closeProjectDetailsModal}
-                title="Project Details"
             >
                 {clickedProject && (
-                    <ProjectDetails
-                        project={clickedProject}
-                        projectTemplate={retrieveProjectTemplateQuery.data}
-                        isLoading={retrieveProjectTemplateQuery.isPending}
-                        onDeleteSuccess={() => {
-                            closeProjectDetailsModal();
-                            queryClient.invalidateQueries({
-                                queryKey: queryKeys.projects.listAll(),
-                            });
-                        }}
-                    />
+                    <>
+                        <SplitModal.Left title={`${clickedProject.name}`}>
+                            <ProjectDetailsLeft
+                                project={clickedProject}
+                                projectTemplate={
+                                    retrieveProjectTemplateQuery.data
+                                }
+                                isLoading={
+                                    retrieveProjectTemplateQuery.isPending
+                                }
+                            />
+                        </SplitModal.Left>
+                        <SplitModal.Right>
+                            <ProjectDetailsRight
+                                project={clickedProject}
+                                isLoading={
+                                    retrieveProjectTemplateQuery.isPending
+                                }
+                                onDeleteSuccess={() => {
+                                    closeProjectDetailsModal();
+                                    queryClient.invalidateQueries({
+                                        queryKey: queryKeys.projects.listAll(),
+                                    });
+                                }}
+                            />
+                        </SplitModal.Right>
+                    </>
                 )}
-            </Modal>
+            </SplitModal>
             <div className="flex h-full flex-1 relative">
                 {days.map((day, i) => {
-                    // const isToday =
-                    //     new Date().toDateString() === day.date.toDateString();
                     const isToday = areSameDay(new Date(), day.date);
                     return (
                         <div
-                            // key={day.date.toISOString()}
                             key={`${day.date.toISOString()}-${i}`}
                             className="flex-none border p-2 text-center flex flex-col gap-2"
                             style={{ width: `${cellWidth}px` }}
@@ -307,7 +327,6 @@ function Timeline({
                             {/* vertical line below label */}
                             <div
                                 className={`w-[0.1rem] h-[90%] mx-auto mt-2 ${
-                                    // isToday ? "bg-palette2" : "bg-gray-700"
                                     isToday
                                         ? "bg-palette2"
                                         : day.date < new Date()
@@ -323,36 +342,18 @@ function Timeline({
                     {projects.map((project) => {
                         const projectEvents = eventMap.get(project.id) || [];
                         if (projectEvents.length === 0) return null;
-
-                        // determine the current project's top offset
-                        const topOffset = cumulativeOffset;
-
-                        // determine additional height if expanded:
-                        const isExpanded = !!expandedProjects[project.id];
-                        const extraHeight = isExpanded
-                            ? projectEvents.length * (eventHeight + rowSpacing)
-                            : 0;
-
-                        // updated cumulative offset: header height + extra height + rowspacing for gap
-                        cumulativeOffset +=
-                            headerHeight + extraHeight + rowSpacing;
-
                         return (
                             <ProjectRow
                                 key={project.id}
                                 project={project}
                                 days={days}
                                 cellWidth={cellWidth}
-                                eventHeight={eventHeight}
-                                rowSpacing={rowSpacing}
                                 expanded={!!expandedProjects[project.id]}
                                 onProjectClick={(project) => {
                                     setClickedProject(project);
                                     openProjectDetailsModal();
                                 }}
                                 toggleProject={toggleProject}
-                                topOffset={topOffset}
-                                headerHeight={headerHeight}
                                 onEventClick={(event) => {
                                     setClickedEvent(event);
                                     openEventDetailsModal();
