@@ -1,6 +1,6 @@
 "use client";
 
-import { Group, Paper, Stack, Text } from "@mantine/core";
+import { Center, Group, Paper, Stack, Text } from "@mantine/core";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import React from "react";
 
@@ -105,26 +105,29 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
                 }}
                 onClick={() => onProjectClick(project)}
             >
-                <Group className="w-full h-full" align="stretch">
-                    <Text className="text-lg font-semibold flex-grow pl-4 py-2">
+                <Group className="w-full h-full flex-nowrap" align="stretch">
+                    <Text
+                        className="text-lg font-semibold flex-grow px-2 py-2"
+                        truncate="end"
+                    >
                         {project.name}
                     </Text>
-                    <Group
-                        className="w-1/12 items-center justify-center transition-colors duration-200 cursor-pointer hover:bg-gray-200"
+                    <Center
+                        className="items-center justify-center transition-colors duration-200 cursor-pointer hover:bg-gray-200 px-1"
                         onClick={chevronOnClick}
                     >
                         {expanded ? (
-                            <ChevronUp size={16} />
+                            <ChevronUp size={20} />
                         ) : (
-                            <ChevronDown size={16} />
+                            <ChevronDown size={20} />
                         )}
-                    </Group>
+                    </Center>
                 </Group>
             </Paper>
 
             {/* Render each event under the header if expanded */}
             {expanded && (
-                <Stack gap="lg" className="relative w-full">
+                <Stack gap="xs" className="relative w-full">
                     {project.events.map((event) => {
                         // Calculate start and end dates for the event.
                         const eventStartDate = event.startDate;

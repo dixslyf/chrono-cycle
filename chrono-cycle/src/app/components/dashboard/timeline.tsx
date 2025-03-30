@@ -256,14 +256,6 @@ function Timeline({
             ref={containerRef}
             className="overflow-x-auto w-full flex-1 h-full flex flex-col relative z-0"
         >
-            {/* <Modal
-                opened={eventDetailsModalOpened}
-                onClose={closeEventDetailsModal}
-                title="Event Details"
-            >
-                {clickedEvent && <DisplayEventDetails event={clickedEvent} />}
-            </Modal> */}
-            {/* event details modal */}
             <SplitModal
                 opened={eventDetailsModalOpened}
                 onClose={closeEventDetailsModal}
@@ -319,7 +311,6 @@ function Timeline({
                     const isToday = areSameDay(new Date(), day.date);
                     return (
                         <div
-                            // key={day.date.toISOString()}
                             key={`${day.date.toISOString()}-${i}`}
                             className="flex-none border p-2 text-center flex flex-col gap-2"
                             style={{ width: `${cellWidth}px` }}
