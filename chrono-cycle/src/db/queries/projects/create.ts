@@ -4,6 +4,7 @@ import { pipe } from "fp-ts/function";
 import * as NEA from "fp-ts/NonEmptyArray";
 import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
+import { DateTime } from "luxon";
 
 import {
     AssertionError,
@@ -122,9 +123,6 @@ function insertReminders(
             ) as DbExpandedEventTemplate;
 
             const toInsert = et.reminders.map((rt) => {
-                const triggerTime = new Date(event.startDate.getTime());
-                triggerTime.setDate(triggerTime.getDate() - rt.daysBeforeEvent);
-
                 // Parse the time and set it on the trigger date.
                 const timeCompsResult = extractTimeStringComponents(rt.time);
                 return pipe(
@@ -132,10 +130,24 @@ function insertReminders(
                     E.match(
                         (err) => E.left(err),
                         (timeComps) => {
-                            triggerTime.setHours(
-                                timeComps.hours,
-                                timeComps.minutes,
-                            );
+                            // Calculate the trigger time.
+                            //
+                            // HACK: This forces the date to Singapore time for simplicity.
+                            const triggerTime = DateTime.fromJSDate(
+                                event.startDate,
+                            )
+                                // At this point, there is no time information, and we are going to override it later,
+                                // so we don't have to worry about "converting" the current time.
+                                .setZone("Asia/Singapore", {
+                                    keepLocalTime: true,
+                                })
+                                .minus({ days: rt.daysBeforeEvent })
+                                .set({
+                                    hour: timeComps.hours,
+                                    minute: timeComps.minutes,
+                                })
+                                .toJSDate();
+
                             return E.right({
                                 eventId: event.id,
                                 triggerTime,

@@ -24,7 +24,7 @@ export const reminderTemplates = pgTable(
             .notNull()
             .references(() => eventTemplates.id, { onDelete: "cascade" }),
         daysBeforeEvent: integer("days_before_event").notNull(),
-        time: time("time", { withTimezone: true }).notNull(),
+        time: time("time").notNull(),
         emailNotifications: boolean("email_notifications")
             .default(true)
             .notNull(),
