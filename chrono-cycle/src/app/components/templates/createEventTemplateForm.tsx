@@ -154,7 +154,13 @@ export function CreateEventTemplateFormLeft({
         <Stack className="h-full overflow-y-auto" align="stretch" gap="xl">
             <form
                 id="create-event-form"
-                onSubmit={form.onSubmit((values) => mutation.mutate(values))}
+                onSubmit={(e) => {
+                    e.stopPropagation();
+                    const formSubmit = form.onSubmit((values) =>
+                        mutation.mutate(values),
+                    );
+                    return formSubmit(e);
+                }}
                 className="h-full"
             >
                 <Stack gap="xl" className="h-full">
