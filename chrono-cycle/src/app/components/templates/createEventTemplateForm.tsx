@@ -34,7 +34,6 @@ import { createEventTemplateAction } from "@/features/event-templates/create/act
 import {
     Failure,
     Payload,
-    payloadSchema,
     rawPayloadSchema,
     refineRawPayloadSchema,
 } from "@/features/event-templates/create/data";

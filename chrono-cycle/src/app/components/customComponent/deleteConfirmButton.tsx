@@ -1,13 +1,6 @@
 "use client";
 
-import {
-    Button,
-    Group,
-    Modal,
-    Stack,
-    Text,
-    useModalsStack,
-} from "@mantine/core";
+import { Button, Group, Stack, Text, useModalsStack } from "@mantine/core";
 import { Trash } from "lucide-react";
 
 import { CriticalButton } from "./criticalButton";
