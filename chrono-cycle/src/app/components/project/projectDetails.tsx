@@ -33,7 +33,7 @@ export function ProjectDetailsLeft({
                     </Text>
                 </Stack>
             </Skeleton>
-            <Skeleton>
+            <Skeleton visible={isLoading}>
                 <Stack>
                     <Text>Project Template:</Text>
                     <Text>
