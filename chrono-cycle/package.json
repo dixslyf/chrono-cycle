@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest",
-    "dev:trigger": "npx trigger.dev@latest dev",
+    "trigger:dev": "npx trigger.dev@latest dev",
+    "trigger:deploy": "npx trigger.dev@latest deploy",
     "coverage": "vitest run --coverage",
     "postinstall": "patch-package"
   },
