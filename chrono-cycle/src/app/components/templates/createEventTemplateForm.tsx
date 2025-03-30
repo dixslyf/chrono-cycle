@@ -35,13 +35,21 @@ import {
     Failure,
     Payload,
     payloadSchema,
+    rawPayloadSchema,
+    refineRawPayloadSchema,
 } from "@/features/event-templates/create/data";
 
 type ReminderData = Required<Payload["reminders"][number]>;
 
 export interface CreateEventTemplateFormState {
-    form: ReturnType<typeof useForm<Payload>>;
-    mutation: ReturnType<typeof useMutation<EventTemplate, Failure, Payload>>;
+    form: ReturnType<typeof useForm<Omit<Payload, "projectTemplateId">>>;
+    mutation: ReturnType<
+        typeof useMutation<
+            EventTemplate,
+            Failure,
+            Omit<Payload, "projectTemplateId">
+        >
+    >;
     durationDisabled: boolean;
 }
 
@@ -52,7 +60,7 @@ export function CreateEventTemplateFormState({
     projectTemplateId: string;
     onSuccess: () => void;
 }): CreateEventTemplateFormState {
-    const form = useForm<Payload>({
+    const form = useForm<Omit<Payload, "projectTemplateId">>({
         mode: "uncontrolled",
         initialValues: {
             name: "",
@@ -61,12 +69,15 @@ export function CreateEventTemplateFormState({
             duration: 1,
             note: "",
             autoReschedule: true,
-            projectTemplateId, // Sqid, not the actual ID.
             reminders: [] as ReminderData[],
             tags: [] as string[],
         },
         validate: {
-            ...zodResolver(payloadSchema),
+            ...zodResolver(
+                refineRawPayloadSchema(
+                    rawPayloadSchema.omit({ projectTemplateId: true }),
+                ),
+            ),
             tags: (tags) => {
                 const badTags = tags
                     .filter((tag) => !tagNameSchema.safeParse(tag).success)
@@ -91,7 +102,10 @@ export function CreateEventTemplateFormState({
     const queryClient = useQueryClient();
     const mutation = useMutation({
         mutationFn: async (values: FormValues) => {
-            const result = await createEventTemplateAction(values);
+            const result = await createEventTemplateAction({
+                projectTemplateId,
+                ...values,
+            });
             return pipe(
                 result,
                 E.getOrElseW((err) => {

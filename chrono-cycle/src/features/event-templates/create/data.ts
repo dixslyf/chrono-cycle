@@ -18,6 +18,7 @@ import {
     refineRawEventTemplateInsertSchema,
 } from "@/db/schema";
 
+export const refineRawPayloadSchema = refineRawEventTemplateInsertSchema;
 export const rawPayloadSchema = z.object({
     name: rawEventTemplateInsertSchema.shape.name,
     offsetDays: rawEventTemplateInsertSchema.shape.offsetDays,
@@ -31,8 +32,7 @@ export const rawPayloadSchema = z.object({
     ),
     tags: z.array(tagNameSchema),
 });
-export const payloadSchema =
-    refineRawEventTemplateInsertSchema(rawPayloadSchema);
+export const payloadSchema = refineRawPayloadSchema(rawPayloadSchema);
 
 export type Payload = z.input<typeof payloadSchema>;
 export type ParsedPayload = z.output<typeof payloadSchema>;
