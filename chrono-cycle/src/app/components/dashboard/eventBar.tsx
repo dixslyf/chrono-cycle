@@ -1,6 +1,6 @@
 "use client";
 
-import { Text } from "@mantine/core";
+import { Box, Text } from "@mantine/core";
 
 import { Event } from "@/common/data/domain";
 
@@ -25,8 +25,8 @@ function EventBar({
     const width = (endIndex - startIndex + 1) * cellWidth;
 
     return (
-        <div
-            className={`rounded-lg flex items-center justify-center ${color} mt-2`}
+        <Box
+            className={`rounded-lg flex items-center justify-center ${color} mt-2 cursor-pointer`}
             style={{
                 marginLeft: `${leftOffset}px`,
                 width: `${width}px`,
@@ -36,7 +36,7 @@ function EventBar({
             <Text className="text-md font-medium text-palette3">
                 {event.name}
             </Text>
-        </div>
+        </Box>
     );
 }
 
