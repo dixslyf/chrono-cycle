@@ -20,6 +20,6 @@ export default defineConfig({
   },
   dirs: ["./src/trigger"],
   build: {
-    external: ["@electric-sql/pglite"],
+    external: ["@electric-sql/pglite", "pg"],
   }
 });
