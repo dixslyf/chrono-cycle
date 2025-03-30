@@ -280,7 +280,7 @@ export function ProjectTemplateDetailsModal<T extends string>({
                     <TextInput
                         variant="unstyled"
                         classNames={{
-                            input: "text-3xl font-bold hover:bg-gray-200 focus:border focus:border-gray-400 focus:bg-gray-200",
+                            input: "text-3xl pt-4 pb-4 font-bold hover:bg-gray-200 focus:border focus:border-gray-400 focus:bg-gray-200",
                         }}
                         {...form.getInputProps("name")}
                     />
