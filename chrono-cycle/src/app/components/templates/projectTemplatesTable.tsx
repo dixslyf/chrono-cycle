@@ -12,9 +12,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
-import { SplitModal } from "@/app/components/customComponent/splitModal";
 import { formatDate } from "@/app/utils/dates";
 import { queryKeys } from "@/app/utils/queries/keys";
 import { listProjectTemplatesOptions } from "@/app/utils/queries/listProjectTemplates";
@@ -23,10 +22,7 @@ import { ProjectTemplate } from "@/common/data/domain";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 
-import {
-    ProjectTemplateDetailsLeft,
-    ProjectTemplateDetailsRight,
-} from "./projectTemplateDetails";
+import { ProjectTemplateDetailsModal } from "./projectTemplateDetails";
 
 export function ProjectTemplatesTable(): React.ReactNode {
     const listPtsQuery = useQuery(listProjectTemplatesOptions());
@@ -50,12 +46,6 @@ export function ProjectTemplatesTable(): React.ReactNode {
         "add-event",
         "event-details",
     ]);
-
-    const { close: modalStackClose } = modalStack;
-    const closeModal = useCallback(
-        () => modalStackClose("project-template-details"),
-        [modalStackClose],
-    );
 
     // State for storing the clicked project template.
     const [clickedId, setClickedId] = useState<string | null>(null);
@@ -83,7 +73,7 @@ export function ProjectTemplatesTable(): React.ReactNode {
         enabled: Boolean(clickedId),
         meta: {
             errorMessage: "Failed to retrieve project template data.",
-            onError: () => closeModal(),
+            onError: () => modalStack.close("project-template-details"),
         },
     });
 
@@ -91,24 +81,11 @@ export function ProjectTemplatesTable(): React.ReactNode {
         <>
             <Modal.Stack>
                 {/* Modal window for showing the details of the clicked project template. */}
-                <SplitModal
-                    {...modalStack.register("project-template-details")}
-                >
-                    <SplitModal.Left title={retrieveQuery.data?.name}>
-                        <ProjectTemplateDetailsLeft
-                            modalStack={modalStack}
-                            projectTemplate={retrieveQuery.data}
-                            isLoading={retrieveQuery.isPending}
-                        />
-                    </SplitModal.Left>
-                    <SplitModal.Right title="Metadata">
-                        <ProjectTemplateDetailsRight
-                            projectTemplate={retrieveQuery.data}
-                            onDeleteSuccess={closeModal}
-                            isLoading={retrieveQuery.isPending}
-                        />
-                    </SplitModal.Right>
-                </SplitModal>
+                <ProjectTemplateDetailsModal
+                    modalStack={modalStack}
+                    projectTemplate={retrieveQuery.data}
+                    isLoading={retrieveQuery.isPending}
+                />
             </Modal.Stack>
             {/* Project Template Table */}
             <ScrollArea className="h-[80%] w-full">
