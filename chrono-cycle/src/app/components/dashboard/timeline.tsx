@@ -295,25 +295,6 @@ function Timeline({
                     </>
                 )}
             </SplitModal>
-            {/* <Modal
-                opened={projectDetailsModalOpened}
-                onClose={closeProjectDetailsModal}
-                title="Project Details"
-            >
-                {clickedProject && (
-                    <ProjectDetails
-                        project={clickedProject}
-                        projectTemplate={retrieveProjectTemplateQuery.data}
-                        isLoading={retrieveProjectTemplateQuery.isPending}
-                        onDeleteSuccess={() => {
-                            closeProjectDetailsModal();
-                            queryClient.invalidateQueries({
-                                queryKey: queryKeys.projects.listAll(),
-                            });
-                        }}
-                    />
-                )}
-            </Modal> */}
             <div className="flex h-full flex-1 relative">
                 {days.map((day, i) => {
                     const isToday = areSameDay(new Date(), day.date);
