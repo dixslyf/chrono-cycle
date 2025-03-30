@@ -1,15 +1,14 @@
 "use client";
 
-import { Button } from "@mantine/core";
 import { useMutation } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
-import { Trash } from "lucide-react";
 
-import { CriticalButton } from "@/app/components/customComponent/criticalButton";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 
 import { deleteProjectAction } from "@/features/projects/delete/action";
+
+import { DeleteConfirmButton } from "../customComponent/deleteConfirmButton";
 
 export function DeleteProjectButton({
     projectId,
@@ -44,13 +43,11 @@ export function DeleteProjectButton({
     });
 
     return (
-        <CriticalButton
+        <DeleteConfirmButton
+            onDelete={() => deleteMutation.mutate(projectId)}
+            itemType="project"
             disabled={disabled}
             loading={deleteMutation.isPending}
-            onClick={() => deleteMutation.mutate(projectId)}
-        >
-            <Trash className="mr-2" />
-            Delete
-        </CriticalButton>
+        />
     );
 }
