@@ -4,11 +4,10 @@ import { useMutation } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 
+import { DeleteConfirmButton } from "@/app/components/customComponent/deleteConfirmButton";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 
 import { deleteProjectAction } from "@/features/projects/delete/action";
-
-import { DeleteConfirmButton } from "../customComponent/deleteConfirmButton";
 
 export function DeleteProjectButton({
     projectId,
