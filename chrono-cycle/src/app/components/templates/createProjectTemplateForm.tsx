@@ -103,6 +103,7 @@ export function CreateProjectTemplateForm({
     return (
         <Stack>
             <form
+                id="create-project-template-form"
                 onSubmit={form.onSubmit((values) =>
                     createMutation.mutate(values),
                 )}
@@ -161,6 +162,7 @@ export function CreateProjectTemplateForm({
                     <Group justify="flex-end">
                         <Button
                             type="submit"
+                            form="create-project-template-form"
                             loading={createMutation.isPending}
                         >
                             Create Template
