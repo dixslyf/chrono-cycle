@@ -71,6 +71,7 @@ function DashNav({ months, selectedMonth, onSelectMonth, year }: DashNavProps) {
     return (
         <>
             <SingleModal
+                title="Create Project"
                 opened={createProjectModalOpened}
                 onClose={closeCreateProjectModal}
             >
