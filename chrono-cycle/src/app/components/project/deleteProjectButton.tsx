@@ -1,5 +1,6 @@
 "use client";
 
+import { useModalsStack } from "@mantine/core";
 import { useMutation } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
@@ -9,12 +10,14 @@ import { notifyError, notifySuccess } from "@/app/utils/notifications";
 
 import { deleteProjectAction } from "@/features/projects/delete/action";
 
-export function DeleteProjectButton({
+export function DeleteProjectButton<T extends string>({
     projectId,
+    modalStack,
     onSuccess,
     disabled,
 }: {
     projectId: string;
+    modalStack: ReturnType<typeof useModalsStack<"confirm-delete-project" | T>>;
     onSuccess: () => void;
     disabled?: boolean;
 }): React.ReactNode {
@@ -43,6 +46,8 @@ export function DeleteProjectButton({
 
     return (
         <DeleteConfirmButton
+            modalStack={modalStack}
+            modalStackId={"confirm-delete-project"}
             onDelete={() => deleteMutation.mutate(projectId)}
             itemType="project"
             disabled={disabled}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useModalsStack } from "@mantine/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
@@ -11,12 +12,16 @@ import { queryKeys } from "@/app/utils/queries/keys";
 import { deleteEventTemplatesAction } from "@/features/event-templates/delete/action";
 import { Failure } from "@/features/event-templates/delete/data";
 
-export function DeleteEventTemplateButton({
+export function DeleteEventTemplateButton<T extends string>({
     eventTemplateId,
+    modalStack,
     onSuccess,
     disabled,
 }: {
     eventTemplateId: string;
+    modalStack: ReturnType<
+        typeof useModalsStack<"confirm-delete-event-template" | T>
+    >;
     onSuccess: () => void;
     disabled?: boolean;
 }): React.ReactNode {
@@ -51,10 +56,12 @@ export function DeleteEventTemplateButton({
 
     return (
         <DeleteConfirmButton
+            onDelete={() => deleteMutation.mutate(eventTemplateId)}
+            modalStack={modalStack}
+            modalStackId="confirm-delete-event-template"
+            itemType="event template"
             disabled={disabled}
             loading={deleteMutation.isPending}
-            onDelete={() => deleteMutation.mutate(eventTemplateId)}
-            itemType="event template"
         />
     );
 }

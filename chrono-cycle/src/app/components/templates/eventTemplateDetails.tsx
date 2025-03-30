@@ -8,6 +8,7 @@ import {
     SimpleGrid,
     Stack,
     Text,
+    useModalsStack,
 } from "@mantine/core";
 import { Calendar, Clock } from "lucide-react";
 
@@ -17,14 +18,14 @@ import { EventTemplate, ReminderTemplate, Tag } from "@/common/data/domain";
 
 import { DeleteEventTemplateButton } from "./deleteEventTemplateButton";
 
-interface DisplayEventDetailsProps {
+interface EventTemplateDetailsLeftProps {
     eventTemplate: EventTemplate;
     onClose: () => void;
 }
 
 export function EventTemplateDetailsLeft({
     eventTemplate,
-}: DisplayEventDetailsProps) {
+}: EventTemplateDetailsLeftProps) {
     return (
         <Stack className="w-full h-full">
             {/* notes */}
@@ -99,10 +100,19 @@ export function EventTemplateDetailsLeft({
     );
 }
 
-export function EventTemplateDetailsRight({
+interface EventTemplateDetailsRightProps<T extends string> {
+    eventTemplate: EventTemplate;
+    modalStack: ReturnType<
+        typeof useModalsStack<"confirm-delete-event-template" | T>
+    >;
+    onClose: () => void;
+}
+
+export function EventTemplateDetailsRight<T extends string>({
     eventTemplate,
+    modalStack,
     onClose,
-}: DisplayEventDetailsProps) {
+}: EventTemplateDetailsRightProps<T>) {
     return (
         <Stack className="h-full" justify="space-between">
             <Stack>
@@ -190,6 +200,7 @@ export function EventTemplateDetailsRight({
             <Group justify="flex-end">
                 <DeleteEventTemplateButton
                     eventTemplateId={eventTemplate.id}
+                    modalStack={modalStack}
                     onSuccess={onClose}
                 />
             </Group>

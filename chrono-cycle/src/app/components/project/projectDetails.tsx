@@ -1,6 +1,13 @@
 "use client";
 
-import { Badge, Group, Skeleton, Stack, Text } from "@mantine/core";
+import {
+    Badge,
+    Group,
+    Skeleton,
+    Stack,
+    Text,
+    useModalsStack,
+} from "@mantine/core";
 import { pipe } from "fp-ts/lib/function";
 import * as O from "fp-ts/Option";
 import React from "react";
@@ -51,12 +58,14 @@ export function ProjectDetailsLeft({
     );
 }
 
-export function ProjectDetailsRight({
+export function ProjectDetailsRight<T extends string>({
     project,
+    modalStack,
     isLoading,
     onDeleteSuccess,
 }: {
     project: Project;
+    modalStack: ReturnType<typeof useModalsStack<"confirm-delete-project" | T>>;
     isLoading?: boolean;
     onDeleteSuccess: () => void;
 }): React.ReactNode {
@@ -107,6 +116,7 @@ export function ProjectDetailsRight({
             <Group justify="flex-end">
                 <DeleteProjectButton
                     projectId={project.id}
+                    modalStack={modalStack}
                     onSuccess={onDeleteSuccess}
                     disabled={isLoading}
                 />

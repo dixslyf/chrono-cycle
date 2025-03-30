@@ -1,28 +1,48 @@
 "use client";
 
-import { Button, Group, Modal, Text } from "@mantine/core";
+import {
+    Button,
+    Group,
+    Modal,
+    Stack,
+    Text,
+    useModalsStack,
+} from "@mantine/core";
 import { Trash } from "lucide-react";
-import { useState } from "react";
 
 import { CriticalButton } from "./criticalButton";
+import { SingleModal } from "./singleModal";
 
-interface DeleteConfirmButtonProps {
+interface DeleteConfirmButtonProps<
+    ModalStackId extends string,
+    OtherModalStackIds extends string,
+> {
+    modalStack: ReturnType<
+        typeof useModalsStack<ModalStackId | OtherModalStackIds>
+    >;
+    modalStackId: ModalStackId;
     onDelete: () => void;
     itemType: string;
     disabled?: boolean;
     loading?: boolean;
 }
 
-export function DeleteConfirmButton({
+export function DeleteConfirmButton<
+    ModalStackId extends string,
+    OtherModalStackIds extends string,
+>({
+    modalStack,
+    modalStackId,
     onDelete,
     itemType,
     disabled = false,
     loading = false,
-}: DeleteConfirmButtonProps): React.ReactNode {
-    const [opened, setOpened] = useState(false);
-
+}: DeleteConfirmButtonProps<
+    ModalStackId,
+    OtherModalStackIds
+>): React.ReactNode {
     const handleConfirm = () => {
-        setOpened(false);
+        modalStack.close(modalStackId);
         onDelete();
     };
 
@@ -32,32 +52,38 @@ export function DeleteConfirmButton({
                 disabled={disabled}
                 loading={loading}
                 leftSection={<Trash />}
-                onClick={() => setOpened(true)}
+                onClick={() => modalStack.open(modalStackId)}
             >
                 Delete
             </CriticalButton>
 
-            <Modal
-                opened={opened}
-                onClose={() => setOpened(false)}
+            <SingleModal
                 title="Confirm Deletion"
                 centered
-                size="sm"
-                zIndex={9999}
+                className="bg-red-100"
+                {...modalStack.register(modalStackId)}
             >
-                <Text size="sm" mb="lg">
-                    Are you sure you want to delete this {itemType}? This action
-                    cannot be undone.
-                </Text>
-                <Group justify="flex-end" mt="md">
-                    <Button variant="default" onClick={() => setOpened(false)}>
-                        Cancel
-                    </Button>
-                    <CriticalButton onClick={handleConfirm} loading={loading}>
-                        Delete
-                    </CriticalButton>
-                </Group>
-            </Modal>
+                <Stack>
+                    <Text>
+                        Are you sure you want to delete this {itemType}?
+                    </Text>
+                    <Text fw="bold">This action cannot be undone.</Text>
+                    <Group justify="flex-end" mt="md">
+                        <Button
+                            variant="default"
+                            onClick={() => modalStack.close(modalStackId)}
+                        >
+                            Cancel
+                        </Button>
+                        <CriticalButton
+                            onClick={handleConfirm}
+                            loading={loading}
+                        >
+                            Delete
+                        </CriticalButton>
+                    </Group>
+                </Stack>
+            </SingleModal>
         </>
     );
 }
