@@ -48,6 +48,7 @@ export function ProjectTemplateDetailsLeft<T extends string>({
     projectTemplate,
     modalStack,
     form,
+    mutation,
     isLoading,
 }: {
     projectTemplate?: ProjectTemplate | undefined;
@@ -61,6 +62,12 @@ export function ProjectTemplateDetailsLeft<T extends string>({
         >
     >;
     form: UseFormReturnType<FormValues>;
+    mutation: UseMutationResult<
+        ProjectTemplateOverview,
+        Failure,
+        FormValues,
+        unknown
+    >;
     isLoading?: boolean | undefined;
 }): React.ReactNode {
     return (
@@ -69,12 +76,13 @@ export function ProjectTemplateDetailsLeft<T extends string>({
             <Skeleton visible={isLoading}>
                 <Stack className="h-1/4" align="stretch">
                     <Textarea
+                        key={form.key("description")}
                         label="Description"
                         classNames={{
                             label: "text-palette5 font-semibold text-xl mb-2",
                             input: "text-base border border-gray-400 rounded-xl",
                         }}
-                        key={form.key("description")}
+                        disabled={isLoading || mutation.isPending}
                         {...form.getInputProps("description")}
                     />
                 </Stack>
@@ -289,6 +297,7 @@ export function ProjectTemplateDetailsModal<T extends string>({
                 titleComponent={() => (
                     <EditableTitle
                         key={form.key("name")}
+                        disabled={isLoading || mutation.isPending}
                         {...form.getInputProps("name")}
                     />
                 )}
@@ -297,6 +306,7 @@ export function ProjectTemplateDetailsModal<T extends string>({
                     modalStack={modalStack}
                     projectTemplate={projectTemplate}
                     form={form}
+                    mutation={mutation}
                     isLoading={isLoading}
                 />
             </SplitModal.Left>
