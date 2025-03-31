@@ -7,9 +7,13 @@ import {
     Checkbox,
     Fieldset,
     Group,
+    NumberInput,
+    Select,
     SimpleGrid,
     Stack,
+    TagsInput,
     Text,
+    Textarea,
     useModalsStack,
 } from "@mantine/core";
 import { useForm, zodResolver, type UseFormReturnType } from "@mantine/form";
@@ -45,75 +49,64 @@ type UpdateFormValues = Required<Omit<Payload, "id" | "autoReschedule">>;
 
 interface EventTemplateDetailsLeftProps {
     eventTemplate: EventTemplate;
-    onClose: () => void;
+    updateMutation: UseMutationResult<EventTemplate, Failure, UpdateFormValues>;
+    updateForm: UseFormReturnType<UpdateFormValues>;
 }
 
 export function EventTemplateDetailsLeft({
     eventTemplate,
+    updateMutation,
+    updateForm,
 }: EventTemplateDetailsLeftProps) {
     return (
-        <Stack className="w-full h-full">
-            {/* notes */}
-            <Stack>
-                <Fieldset legend="Note" className="border-gray-400 rounded-xl">
-                    <Text className="text-gray-600">
-                        {eventTemplate.note || "No note attached"}
-                    </Text>
-                </Fieldset>
-            </Stack>
-            <Fieldset
-                legend="Reminders"
-                className="border-gray-400 rounded-xl flex-1"
-            >
-                <SimpleGrid cols={2} className="w-full">
-                    {eventTemplate.reminders.length > 0 ? (
-                        eventTemplate.reminders.map(
-                            (reminder: ReminderTemplate, _index) => (
-                                <Stack
-                                    key={reminder.id}
-                                    className="border border-gray-400 rounded-lg p-4"
-                                    justify="center"
-                                >
-                                    <Group gap="xl">
-                                        <Group gap="md">
-                                            <Calendar className="w-8 h-8" />
-                                            <Text>Days before event:</Text>
-                                        </Group>
-                                        <Text>
-                                            {reminder.daysBeforeEvent}{" "}
-                                            {reminder.daysBeforeEvent === 1
-                                                ? "day"
-                                                : "days"}
-                                        </Text>
-                                    </Group>
-                                    <Group gap="xl">
-                                        <Group gap="md">
-                                            <Clock className="w-8 h-8" />
-                                            <Text>Trigger time:</Text>
-                                        </Group>
-                                        <Text>
-                                            {formatReminderTemplateTime(
-                                                reminder.time,
-                                            )}
-                                        </Text>
-                                    </Group>
-                                    <Group>
-                                        <Checkbox
-                                            checked={
-                                                reminder.emailNotifications
-                                            }
-                                            readOnly
-                                            label="Email notification"
-                                        />
-                                    </Group>
-                                </Stack>
-                            ),
-                        )
-                    ) : (
-                        <Text className="text-gray-600">No reminders set</Text>
-                    )}
-                </SimpleGrid>
-            </Fieldset>
+        <Stack gap="xl" className="h-full">
+            {/* Not editable because an event's type is not modifiable. */}
+            <Text>
+                <Text span fw={500}>
+                    Event type:
+                </Text>
+                {eventTemplate.eventType === "task" ? " Task" : " Activity"}
+            </Text>
+            <Group grow>
+                {/* offset days */}
+                <NumberInput
+                    size="md"
+                    label="Offset days"
+                    error="Invalid number of offset days"
+                    disabled={updateMutation.isPending}
+                    required
+                    {...updateForm.getInputProps("offsetDays")}
+                />
+                {/* duration */}
+                <NumberInput
+                    size="md"
+                    key={updateForm.key("duration")}
+                    label="Duration (days)"
+                    min={1}
+                    error="Invalid duration"
+                    disabled={eventTemplate.eventType === "task"}
+                    required
+                    {...updateForm.getInputProps("duration")}
+                />
+            </Group>
+            {/* note */}
+            <Textarea
+                label="Note"
+                size="md"
+                placeholder="Enter note"
+                disabled={updateMutation.isPending}
+                error="Invalid note"
+                minRows={3}
+                maxRows={3}
+                {...updateForm.getInputProps("note")}
+            />
+            <TagsInput
+                size="md"
+                label="Tags"
+                placeholder="Add a Tag"
+                {...updateForm.getInputProps("tags")}
+                classNames={{ pill: "bg-gray-200" }}
+            />
         </Stack>
     );
 }
@@ -287,6 +280,10 @@ export function EventTemplateDetailsModal<T extends string>({
         }
     }, [eventTemplate, setFormInitialValues, resetForm]);
 
+    useEffect(() => {
+        console.log(updateForm.values);
+    }, [updateForm.values]);
+
     const queryClient = useQueryClient();
     const updateMutation = useMutation({
         mutationFn: async (values: UpdateFormValues) => {
@@ -334,13 +331,15 @@ export function EventTemplateDetailsModal<T extends string>({
                         title={eventTemplate?.name ?? ""}
                         titleComponent={() => (
                             <EditableTitle
+                                key={updateForm.key("name")}
                                 {...updateForm.getInputProps("name")}
                             />
                         )}
                     >
                         <EventTemplateDetailsLeft
                             eventTemplate={eventTemplate}
-                            onClose={() => modalStack.close("event-details")}
+                            updateForm={updateForm}
+                            updateMutation={updateMutation}
                         />
                     </SplitModal.Left>
                     <SplitModal.Right>
