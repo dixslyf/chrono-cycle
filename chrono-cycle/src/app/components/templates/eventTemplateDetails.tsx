@@ -12,7 +12,7 @@ import {
     Text,
     useModalsStack,
 } from "@mantine/core";
-import { useForm, UseFormReturnType, zodResolver } from "@mantine/form";
+import { useForm, zodResolver, type UseFormReturnType } from "@mantine/form";
 import {
     useMutation,
     UseMutationResult,
@@ -40,7 +40,8 @@ import {
 
 import { DeleteEventTemplateButton } from "./deleteEventTemplateButton";
 
-type UpdateFormValues = Omit<Payload, "id">;
+// Removing auto-scheduling because we don't have time to implement it.
+type UpdateFormValues = Required<Omit<Payload, "id" | "autoReschedule">>;
 
 interface EventTemplateDetailsLeftProps {
     eventTemplate: EventTemplate;
@@ -255,9 +256,9 @@ export function EventTemplateDetailsModal<T extends string>({
             offsetDays: eventTemplate?.offsetDays ?? 0,
             duration: eventTemplate?.duration ?? 0,
             note: eventTemplate?.note ?? "",
-            remindersDelete: [] as Payload["remindersDelete"],
-            remindersUpdate: [] as Payload["remindersUpdate"],
-            remindersInsert: [] as Payload["remindersInsert"],
+            remindersDelete: [] as NonNullable<Payload["remindersDelete"]>,
+            remindersUpdate: [] as NonNullable<Payload["remindersUpdate"]>,
+            remindersInsert: [] as NonNullable<Payload["remindersInsert"]>,
             tags:
                 eventTemplate?.tags.map((tag) => tag.name) ?? ([] as string[]),
         } satisfies UpdateFormValues,
@@ -277,9 +278,9 @@ export function EventTemplateDetailsModal<T extends string>({
                 offsetDays: eventTemplate.offsetDays,
                 duration: eventTemplate.duration,
                 note: eventTemplate.note,
-                remindersDelete: [] as Payload["remindersDelete"],
-                remindersUpdate: [] as Payload["remindersUpdate"],
-                remindersInsert: [] as Payload["remindersInsert"],
+                remindersDelete: [] as NonNullable<Payload["remindersDelete"]>,
+                remindersUpdate: [] as NonNullable<Payload["remindersUpdate"]>,
+                remindersInsert: [] as NonNullable<Payload["remindersInsert"]>,
                 tags: eventTemplate.tags.map((tag) => tag.name),
             });
             resetForm();
