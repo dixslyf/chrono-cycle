@@ -2,6 +2,8 @@
 
 import {
     Badge,
+    Box,
+    Button,
     Checkbox,
     Fieldset,
     Group,
@@ -10,13 +12,35 @@ import {
     Text,
     useModalsStack,
 } from "@mantine/core";
+import { useForm, UseFormReturnType, zodResolver } from "@mantine/form";
+import {
+    useMutation,
+    UseMutationResult,
+    useQueryClient,
+} from "@tanstack/react-query";
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
 import { Calendar, Clock } from "lucide-react";
+import { useEffect } from "react";
 
+import { EditableTitle } from "@/app/components/customComponent/editableTitle";
+import { SplitModal } from "@/app/components/customComponent/splitModal";
 import { formatReminderTemplateTime } from "@/app/utils/dates";
+import { notifyError, notifySuccess } from "@/app/utils/notifications";
+import { queryKeys } from "@/app/utils/queries/keys";
 
 import { EventTemplate, ReminderTemplate, Tag } from "@/common/data/domain";
 
+import { updateEventTemplateAction } from "@/features/event-templates/update/action";
+import {
+    Failure,
+    Payload,
+    payloadSchema,
+} from "@/features/event-templates/update/data";
+
 import { DeleteEventTemplateButton } from "./deleteEventTemplateButton";
+
+type UpdateFormValues = Omit<Payload, "id">;
 
 interface EventTemplateDetailsLeftProps {
     eventTemplate: EventTemplate;
@@ -98,12 +122,16 @@ interface EventTemplateDetailsRightProps<T extends string> {
     modalStack: ReturnType<
         typeof useModalsStack<"confirm-delete-event-template" | T>
     >;
+    updateMutation: UseMutationResult<EventTemplate, Failure, UpdateFormValues>;
+    updateForm: UseFormReturnType<UpdateFormValues>;
     onClose: () => void;
 }
 
 export function EventTemplateDetailsRight<T extends string>({
     eventTemplate,
     modalStack,
+    updateMutation,
+    updateForm,
     onClose,
 }: EventTemplateDetailsRightProps<T>) {
     return (
@@ -196,7 +224,137 @@ export function EventTemplateDetailsRight<T extends string>({
                     modalStack={modalStack}
                     onSuccess={onClose}
                 />
+                <Button
+                    type="submit"
+                    form="update-event-template-form"
+                    loading={updateMutation.isPending}
+                    disabled={!updateForm.isDirty()}
+                >
+                    Save
+                </Button>
             </Group>
         </Stack>
+    );
+}
+
+export function EventTemplateDetailsModal<T extends string>({
+    modalStack,
+    eventTemplate,
+}: {
+    modalStack: ReturnType<
+        typeof useModalsStack<
+            "event-details" | "confirm-delete-event-template" | T
+        >
+    >;
+    eventTemplate?: EventTemplate;
+}) {
+    const updateForm = useForm({
+        mode: "uncontrolled",
+        initialValues: {
+            name: eventTemplate?.name ?? "",
+            offsetDays: eventTemplate?.offsetDays ?? 0,
+            duration: eventTemplate?.duration ?? 0,
+            note: eventTemplate?.note ?? "",
+            remindersDelete: [] as Payload["remindersDelete"],
+            remindersUpdate: [] as Payload["remindersUpdate"],
+            remindersInsert: [] as Payload["remindersInsert"],
+            tags:
+                eventTemplate?.tags.map((tag) => tag.name) ?? ([] as string[]),
+        } satisfies UpdateFormValues,
+        validate: zodResolver(payloadSchema.omit({ id: true })),
+    });
+
+    // Similar to project template details. Needed for the initial values to show properly.
+    // By the time the project template data has been loaded, the form has already
+    // been created (with empty strings since those are the fallback). We need to manually
+    // reset the form once the event template data has loaded to set the initial values.
+    const setFormInitialValues = updateForm.setInitialValues;
+    const resetForm = updateForm.reset;
+    useEffect(() => {
+        if (eventTemplate) {
+            setFormInitialValues({
+                name: eventTemplate.name,
+                offsetDays: eventTemplate.offsetDays,
+                duration: eventTemplate.duration,
+                note: eventTemplate.note,
+                remindersDelete: [] as Payload["remindersDelete"],
+                remindersUpdate: [] as Payload["remindersUpdate"],
+                remindersInsert: [] as Payload["remindersInsert"],
+                tags: eventTemplate.tags.map((tag) => tag.name),
+            });
+            resetForm();
+        }
+    }, [eventTemplate, setFormInitialValues, resetForm]);
+
+    const queryClient = useQueryClient();
+    const updateMutation = useMutation({
+        mutationFn: async (values: UpdateFormValues) => {
+            const result = await updateEventTemplateAction(null, {
+                id: eventTemplate?.id as string,
+                ...values,
+            });
+
+            return pipe(
+                result,
+                E.getOrElseW((err) => {
+                    throw err;
+                }),
+            );
+        },
+        onSuccess: () => {
+            notifySuccess({
+                message: "Successfully updated event template!",
+            });
+
+            // Safety: Project template should already have loaded,
+            // so its ID can be safely cast to string.
+            queryClient.invalidateQueries({
+                queryKey: queryKeys.projectTemplates.retrieve(
+                    eventTemplate?.projectTemplateId as string,
+                ),
+            });
+        },
+        onError: (_err: Failure) => {
+            notifyError({ message: "Failed to update event template." });
+        },
+    });
+
+    return (
+        <SplitModal {...modalStack.register("event-details")}>
+            <form
+                id="update-event-template-form"
+                onSubmit={updateForm.onSubmit((values) =>
+                    updateMutation.mutate(values),
+                )}
+            />
+            {eventTemplate ? (
+                <>
+                    <SplitModal.Left
+                        title={eventTemplate?.name ?? ""}
+                        titleComponent={() => (
+                            <EditableTitle
+                                {...updateForm.getInputProps("name")}
+                            />
+                        )}
+                    >
+                        <EventTemplateDetailsLeft
+                            eventTemplate={eventTemplate}
+                            onClose={() => modalStack.close("event-details")}
+                        />
+                    </SplitModal.Left>
+                    <SplitModal.Right>
+                        <EventTemplateDetailsRight
+                            eventTemplate={eventTemplate}
+                            modalStack={modalStack}
+                            updateMutation={updateMutation}
+                            updateForm={updateForm}
+                            onClose={() => modalStack.close("event-details")}
+                        />
+                    </SplitModal.Right>
+                </>
+            ) : (
+                <Box>Loading event details...</Box>
+            )}
+        </SplitModal>
     );
 }
