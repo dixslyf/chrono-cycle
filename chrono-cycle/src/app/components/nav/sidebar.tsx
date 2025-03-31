@@ -2,6 +2,7 @@
 "use client";
 
 // import { useEffect } from "react";
+import { Box, Group, Stack, Text } from "@mantine/core";
 import { CircleHelp, Cog, House, LayoutTemplate } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -32,16 +33,16 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                 }`}
             >
                 {/* logo and close button */}
-                <div onClick={toggleSidebar} className="flex justify-between">
+                <Group onClick={toggleSidebar} justify="space-between">
                     <Logo className="text-palette3 h-14 w-auto" />
                     <HamburgerMenu isOpen={isSidebarOpen} />
-                </div>
+                </Group>
                 {/* Navigation links */}
-                <div className="w-full mt-10 p-5 flex flex-col gap-8">
+                <Stack className="w-full mt-10 p-5" gap="lg">
                     {mounted && (
                         <>
                             {/* dashboard */}
-                            <div>
+                            <Box>
                                 <Link
                                     href="/dashboard"
                                     className={`flex items-center gap-5 p-3 rounded-lg text-palette3 overflow-hidden ${
@@ -51,62 +52,62 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                                     }`}
                                 >
                                     <House className="w-10 h-10 min-w-[40px] flex-shrink-0" />
-                                    <span className="font-semibold text-2xl truncate">
+                                    <Text className="font-semibold text-2xl truncate">
                                         Dashboard
-                                    </span>
+                                    </Text>
                                 </Link>
-                            </div>
+                            </Box>
                             {/* template */}
-                            <div>
+                            <Box>
                                 <Link
                                     href="/templates"
-                                    className={`flex gap-5 p-3 rounded-lg text-palette3 overflow-hidden ${
+                                    className={`flex items-center gap-5 p-3 rounded-lg text-palette3 overflow-hidden ${
                                         pathname == "/templates"
                                             ? "bg-[#FFFFFF18] hover:bg-[#FFFFFF30]"
                                             : "hover:bg-[#FFFFFF18]"
                                     }`}
                                 >
                                     <LayoutTemplate className="w-10 h-10 min-w-[40px] flex-shrink-0" />
-                                    <span className="font-semibold text-2xl truncate">
+                                    <Text className="font-semibold text-2xl truncate">
                                         Templates
-                                    </span>
+                                    </Text>
                                 </Link>
-                            </div>
+                            </Box>
                             {/* circle help */}
-                            <div>
+                            <Box>
                                 <Link
                                     href="/help"
-                                    className={`flex gap-5 p-3 rounded-lg text-palette3 overflow-hidden ${
+                                    className={`flex items-center gap-5 p-3 rounded-lg text-palette3 overflow-hidden ${
                                         pathname == "/help"
                                             ? "bg-[#FFFFFF18] hover:bg-[#FFFFFF30]"
                                             : "hover:bg-[#FFFFFF18]"
                                     }`}
                                 >
                                     <CircleHelp className="w-10 h-10 min-w-[40px] flex-shrink-0" />
-                                    <span className="font-semibold text-2xl truncate">
+                                    <Text className="font-semibold text-2xl truncate">
                                         Help
-                                    </span>
+                                    </Text>
                                 </Link>
-                            </div>
+                            </Box>
                             {/* settings */}
-                            <div>
+                            <Box>
                                 <Link
                                     href="/settings"
-                                    className={`flex gap-5 p-3 rounded-lg text-palette3 overflow-hidden ${
+                                    className={`flex items-center gap-5 p-3 rounded-lg text-palette3 overflow-hidden ${
                                         pathname == "/settings"
                                             ? "bg-[#FFFFFF18] hover:bg-[#FFFFFF30]"
                                             : "hover:bg-[#FFFFFF18]"
                                     }`}
                                 >
                                     <Cog className="w-10 h-10 min-w-[40px] flex-shrink-0" />
-                                    <span className="font-semibold text-2xl truncate">
+                                    <Text className="font-semibold text-2xl truncate">
                                         Settings
-                                    </span>
+                                    </Text>
                                 </Link>
-                            </div>
+                            </Box>
                         </>
                     )}
-                </div>
+                </Stack>
             </nav>
             {/* overlay */}
             {isSidebarOpen && (
