@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal, Text, useModalsStack } from "@mantine/core";
+import { Box, Group, Modal, Stack, Text, useModalsStack } from "@mantine/core";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
@@ -249,9 +249,9 @@ function Timeline({
 
     // each day is one column wide, so number of columns should be days.length
     return (
-        <div
+        <Stack
             ref={containerRef}
-            className="overflow-x-auto w-full flex-1 h-full flex flex-col relative z-0"
+            className="overflow-x-auto w-full flex-1 h-full relative z-0"
         >
             <Modal.Stack>
                 <SplitModal {...modalStack.register("event-details")}>
@@ -303,14 +303,18 @@ function Timeline({
                     )}
                 </SplitModal>
             </Modal.Stack>
-            <div className="flex h-full flex-1 relative">
+            <Group className="h-full flex-1 relative" align="stretch">
                 {days.map((day, i) => {
                     const isToday = areSameDay(new Date(), day.date);
                     return (
-                        <div
+                        <Stack
                             key={`${day.date.toISOString()}-${i}`}
-                            className="flex-none border p-2 text-center flex flex-col gap-2"
-                            style={{ width: `${cellWidth}px` }}
+                            // className="flex-none border p-2 text-center flex flex-col gap-2"
+                            className="absolute top-0 bottom-0 border p-2 text-center gap-2"
+                            style={{
+                                width: `${cellWidth}px`,
+                                left: `${i * cellWidth}px`,
+                            }}
                         >
                             <Text
                                 className={
@@ -322,8 +326,8 @@ function Timeline({
                                 {day.label}
                             </Text>
                             {/* vertical line below label */}
-                            <div
-                                className={`w-[0.1rem] h-[90%] mx-auto mt-2 ${
+                            <Box
+                                className={`w-[0.1rem] h-[95%] mx-auto mt-2 ${
                                     isToday
                                         ? "bg-palette2"
                                         : day.date < new Date()
@@ -331,11 +335,11 @@ function Timeline({
                                           : "bg-gray-700"
                                 }`}
                             />
-                        </div>
+                        </Stack>
                     );
                 })}
                 {/* render project row with events */}
-                <div className="absolute top-16 w-full">
+                <Stack className="my-12 flex-nowrap">
                     {projects.map((project) => {
                         const projectEvents = eventMap.get(project.id) || [];
                         if (projectEvents.length === 0) return null;
@@ -358,9 +362,9 @@ function Timeline({
                             />
                         );
                     })}
-                </div>
-            </div>
-        </div>
+                </Stack>
+            </Group>
+        </Stack>
     );
 }
 
