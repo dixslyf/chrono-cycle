@@ -34,6 +34,16 @@ export function SplitModal(props: SplitModalProps): ReactNode {
             radius="lg"
             withCloseButton={false}
             padding={0}
+            styles={{
+                content: {
+                    height: "100%",
+                    width: "100%",
+                },
+                body: {
+                    height: "100%",
+                    width: "100%",
+                },
+            }}
             {...passedProps}
         >
             {wrapper ? wrapper(root) : root}

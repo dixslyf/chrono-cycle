@@ -1,7 +1,6 @@
 "use client";
 
-import { Modal, Text } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { Modal, Text, useModalsStack } from "@mantine/core";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
@@ -203,19 +202,17 @@ function Timeline({
 
     const queryClient = useQueryClient();
 
+    const modalStack = useModalsStack([
+        "project-details",
+        "event-details",
+        "confirm-delete-project",
+    ]);
+
     // States for showing event details in a modal window.
     const [clickedEvent, setClickedEvent] = useState<Event | null>(null);
-    const [
-        eventDetailsModalOpened,
-        { open: openEventDetailsModal, close: closeEventDetailsModal },
-    ] = useDisclosure(false);
 
     // States for showing project details in a modal window.
     const [clickedProject, setClickedProject] = useState<Project | null>(null);
-    const [
-        projectDetailsModalOpened,
-        { open: openProjectDetailsModal, close: closeProjectDetailsModal },
-    ] = useDisclosure(false);
     const retrieveProjectTemplateQuery = useQuery({
         queryKey: queryKeys.projects.retrieveProjectTemplate(
             clickedProject?.id ?? null,
@@ -246,7 +243,7 @@ function Timeline({
         meta: {
             errorMessage:
                 "Failed to retrieve project's project template information.",
-            onError: () => closeProjectDetailsModal(),
+            onError: () => modalStack.close("project-details"),
         },
     });
 
@@ -256,56 +253,56 @@ function Timeline({
             ref={containerRef}
             className="overflow-x-auto w-full flex-1 h-full flex flex-col relative z-0"
         >
-            <SplitModal
-                opened={eventDetailsModalOpened}
-                onClose={closeEventDetailsModal}
-            >
-                {clickedEvent && (
-                    <>
-                        <SplitModal.Left title={`${clickedEvent.name}`}>
-                            <DisplayEventDetailsLeft event={clickedEvent} />
-                        </SplitModal.Left>
-                        <SplitModal.Right>
-                            <DisplayEventDetailsRight event={clickedEvent} />
-                        </SplitModal.Right>
-                    </>
-                )}
-            </SplitModal>
-            {/* project details modal */}
-            <SplitModal
-                opened={projectDetailsModalOpened}
-                onClose={closeProjectDetailsModal}
-            >
-                {clickedProject && (
-                    <>
-                        <SplitModal.Left title={`${clickedProject.name}`}>
-                            <ProjectDetailsLeft
-                                project={clickedProject}
-                                projectTemplate={
-                                    retrieveProjectTemplateQuery.data
-                                }
-                                isLoading={
-                                    retrieveProjectTemplateQuery.isPending
-                                }
-                            />
-                        </SplitModal.Left>
-                        <SplitModal.Right>
-                            <ProjectDetailsRight
-                                project={clickedProject}
-                                isLoading={
-                                    retrieveProjectTemplateQuery.isPending
-                                }
-                                onDeleteSuccess={() => {
-                                    closeProjectDetailsModal();
-                                    queryClient.invalidateQueries({
-                                        queryKey: queryKeys.projects.listAll(),
-                                    });
-                                }}
-                            />
-                        </SplitModal.Right>
-                    </>
-                )}
-            </SplitModal>
+            <Modal.Stack>
+                <SplitModal {...modalStack.register("event-details")}>
+                    {clickedEvent && (
+                        <>
+                            <SplitModal.Left title={`${clickedEvent.name}`}>
+                                <DisplayEventDetailsLeft event={clickedEvent} />
+                            </SplitModal.Left>
+                            <SplitModal.Right>
+                                <DisplayEventDetailsRight
+                                    event={clickedEvent}
+                                />
+                            </SplitModal.Right>
+                        </>
+                    )}
+                </SplitModal>
+                {/* project details modal */}
+                <SplitModal {...modalStack.register("project-details")}>
+                    {clickedProject && (
+                        <>
+                            <SplitModal.Left title={`${clickedProject.name}`}>
+                                <ProjectDetailsLeft
+                                    project={clickedProject}
+                                    projectTemplate={
+                                        retrieveProjectTemplateQuery.data
+                                    }
+                                    isLoading={
+                                        retrieveProjectTemplateQuery.isPending
+                                    }
+                                />
+                            </SplitModal.Left>
+                            <SplitModal.Right>
+                                <ProjectDetailsRight
+                                    project={clickedProject}
+                                    modalStack={modalStack}
+                                    isLoading={
+                                        retrieveProjectTemplateQuery.isPending
+                                    }
+                                    onDeleteSuccess={() => {
+                                        modalStack.close("project-details");
+                                        queryClient.invalidateQueries({
+                                            queryKey:
+                                                queryKeys.projects.listAll(),
+                                        });
+                                    }}
+                                />
+                            </SplitModal.Right>
+                        </>
+                    )}
+                </SplitModal>
+            </Modal.Stack>
             <div className="flex h-full flex-1 relative">
                 {days.map((day, i) => {
                     const isToday = areSameDay(new Date(), day.date);
@@ -351,12 +348,12 @@ function Timeline({
                                 expanded={!!expandedProjects[project.id]}
                                 onProjectClick={(project) => {
                                     setClickedProject(project);
-                                    openProjectDetailsModal();
+                                    modalStack.open("project-details");
                                 }}
                                 toggleProject={toggleProject}
                                 onEventClick={(event) => {
                                     setClickedEvent(event);
-                                    openEventDetailsModal();
+                                    modalStack.open("event-details");
                                 }}
                             />
                         );

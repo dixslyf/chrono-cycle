@@ -4,7 +4,7 @@
 import { ActionIcon, Box, Group, Text } from "@mantine/core";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
-import { Bell, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 import {
     startTransition,

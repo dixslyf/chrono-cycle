@@ -16,7 +16,9 @@ import {
 interface EventsTableProps<T extends string> {
     projectTemplateId: string;
     modalStack: ReturnType<
-        typeof useModalsStack<"add-event" | "event-details" | T>
+        typeof useModalsStack<
+            "add-event" | "event-details" | "confirm-delete-event-template" | T
+        >
     >;
     eventTemplates: EventTemplate[];
     rowsPerPage?: number;
@@ -155,6 +157,7 @@ export function EventTemplatesTable<T extends string>({
                         <SplitModal.Right>
                             <EventTemplateDetailsRight
                                 eventTemplate={selectedEventTemplate}
+                                modalStack={modalStack}
                                 onClose={closeEventDetailsModal}
                             />
                         </SplitModal.Right>

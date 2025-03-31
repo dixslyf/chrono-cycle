@@ -53,7 +53,11 @@ export function ProjectTemplateDetailsLeft<T extends string>({
     projectTemplate?: ProjectTemplate | undefined;
     modalStack: ReturnType<
         typeof useModalsStack<
-            "project-template-details" | "add-event" | "event-details" | T
+            | "project-template-details"
+            | "add-event"
+            | "event-details"
+            | "confirm-delete-event-template"
+            | T
         >
     >;
     form: UseFormReturnType<FormValues>;
@@ -90,14 +94,18 @@ export function ProjectTemplateDetailsLeft<T extends string>({
     );
 }
 
-export function ProjectTemplateDetailsRight({
+export function ProjectTemplateDetailsRight<T extends string>({
     projectTemplate,
+    modalStack,
     onDeleteSuccess,
     form,
     mutation,
     isLoading,
 }: {
     projectTemplate?: ProjectTemplate | undefined;
+    modalStack: ReturnType<
+        typeof useModalsStack<"confirm-delete-project-template" | T>
+    >;
     onDeleteSuccess: () => void;
     form: UseFormReturnType<FormValues>;
     mutation: UseMutationResult<
@@ -160,6 +168,7 @@ export function ProjectTemplateDetailsRight({
             <Group justify="flex-end">
                 <DeleteProjectTemplateButton
                     projectTemplateId={projectTemplate?.id ?? ""}
+                    modalStack={modalStack}
                     onSuccess={onDeleteSuccess}
                     disabled={isLoading}
                 />
@@ -186,7 +195,12 @@ export function ProjectTemplateDetailsModal<T extends string>({
 }: {
     modalStack: ReturnType<
         typeof useModalsStack<
-            "project-template-details" | "add-event" | "event-details" | T
+            | "project-template-details"
+            | "add-event"
+            | "event-details"
+            | "confirm-delete-event-template"
+            | "confirm-delete-project-template"
+            | T
         >
     >;
     projectTemplate?: ProjectTemplate;
@@ -296,6 +310,7 @@ export function ProjectTemplateDetailsModal<T extends string>({
             <SplitModal.Right title="Metadata">
                 <ProjectTemplateDetailsRight
                     projectTemplate={projectTemplate}
+                    modalStack={modalStack}
                     onDeleteSuccess={() =>
                         modalStack.close("project-template-details")
                     }

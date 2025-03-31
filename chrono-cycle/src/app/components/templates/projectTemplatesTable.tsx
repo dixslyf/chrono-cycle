@@ -45,6 +45,8 @@ export function ProjectTemplatesTable(): React.ReactNode {
         "project-template-details",
         "add-event",
         "event-details",
+        "confirm-delete-event-template",
+        "confirm-delete-project-template",
     ]);
 
     // State for storing the clicked project template.
