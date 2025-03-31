@@ -150,13 +150,6 @@ export function DisplayEventDetailsRight({ event }: DisplayEventDetailsProps) {
                                             readOnly
                                             label="Email Notification"
                                         />
-                                        <Checkbox
-                                            checked={
-                                                reminder.desktopNotifications
-                                            }
-                                            readOnly
-                                            label="Desktop Notification"
-                                        />
                                     </Group>
                                 </Stack>
                             ))

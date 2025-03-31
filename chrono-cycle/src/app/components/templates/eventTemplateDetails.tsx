@@ -80,13 +80,6 @@ export function EventTemplateDetailsLeft({
                                             readOnly
                                             label="Email notification"
                                         />
-                                        <Checkbox
-                                            checked={
-                                                reminder.desktopNotifications
-                                            }
-                                            readOnly
-                                            label="Desktop notification"
-                                        />
                                     </Group>
                                 </Stack>
                             ),
