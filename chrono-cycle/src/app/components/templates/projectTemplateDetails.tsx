@@ -178,6 +178,7 @@ export function ProjectTemplateDetailsRight<T extends string>({
                 />
                 <Button
                     type="submit"
+                    form="update-project-template-form"
                     loading={mutation.isPending}
                     disabled={isLoading || !form.isDirty()}
                 >
@@ -270,24 +271,20 @@ export function ProjectTemplateDetailsModal<T extends string>({
 
     return (
         <SplitModal
-            wrapper={(root) => (
-                <form
-                    className="w-full h-full"
-                    onSubmit={(ev) => {
-                        if (form.getValues().name === projectTemplate?.name) {
-                            form.setValues({ name: undefined });
-                        }
-                        const submit = form.onSubmit((values) =>
-                            mutation.mutate(values),
-                        );
-                        submit(ev);
-                    }}
-                >
-                    {root}
-                </form>
-            )}
             {...modalStack.register("project-template-details")}
         >
+            <form
+                id="update-project-template-form"
+                onSubmit={(ev) => {
+                    if (form.getValues().name === projectTemplate?.name) {
+                        form.setValues({ name: undefined });
+                    }
+                    const submit = form.onSubmit((values) =>
+                        mutation.mutate(values),
+                    );
+                    submit(ev);
+                }}
+            />
             <SplitModal.Left
                 title={projectTemplate?.name}
                 titleComponent={() => (
