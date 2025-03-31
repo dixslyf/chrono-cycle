@@ -16,17 +16,10 @@ import classes from "./split-modal.module.css";
 const SECTION_PX = 30;
 const SECTION_PY = 24;
 
-export type SplitModalProps = Omit<ModalProps, "withCloseButton" | "title"> & {
-    wrapper?: (children: ReactNode) => ReactNode;
-};
+export type SplitModalProps = Omit<ModalProps, "withCloseButton" | "title">;
 
 export function SplitModal(props: SplitModalProps): ReactNode {
-    const { children, wrapper, ...passedProps } = props;
-    const root = (
-        <Group gap={0} className="w-full h-full items-stretch">
-            {children}
-        </Group>
-    );
+    const { children, ...passedProps } = props;
     return (
         <Modal
             centered
@@ -46,7 +39,9 @@ export function SplitModal(props: SplitModalProps): ReactNode {
             }}
             {...passedProps}
         >
-            {wrapper ? wrapper(root) : root}
+            <Group gap={0} className="w-full h-full items-stretch">
+                {children}
+            </Group>
         </Modal>
     );
 }
