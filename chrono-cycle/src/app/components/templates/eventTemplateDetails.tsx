@@ -84,7 +84,10 @@ export function EventTemplateDetailsLeft({
                     label="Duration (days)"
                     min={1}
                     error="Invalid duration"
-                    disabled={eventTemplate.eventType === "task"}
+                    disabled={
+                        updateMutation.isPending ||
+                        eventTemplate.eventType === "task"
+                    }
                     required
                     {...updateForm.getInputProps("duration")}
                 />
@@ -104,6 +107,7 @@ export function EventTemplateDetailsLeft({
                 size="md"
                 label="Tags"
                 placeholder="Add a Tag"
+                disabled={updateMutation.isPending}
                 {...updateForm.getInputProps("tags")}
                 classNames={{ pill: "bg-gray-200" }}
             />
@@ -332,6 +336,7 @@ export function EventTemplateDetailsModal<T extends string>({
                         titleComponent={() => (
                             <EditableTitle
                                 key={updateForm.key("name")}
+                                disabled={updateMutation.isPending}
                                 {...updateForm.getInputProps("name")}
                             />
                         )}
