@@ -74,6 +74,7 @@ export function ProjectTemplateDetailsLeft<T extends string>({
                             label: "text-palette5 font-semibold text-xl mb-2",
                             input: "text-base border border-gray-400 rounded-xl",
                         }}
+                        key={form.key("description")}
                         {...form.getInputProps("description")}
                     />
                 </Stack>
@@ -270,9 +271,7 @@ export function ProjectTemplateDetailsModal<T extends string>({
     });
 
     return (
-        <SplitModal
-            {...modalStack.register("project-template-details")}
-        >
+        <SplitModal {...modalStack.register("project-template-details")}>
             <form
                 id="update-project-template-form"
                 onSubmit={(ev) => {
@@ -293,6 +292,7 @@ export function ProjectTemplateDetailsModal<T extends string>({
                         classNames={{
                             input: "text-3xl pt-4 pb-4 font-bold hover:bg-gray-200 focus:border focus:border-gray-400 focus:bg-gray-200",
                         }}
+                        key={form.key("name")}
                         {...form.getInputProps("name")}
                     />
                 )}
