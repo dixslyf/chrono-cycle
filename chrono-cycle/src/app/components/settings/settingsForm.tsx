@@ -103,34 +103,17 @@ function SettingsForm({ initialSettings }: { initialSettings: UserSettings }) {
                     Update Your Notification Perferences
                 </Text>
 
-                <SimpleGrid cols={3}>
-                    <Group justify="space-between">
-                        <Text className="text-xl font-semibold">
-                            Email Notifications:
-                        </Text>
-                        <Switch
-                            size="md"
-                            {...form.getInputProps("enableEmailNotifications", {
-                                type: "checkbox",
-                            })}
-                        />
-                    </Group>
-                    <div /> {/* center column left */}
-                    <Group justify="space-between">
-                        <Text className="text-xl font-semibold">
-                            Desktop Notifications:
-                        </Text>
-                        <Switch
-                            size="md"
-                            {...form.getInputProps(
-                                "enableDesktopNotifications",
-                                {
-                                    type: "checkbox",
-                                },
-                            )}
-                        />
-                    </Group>
-                </SimpleGrid>
+                <Group className="w-1/3" justify="space-between">
+                    <Text className="text-xl font-semibold">
+                        Email Notifications
+                    </Text>
+                    <Switch
+                        size="md"
+                        {...form.getInputProps("enableEmailNotifications", {
+                            type: "checkbox",
+                        })}
+                    />
+                </Group>
                 <hr />
             </Stack>
 
