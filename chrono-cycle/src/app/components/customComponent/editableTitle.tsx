@@ -1,4 +1,4 @@
-import { TextInput, TextInputProps } from "@mantine/core";
+import { TextInput, type TextInputProps } from "@mantine/core";
 
 export function EditableTitle(props: TextInputProps) {
     return (

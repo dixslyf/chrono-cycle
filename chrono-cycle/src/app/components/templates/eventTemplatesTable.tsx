@@ -1,29 +1,12 @@
 "use client";
 
-import {
-    Box,
-    Group,
-    Pagination,
-    Table,
-    TextInput,
-    useModalsStack,
-} from "@mantine/core";
-import { useForm, zodResolver } from "@mantine/form";
-import React, { useCallback, useState } from "react";
-
-import { SplitModal } from "@/app/components/customComponent/splitModal";
+import { Box, Group, Pagination, Table, useModalsStack } from "@mantine/core";
+import React, { useState } from "react";
 
 import { EventTemplate } from "@/common/data/domain";
 
-import { payloadSchema } from "@/features/event-templates/update/data";
-
-import { EditableTitle } from "../customComponent/editableTitle";
 import { CreateEventTemplateButton } from "./createEventTemplateButton";
-import {
-    EventTemplateDetailsLeft,
-    EventTemplateDetailsModal,
-    EventTemplateDetailsRight,
-} from "./eventTemplateDetails";
+import { EventTemplateDetailsModal } from "./eventTemplateDetails";
 
 interface EventsTableProps<T extends string> {
     projectTemplateId: string;
