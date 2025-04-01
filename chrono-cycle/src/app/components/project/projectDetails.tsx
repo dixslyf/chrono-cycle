@@ -160,7 +160,7 @@ export function ProjectDetailsModal<T extends string>({
                     isLoading={isLoading}
                 />
             </SplitModal.Left>
-            <SplitModal.Right>
+            <SplitModal.Right title="Metadata">
                 <ProjectDetailsRight
                     project={project}
                     modalStack={modalStack}
