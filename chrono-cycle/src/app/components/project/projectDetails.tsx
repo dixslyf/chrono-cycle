@@ -7,9 +7,10 @@ import {
     Skeleton,
     Stack,
     Text,
+    Textarea,
     useModalsStack,
 } from "@mantine/core";
-import { useForm, zodResolver } from "@mantine/form";
+import { useForm, zodResolver, type UseFormReturnType } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
@@ -30,6 +31,12 @@ import { updateProjectAction } from "@/features/projects/update/action";
 import { Failure, Payload } from "@/features/projects/update/data";
 
 import { DeleteProjectButton } from "./deleteProjectButton";
+
+type UpdateFormValues = {
+    name: string;
+    description: string;
+    startsAt: Date;
+};
 
 function extractUpdateErrorMessage(err: Failure): string {
     return match(err)
@@ -53,12 +60,14 @@ function extractUpdateErrorMessage(err: Failure): string {
 }
 
 function ProjectDetailsLeft({
-    project,
+    updateForm,
     projectTemplate,
+    updatePending,
     isLoading,
 }: {
-    project?: Project;
+    updateForm: UseFormReturnType<UpdateFormValues>;
     projectTemplate?: O.Option<ProjectTemplate>;
+    updatePending?: boolean;
     isLoading?: boolean;
 }): React.ReactNode {
     return (
@@ -66,12 +75,16 @@ function ProjectDetailsLeft({
             {/* description */}
             <Skeleton visible={isLoading}>
                 <Stack align="stretch">
-                    <Text className="text-palette5 font-semibold text-xl">
-                        Description
-                    </Text>
-                    <Text className="flex-1 border border-gray-400 rounded-xl p-4">
-                        {project?.description}
-                    </Text>
+                    <Textarea
+                        key={updateForm.key("description")}
+                        label="Description"
+                        classNames={{
+                            label: "text-palette5 font-semibold text-xl mb-2",
+                            input: "text-base border border-gray-400 rounded-xl",
+                        }}
+                        disabled={isLoading || updatePending}
+                        {...updateForm.getInputProps("description")}
+                    />
                 </Stack>
             </Skeleton>
             <Skeleton visible={isLoading}>
@@ -192,7 +205,7 @@ export function ProjectDetailsModal<T extends string>({
     projectTemplate?: O.Option<ProjectTemplate>;
     isLoading?: boolean;
 }) {
-    const updateForm = useForm({
+    const updateForm = useForm<UpdateFormValues>({
         mode: "uncontrolled",
         initialValues: {
             name: project?.name ?? "",
@@ -201,7 +214,6 @@ export function ProjectDetailsModal<T extends string>({
         },
         // validate: zodResolver(payloadSchema.omit({ id: true })),
     });
-    type FormValues = typeof updateForm.values;
 
     // Needed for the initial values to show properly. The reason is that,
     // by the time the project data has been loaded, the form has already
@@ -222,7 +234,7 @@ export function ProjectDetailsModal<T extends string>({
 
     const queryClient = useQueryClient();
     const updateMutation = useMutation({
-        mutationFn: async (values: FormValues) => {
+        mutationFn: async (values: UpdateFormValues) => {
             const { startsAt: startsAtDate, ...rest } = values;
             // By default, Luxon already uses the local timezone, so the date should be correct.
             // Safety: JS dates will always successfully into a DateTime, so we should never
@@ -292,7 +304,7 @@ export function ProjectDetailsModal<T extends string>({
                 )}
             >
                 <ProjectDetailsLeft
-                    project={project}
+                    updateForm={updateForm}
                     projectTemplate={projectTemplate}
                     isLoading={isLoading}
                 />
