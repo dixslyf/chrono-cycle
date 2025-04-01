@@ -309,6 +309,8 @@ export function EventTemplateDetailsModal<T extends string>({
                     eventTemplate?.projectTemplateId as string,
                 ),
             });
+
+            updateForm.resetDirty();
         },
         onError: (_err: Failure) => {
             notifyError({ message: "Failed to update event template." });
