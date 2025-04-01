@@ -60,17 +60,19 @@ function extractUpdateErrorMessage(err: Failure): string {
         )
         .with(
             { _errorKind: "InternalError" },
-            () => "Failed to create project!",
+            () => "Failed to update project!",
         )
         .exhaustive();
 }
 
 function ProjectDetailsLeft({
+    project,
     updateForm,
     projectTemplate,
     updatePending,
     isLoading,
 }: {
+    project?: Project;
     updateForm: UseFormReturnType<UpdateFormValues>;
     projectTemplate?: O.Option<ProjectTemplate>;
     updatePending?: boolean;
@@ -93,17 +95,12 @@ function ProjectDetailsLeft({
                 </Text>
             </Skeleton>
             <Skeleton visible={isLoading}>
-                <DatePickerInput
-                    key={updateForm.key("startsAt")}
-                    label="Start Date"
-                    placeholder="Project start date"
-                    disabled={updatePending}
-                    classNames={{
-                        label: "text-palette5 font-semibold text-xl mb-2",
-                        input: "text-base border border-gray-400 rounded-xl",
-                    }}
-                    {...updateForm.getInputProps("startsAt")}
-                />
+                <Text className="text-palette5 text-xl">
+                    <Text span className="text-xl font-semibold">
+                        Start Date:{" "}
+                    </Text>
+                    {project ? formatDate(project.startsAt) : undefined}
+                </Text>
             </Skeleton>
             {/* description */}
             <Skeleton visible={isLoading}>
@@ -313,6 +310,7 @@ export function ProjectDetailsModal<T extends string>({
                 )}
             >
                 <ProjectDetailsLeft
+                    project={project}
                     updateForm={updateForm}
                     projectTemplate={projectTemplate}
                     isLoading={isLoading}
