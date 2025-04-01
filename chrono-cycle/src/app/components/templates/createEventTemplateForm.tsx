@@ -1,30 +1,22 @@
 "use client";
 
 import {
-    ActionIcon,
     Button,
-    Checkbox,
-    Fieldset,
     Group,
     NumberInput,
-    ScrollArea,
     Select,
     Stack,
     TagsInput,
-    Text,
     Textarea,
     TextInput,
 } from "@mantine/core";
-import { TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
-import { Calendar, Clock, Plus, Trash } from "lucide-react";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useState } from "react";
 
-import { theme } from "@/app/provider";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { queryKeys } from "@/app/utils/queries/keys";
 
@@ -37,6 +29,8 @@ import {
     rawPayloadSchema,
     refineRawPayloadSchema,
 } from "@/features/event-templates/create/data";
+
+import { RemindersInput } from "./remindersInput";
 
 type ReminderData = Required<Payload["reminders"][number]>;
 
@@ -252,7 +246,31 @@ export function CreateEventTemplateFormRight({
 }): React.ReactNode {
     return (
         <Stack className="h-full" justify="space-between">
-            <RemindersInput form={form} mutation={mutation} />
+            <RemindersInput
+                entries={form.getValues().reminders}
+                daysBeforeEventInputProps={(index) => ({
+                    key: form.key(`reminders.${index}.daysBeforeEvent`),
+                    ...form.getInputProps(`reminders.${index}.daysBeforeEvent`),
+                })}
+                triggerTimeInputProps={(index) => ({
+                    key: form.key(`reminders.${index}.time`),
+                    ...form.getInputProps(`reminders.${index}.time`),
+                })}
+                emailNotificationsInputProps={(index) => ({
+                    key: form.key(`reminders.${index}.emailNotifications`),
+                    ...form.getInputProps(
+                        `reminders.${index}.emailNotifications`,
+                        { type: "checkbox" },
+                    ),
+                })}
+                onReminderDelete={(index) =>
+                    form.removeListItem("reminders", index)
+                }
+                onReminderAdd={(defaultEntry) =>
+                    form.insertListItem("reminders", defaultEntry)
+                }
+                disabled={mutation.isPending}
+            />
             <Group justify="flex-end">
                 <Button
                     type="submit"
@@ -263,110 +281,5 @@ export function CreateEventTemplateFormRight({
                 </Button>
             </Group>
         </Stack>
-    );
-}
-
-function RemindersInput({
-    form,
-    mutation,
-}: {
-    form: CreateEventTemplateFormState["form"];
-    mutation: CreateEventTemplateFormState["mutation"];
-}) {
-    return (
-        <Fieldset c="white" unstyled style={{ display: "flex" }}>
-            <Stack gap="lg" w="100%">
-                <ScrollArea style={{ root: { flex: 1 } }}>
-                    <Stack gap="lg" style={{ flex: 1 }}>
-                        {form.values.reminders.length > 0 ? (
-                            form.values.reminders.map((_reminder, index) => (
-                                <Stack
-                                    key={`reminder-${index}`}
-                                    styles={{
-                                        root: {
-                                            border: "1px solid",
-                                            borderColor: theme.white,
-                                        },
-                                    }}
-                                    className="rounded-lg p-4"
-                                    justify="center"
-                                >
-                                    <Group gap="xl" grow>
-                                        <NumberInput
-                                            label="Days before event"
-                                            leftSection={<Calendar />}
-                                            min={0}
-                                            disabled={mutation.isPending}
-                                            required
-                                            {...form.getInputProps(
-                                                `reminders.${index}.daysBeforeEvent`,
-                                            )}
-                                        />
-                                        <TimeInput
-                                            label="Trigger time"
-                                            leftSection={<Clock />}
-                                            disabled={mutation.isPending}
-                                            required
-                                            {...form.getInputProps(
-                                                `reminders.${index}.time`,
-                                            )}
-                                        />
-                                    </Group>
-                                    {/* notification */}
-                                    <Group>
-                                        <Checkbox
-                                            label="Email notification"
-                                            disabled={mutation.isPending}
-                                            {...form.getInputProps(
-                                                `reminders.${index}.emailNotifications`,
-                                                { type: "checkbox" },
-                                            )}
-                                        />
-                                        {/* delete button */}
-                                        <Group
-                                            justify="flex-end"
-                                            className="flex-grow"
-                                        >
-                                            <ActionIcon
-                                                color="red"
-                                                onClick={() =>
-                                                    form.removeListItem(
-                                                        "reminders",
-                                                        index,
-                                                    )
-                                                }
-                                            >
-                                                <Trash />
-                                            </ActionIcon>
-                                        </Group>
-                                    </Group>
-                                </Stack>
-                            ))
-                        ) : (
-                            <Text c="white">No reminders set</Text>
-                        )}
-                    </Stack>
-                </ScrollArea>
-                <Group justify="flex-end">
-                    <Button
-                        leftSection={<Plus />}
-                        onClick={() =>
-                            form.insertListItem(
-                                "reminders",
-                                {
-                                    daysBeforeEvent: 0,
-                                    time: "09:00",
-                                    emailNotifications: true,
-                                    desktopNotifications: true,
-                                },
-                                0,
-                            )
-                        }
-                    >
-                        Add Reminder
-                    </Button>
-                </Group>
-            </Stack>
-        </Fieldset>
     );
 }
