@@ -10,6 +10,7 @@ import {
     ScrollArea,
     SegmentedControl,
     Stack,
+    TagsInput,
     Text,
     Textarea,
     useModalsStack,
@@ -28,12 +29,13 @@ import { DateTime } from "luxon";
 import React, { useEffect } from "react";
 import { z } from "zod";
 
+import { EditableTitle } from "@/app/components/customComponent/editableTitle";
 import { SplitModal } from "@/app/components/customComponent/splitModal";
 import { theme } from "@/app/provider";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { queryKeys } from "@/app/utils/queries/keys";
 
-import { Event, Reminder, Tag } from "@/common/data/domain";
+import { Event, Reminder, Tag, tagNameSchema } from "@/common/data/domain";
 
 import { updateEventAction } from "@/features/events/update/action";
 import {
@@ -41,8 +43,6 @@ import {
     payloadSchema,
     Payload as UpdatePayload,
 } from "@/features/events/update/data";
-
-import { EditableTitle } from "../customComponent/editableTitle";
 
 // Removing auto-scheduling because we don't have time to implement it.
 type UpdateFormValues = Required<
@@ -140,20 +140,13 @@ function EventDetailsLeft({
                 maxRows={3}
                 {...updateForm.getInputProps("note")}
             />
-            <Stack gap="sm" className="py-4">
-                <Text>Tags</Text>
-                <Group>
-                    {event.tags.length > 0 ? (
-                        <Group>
-                            {event.tags.map((tag: Tag) => (
-                                <Badge key={tag.id}>{tag.name}</Badge>
-                            ))}
-                        </Group>
-                    ) : (
-                        <Text className="text-gray-300">No tags assigned</Text>
-                    )}
-                </Group>
-            </Stack>
+            <TagsInput
+                size="md"
+                label="Tags"
+                placeholder="Add a Tag"
+                {...updateForm.getInputProps("tags")}
+                classNames={{ pill: "bg-gray-200" }}
+            />
         </Stack>
     );
 }
@@ -242,10 +235,30 @@ export function EventDetailsModal<T extends string>({
             duration: event?.duration ?? 0,
             note: event?.note ?? "",
             status: event?.status ?? "none",
+            tags: event?.tags.map((t) => t.name) ?? [],
         } satisfies UpdateFormValues,
-        validate: zodResolver(
-            payloadSchema.omit({ id: true }).setKey("startDate", z.date()),
-        ),
+        validate: {
+            ...zodResolver(
+                payloadSchema.omit({ id: true }).setKey("startDate", z.date()),
+            ),
+            tags: (tags) => {
+                const badTags = tags
+                    .filter((tag) => !tagNameSchema.safeParse(tag).success)
+                    .map((tag) => `"${tag}"`);
+
+                if (badTags.length > 0) {
+                    const badTagsString =
+                        badTags.length > 1
+                            ? badTags.slice(0, -1).join(", ") +
+                              " and " +
+                              badTags.at(-1)
+                            : badTags[0];
+                    return `Tags can only contain alphanumeric characters, dashes and underscores. Invalid tag(s): ${badTagsString}.`;
+                }
+
+                return null;
+            },
+        },
     });
 
     // Similar to project template details. Needed for the initial values to show properly.
@@ -262,6 +275,7 @@ export function EventDetailsModal<T extends string>({
                 duration: event.duration,
                 note: event.note,
                 status: event.status,
+                tags: event.tags.map((t) => t.name),
             });
             resetForm();
         }
