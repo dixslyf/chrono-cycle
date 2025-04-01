@@ -16,7 +16,7 @@ export function DeleteProjectButton<T extends string>({
     onSuccess,
     disabled,
 }: {
-    projectId: string;
+    projectId?: string;
     modalStack: ReturnType<typeof useModalsStack<"confirm-delete-project" | T>>;
     onSuccess: () => void;
     disabled?: boolean;
@@ -48,9 +48,12 @@ export function DeleteProjectButton<T extends string>({
         <DeleteConfirmButton
             modalStack={modalStack}
             modalStackId={"confirm-delete-project"}
-            onDelete={() => deleteMutation.mutate(projectId)}
+            onDelete={() => {
+                // Safety: Button is only enabled when projectId is not undefined.
+                return deleteMutation.mutate(projectId as string);
+            }}
             itemType="project"
-            disabled={disabled}
+            disabled={!projectId || disabled}
             loading={deleteMutation.isPending}
         />
     );

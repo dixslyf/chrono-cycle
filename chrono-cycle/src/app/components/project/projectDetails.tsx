@@ -8,22 +8,25 @@ import {
     Text,
     useModalsStack,
 } from "@mantine/core";
+import { useQueryClient } from "@tanstack/react-query";
 import { pipe } from "fp-ts/lib/function";
 import * as O from "fp-ts/Option";
 import React from "react";
 
+import { SplitModal } from "@/app/components/customComponent/splitModal";
 import { formatDate } from "@/app/utils/dates";
+import { queryKeys } from "@/app/utils/queries/keys";
 
 import { Project, ProjectTemplate } from "@/common/data/domain";
 
 import { DeleteProjectButton } from "./deleteProjectButton";
 
-export function ProjectDetailsLeft({
+function ProjectDetailsLeft({
     project,
     projectTemplate,
     isLoading,
 }: {
-    project: Project;
+    project?: Project;
     projectTemplate?: O.Option<ProjectTemplate>;
     isLoading?: boolean;
 }): React.ReactNode {
@@ -36,7 +39,7 @@ export function ProjectDetailsLeft({
                         Description
                     </Text>
                     <Text className="flex-1 border border-gray-400 rounded-xl p-4">
-                        {project.description}
+                        {project?.description}
                     </Text>
                 </Stack>
             </Skeleton>
@@ -58,14 +61,14 @@ export function ProjectDetailsLeft({
     );
 }
 
-export function ProjectDetailsRight<T extends string>({
-    project,
+function ProjectDetailsRight<T extends string>({
     modalStack,
+    project,
     isLoading,
     onDeleteSuccess,
 }: {
-    project: Project;
     modalStack: ReturnType<typeof useModalsStack<"confirm-delete-project" | T>>;
+    project?: Project;
     isLoading?: boolean;
     onDeleteSuccess: () => void;
 }): React.ReactNode {
@@ -78,7 +81,7 @@ export function ProjectDetailsRight<T extends string>({
                             Project ID:
                         </Text>
                         <Badge size="lg" color="brown">
-                            {project.id}
+                            {project?.id}
                         </Badge>
                     </Group>
                 </Skeleton>
@@ -88,7 +91,7 @@ export function ProjectDetailsRight<T extends string>({
                             Starts At:
                         </Text>
                         <Text className="text-lg font-medium text-gray-300">
-                            {formatDate(project.startsAt)}
+                            {project ? formatDate(project.startsAt) : undefined}
                         </Text>
                     </Group>
                 </Skeleton>
@@ -98,7 +101,11 @@ export function ProjectDetailsRight<T extends string>({
                             Created At:
                         </Text>
                         <Text className="text-lg font-medium text-gray-300">
-                            {formatDate(project.createdAt, { withTime: true })}
+                            {project
+                                ? formatDate(project.createdAt, {
+                                      withTime: true,
+                                  })
+                                : undefined}
                         </Text>
                     </Group>
                 </Skeleton>
@@ -108,19 +115,64 @@ export function ProjectDetailsRight<T extends string>({
                             Updated At:
                         </Text>
                         <Text className="text-lg font-medium text-gray-300">
-                            {formatDate(project.updatedAt, { withTime: true })}
+                            {project
+                                ? formatDate(project.updatedAt, {
+                                      withTime: true,
+                                  })
+                                : undefined}
                         </Text>
                     </Group>
                 </Skeleton>
             </Stack>
             <Group justify="flex-end">
                 <DeleteProjectButton
-                    projectId={project.id}
+                    projectId={project?.id}
                     modalStack={modalStack}
                     onSuccess={onDeleteSuccess}
                     disabled={isLoading}
                 />
             </Group>
         </Stack>
+    );
+}
+
+export function ProjectDetailsModal<T extends string>({
+    modalStack,
+    project,
+    projectTemplate,
+    isLoading,
+}: {
+    modalStack: ReturnType<
+        typeof useModalsStack<"project-details" | "confirm-delete-project" | T>
+    >;
+    project?: Project;
+    projectTemplate?: O.Option<ProjectTemplate>;
+    isLoading?: boolean;
+}) {
+    const queryClient = useQueryClient();
+    return (
+        <SplitModal {...modalStack.register("project-details")}>
+            {/* TODO: skeleton for name */}
+            <SplitModal.Left title={`${project?.name}`}>
+                <ProjectDetailsLeft
+                    project={project}
+                    projectTemplate={projectTemplate}
+                    isLoading={isLoading}
+                />
+            </SplitModal.Left>
+            <SplitModal.Right>
+                <ProjectDetailsRight
+                    project={project}
+                    modalStack={modalStack}
+                    isLoading={isLoading}
+                    onDeleteSuccess={() => {
+                        modalStack.close("project-details");
+                        queryClient.invalidateQueries({
+                            queryKey: queryKeys.projects.listAll(),
+                        });
+                    }}
+                />
+            </SplitModal.Right>
+        </SplitModal>
     );
 }
