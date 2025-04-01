@@ -2,21 +2,31 @@
 
 import {
     Badge,
+    Button,
     Checkbox,
     Fieldset,
     Group,
+    NumberInput,
     ScrollArea,
+    SegmentedControl,
     Stack,
     Text,
+    Textarea,
     useModalsStack,
 } from "@mantine/core";
-import { useForm, zodResolver } from "@mantine/form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { DatePickerInput } from "@mantine/dates";
+import { useForm, zodResolver, type UseFormReturnType } from "@mantine/form";
+import {
+    useMutation,
+    UseMutationResult,
+    useQueryClient,
+} from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { Clock } from "lucide-react";
 import { DateTime } from "luxon";
 import React, { useEffect } from "react";
+import { z } from "zod";
 
 import { SplitModal } from "@/app/components/customComponent/splitModal";
 import { theme } from "@/app/provider";
@@ -31,6 +41,8 @@ import {
     payloadSchema,
     Payload as UpdatePayload,
 } from "@/features/events/update/data";
+
+import { EditableTitle } from "../customComponent/editableTitle";
 
 // Removing auto-scheduling because we don't have time to implement it.
 type UpdateFormValues = Required<
@@ -48,77 +60,86 @@ type UpdateFormValues = Required<
     startDate: Date;
 };
 
-function EventDetailsLeft({ event }: { event: Event }): React.ReactNode {
+function EventDetailsLeft({
+    event,
+    updateMutation,
+    updateForm,
+}: {
+    event: Event;
+    updateMutation: UseMutationResult<Event, Failure, UpdateFormValues>;
+    updateForm: UseFormReturnType<UpdateFormValues>;
+}): React.ReactNode {
     return (
-        <Stack className="h-full overflow-y-auto" align="stretch" gap="xl">
-            {/* Event type */}
-            <Group className="py-4" gap="lg" grow={true}>
-                <Group>
-                    <Text className="text-md font-semibold text-palette5">
-                        Event Type
+        <Stack gap="xl" className="h-full">
+            <Group grow>
+                {/* Not editable because an event's type is not modifiable. */}
+                <Text>
+                    <Text span fw={500}>
+                        Event type:
                     </Text>
-                    <Text
-                        className={`text-md font-semibold ${
+                    {event.eventType === "task" ? " Task" : " Activity"}
+                </Text>
+                <Group>
+                    <Text span fw={500}>
+                        Status:{" "}
+                    </Text>
+                    <SegmentedControl
+                        fullWidth
+                        radius="lg"
+                        data={
                             event.eventType === "task"
-                                ? "text-fuchsia-500"
-                                : "text-blue-400"
-                        }`}
-                    >
-                        {event.eventType === "task" ? "Task" : "Activity"}
-                    </Text>
-                </Group>
-                <Group>
-                    <Text className="text-md font-semibold text-palette5">
-                        Status
-                    </Text>
-                    <Badge
-                        tt="uppercase"
-                        color={
-                            event.status === "completed"
-                                ? "green"
-                                : event.status === "in progress"
-                                  ? "blue"
-                                  : event.status === "not started"
-                                    ? "yellow"
-                                    : "gray"
+                                ? [
+                                      {
+                                          label: "Not Started",
+                                          value: "not started",
+                                      },
+                                      {
+                                          label: "In Progress",
+                                          value: "in progress",
+                                      },
+                                      {
+                                          label: "Completed",
+                                          value: "completed",
+                                      },
+                                  ]
+                                : [{ label: "None", value: "none" }]
                         }
-                    >
-                        {event.status}
-                    </Badge>
+                        disabled={event.eventType === "activity"}
+                        {...updateForm.getInputProps("status")}
+                    />
                 </Group>
             </Group>
-            <Group className="py-4" gap="lg" grow={true}>
-                {/* start date */}
-                <Group gap={0}>
-                    <Text className="text-md font-semibold text-palette5 w-1/2">
-                        Start Date
-                    </Text>
-                    <Text className="text-md font-semibold text-red-500 w-1/2">
-                        {event.startDate.toString()}
-                    </Text>
-                </Group>
-                <Group>
-                    <Text className="text-md font-semibold text-palette5">
-                        Duration (days)
-                    </Text>
-                    <Text className="text-md font-semibold text-green-400">
-                        {event.eventType === "activity"
-                            ? event.duration !== null
-                                ? event.duration
-                                : "-"
-                            : "-"}
-                    </Text>
-                </Group>
+            <Group grow>
+                <DatePickerInput
+                    size="md"
+                    label="Start Date"
+                    disabled={updateMutation.isPending}
+                    required
+                    {...updateForm.getInputProps("startDate")}
+                />
+                <NumberInput
+                    size="md"
+                    key={updateForm.key("duration")}
+                    label="Duration (days)"
+                    min={1}
+                    error="Invalid duration"
+                    disabled={
+                        updateMutation.isPending || event.eventType === "task"
+                    }
+                    required
+                    {...updateForm.getInputProps("duration")}
+                />
             </Group>
-            {/* note */}
-            <Stack>
-                <Fieldset legend="Note" className="border-gray-400 rounded-xl">
-                    <Text className="text-gray-600">
-                        {event.note || "No note attached"}{" "}
-                    </Text>
-                </Fieldset>
-            </Stack>
-            {/* tags */}
+            <Textarea
+                label="Note"
+                size="md"
+                placeholder="Enter note"
+                disabled={updateMutation.isPending}
+                error="Invalid note"
+                minRows={3}
+                maxRows={3}
+                {...updateForm.getInputProps("note")}
+            />
             <Stack gap="sm" className="py-4">
                 <Text>Tags</Text>
                 <Group>
@@ -137,9 +158,17 @@ function EventDetailsLeft({ event }: { event: Event }): React.ReactNode {
     );
 }
 
-function EventDetailsRight({ event }: { event: Event }) {
+function EventDetailsRight({
+    event,
+    updateMutation,
+    updateForm,
+}: {
+    event: Event;
+    updateMutation: UseMutationResult<Event, Failure, UpdateFormValues>;
+    updateForm: UseFormReturnType<UpdateFormValues>;
+}) {
     return (
-        <Stack className="h-full">
+        <Stack className="h-full" justify="space-between">
             <Fieldset c="white" unstyled className="flex">
                 <Stack gap="lg" w="100%">
                     <ScrollArea style={{ root: { flex: 1 } }}>
@@ -183,6 +212,17 @@ function EventDetailsRight({ event }: { event: Event }) {
                     </ScrollArea>
                 </Stack>
             </Fieldset>
+
+            <Group justify="flex-end">
+                <Button
+                    type="submit"
+                    form="update-event-form"
+                    loading={updateMutation.isPending}
+                    disabled={!updateForm.isDirty()}
+                >
+                    Save
+                </Button>
+            </Group>
         </Stack>
     );
 }
@@ -203,7 +243,9 @@ export function EventDetailsModal<T extends string>({
             note: event?.note ?? "",
             status: event?.status ?? "none",
         } satisfies UpdateFormValues,
-        validate: zodResolver(payloadSchema.omit({ id: true })),
+        validate: zodResolver(
+            payloadSchema.omit({ id: true }).setKey("startDate", z.date()),
+        ),
     });
 
     // Similar to project template details. Needed for the initial values to show properly.
@@ -269,13 +311,36 @@ export function EventDetailsModal<T extends string>({
 
     return (
         <SplitModal {...modalStack.register("event-details")}>
+            <form
+                id="update-event-form"
+                onSubmit={updateForm.onSubmit((values) =>
+                    updateMutation.mutate(values),
+                )}
+            />
             {event && (
                 <>
-                    <SplitModal.Left title={`${event.name}`}>
-                        <EventDetailsLeft event={event} />
+                    <SplitModal.Left
+                        title={`${event.name}`}
+                        titleComponent={() => (
+                            <EditableTitle
+                                key={updateForm.key("name")}
+                                disabled={updateMutation.isPending}
+                                {...updateForm.getInputProps("name")}
+                            />
+                        )}
+                    >
+                        <EventDetailsLeft
+                            event={event}
+                            updateForm={updateForm}
+                            updateMutation={updateMutation}
+                        />
                     </SplitModal.Left>
-                    <SplitModal.Right>
-                        <EventDetailsRight event={event} />
+                    <SplitModal.Right title="Reminders">
+                        <EventDetailsRight
+                            event={event}
+                            updateForm={updateForm}
+                            updateMutation={updateMutation}
+                        />
                     </SplitModal.Right>
                 </>
             )}
