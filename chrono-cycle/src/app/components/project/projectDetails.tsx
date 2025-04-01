@@ -10,7 +10,6 @@ import {
     Textarea,
     useModalsStack,
 } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
 import { useForm, zodResolver, type UseFormReturnType } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
