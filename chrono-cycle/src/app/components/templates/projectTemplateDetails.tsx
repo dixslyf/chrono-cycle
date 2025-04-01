@@ -32,6 +32,7 @@ import { ProjectTemplate, ProjectTemplateOverview } from "@/common/data/domain";
 import { updateProjectTemplateAction } from "@/features/project-templates/update/action";
 import {
     Failure,
+    Payload,
     payloadSchema,
 } from "@/features/project-templates/update/data";
 
@@ -244,11 +245,18 @@ export function ProjectTemplateDetailsModal<T extends string>({
     const queryClient = useQueryClient();
     const mutation = useMutation({
         mutationFn: async (values: FormValues) => {
-            const result = await updateProjectTemplateAction(null, {
+            const payload = {
                 id: projectTemplate?.id as string,
-                name: values.name,
-                description: values.description,
-            });
+                ...values,
+            } as Payload;
+
+            // Set name to undefined if it hasn't changed to prevent
+            // server action from raising duplicate name error.
+            if (values.name === projectTemplate?.name) {
+                payload.name = undefined;
+            }
+
+            const result = await updateProjectTemplateAction(null, payload);
 
             return pipe(
                 result,
@@ -282,15 +290,7 @@ export function ProjectTemplateDetailsModal<T extends string>({
         <SplitModal {...modalStack.register("project-template-details")}>
             <form
                 id="update-project-template-form"
-                onSubmit={(ev) => {
-                    if (form.getValues().name === projectTemplate?.name) {
-                        form.setValues({ name: undefined });
-                    }
-                    const submit = form.onSubmit((values) =>
-                        mutation.mutate(values),
-                    );
-                    submit(ev);
-                }}
+                onSubmit={form.onSubmit((values) => mutation.mutate(values))}
             />
             <SplitModal.Left
                 title={projectTemplate?.name}
