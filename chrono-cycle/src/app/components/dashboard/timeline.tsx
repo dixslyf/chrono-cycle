@@ -8,10 +8,7 @@ import * as O from "fp-ts/Option";
 import { useEffect, useRef, useState } from "react";
 
 import { SplitModal } from "@/app/components/customComponent/splitModal";
-import {
-    DisplayEventDetailsLeft,
-    DisplayEventDetailsRight,
-} from "@/app/components/event/eventDetails";
+import { EventDetailsModal } from "@/app/components/event/eventDetails";
 import { ProjectDetailsModal } from "@/app/components/project/projectDetails";
 import { areSameDay } from "@/app/utils/dates";
 import { queryKeys } from "@/app/utils/queries/keys";
@@ -249,20 +246,10 @@ function Timeline({
             className="overflow-x-auto w-full flex-1 h-full relative z-0"
         >
             <Modal.Stack>
-                <SplitModal {...modalStack.register("event-details")}>
-                    {clickedEvent && (
-                        <>
-                            <SplitModal.Left title={`${clickedEvent.name}`}>
-                                <DisplayEventDetailsLeft event={clickedEvent} />
-                            </SplitModal.Left>
-                            <SplitModal.Right>
-                                <DisplayEventDetailsRight
-                                    event={clickedEvent}
-                                />
-                            </SplitModal.Right>
-                        </>
-                    )}
-                </SplitModal>
+                <EventDetailsModal
+                    modalStack={modalStack}
+                    event={clickedEvent ?? undefined}
+                />
                 {/* project details modal */}
                 <ProjectDetailsModal
                     modalStack={modalStack}
