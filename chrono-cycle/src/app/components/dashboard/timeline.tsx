@@ -37,6 +37,7 @@ function Timeline({
     onYearChange,
     onExtendDays,
 }: TimelineProps) {
+    const [isDragging, setIsDragging] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const cellWidth = 96; // fixed width for each day
 
@@ -185,6 +186,56 @@ function Timeline({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scrollToMonth, days, cellWidth]);
 
+    // click and drag function
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        let isDown = false;
+        let startX = 0;
+        let scrollLeft = 0;
+
+        const handleMouseDown = (e: MouseEvent) => {
+            isDown = true;
+            // container.classList.add("dragging");
+            setIsDragging(true);
+            startX = e.pageX - container.offsetLeft;
+            scrollLeft = container.scrollLeft;
+        };
+
+        const handleMouseLeave = () => {
+            isDown = false;
+            // container.classList.remove("dragging");
+            setIsDragging(false);
+        };
+
+        const handleMouseUp = () => {
+            isDown = false;
+            // container.classList.remove("dragging");
+            setIsDragging(false);
+        };
+
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - container.offsetLeft;
+            const walk = (x - startX) * 1;
+            container.scrollLeft = scrollLeft - walk;
+        };
+
+        container.addEventListener("mousedown", handleMouseDown);
+        container.addEventListener("mouseleave", handleMouseLeave);
+        container.addEventListener("mouseup", handleMouseUp);
+        container.addEventListener("mousemove", handleMouseMove);
+
+        return () => {
+            container.removeEventListener("mousedown", handleMouseDown);
+            container.removeEventListener("mouseleave", handleMouseLeave);
+            container.removeEventListener("mouseup", handleMouseUp);
+            container.removeEventListener("mousemove", handleMouseMove);
+        };
+    }, []);
+
     // calculate a cumulative vertical offset for each project row.
     // each row's height is the header height plus additionnal height for expanded events.
 
@@ -253,6 +304,7 @@ function Timeline({
         <Stack
             ref={containerRef}
             className="overflow-x-auto w-full flex-1 h-full relative z-0"
+            style={{ cursor: isDragging ? "grabbing" : "auto" }}
         >
             <Modal.Stack>
                 <EventDetailsModal
