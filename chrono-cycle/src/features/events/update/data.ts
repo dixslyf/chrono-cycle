@@ -23,23 +23,28 @@ export const payloadSchema = z.object({
     autoReschedule: expandedEventUpdateSchema.shape.autoReschedule,
     status: expandedEventUpdateSchema.shape.status,
     notificationsEnabled: expandedEventUpdateSchema.shape.notificationsEnabled,
-    remindersDelete: z.array(encodedIdSchema),
-    remindersInsert: z.array(
-        z.object({
-            triggerTime: z
-                .string()
-                .datetime({ offset: true, local: false })
-                .pipe(z.coerce.date()),
-            emailNotifications: reminderInsertSchema.shape.emailNotifications,
-            desktopNotifications:
-                reminderInsertSchema.shape.desktopNotifications,
-        }),
-    ),
-    remindersUpdate: z.array(
-        expandedEventUpdateSchema.shape.remindersUpdate.element.extend({
-            id: encodedIdSchema,
-        }),
-    ),
+    remindersDelete: z.array(encodedIdSchema).optional(),
+    remindersInsert: z
+        .array(
+            z.object({
+                triggerTime: z
+                    .string()
+                    .datetime({ offset: true, local: false })
+                    .pipe(z.coerce.date()),
+                emailNotifications:
+                    reminderInsertSchema.shape.emailNotifications,
+                desktopNotifications:
+                    reminderInsertSchema.shape.desktopNotifications,
+            }),
+        )
+        .optional(),
+    remindersUpdate: z
+        .array(
+            expandedEventUpdateSchema.shape.remindersUpdate.element.extend({
+                id: encodedIdSchema,
+            }),
+        )
+        .optional(),
 });
 
 export type Payload = z.input<typeof payloadSchema>;

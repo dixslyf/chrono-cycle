@@ -96,10 +96,11 @@ function unsafeUpdateExpandedEvent(
         // Update existing reminders.
         TE.bindW("updatedRts", () =>
             pipe(
-                data.remindersUpdate,
+                data.remindersUpdate ?? [],
                 TE.traverseArray((rt) => updateReminder(db, rt)),
             ),
         ),
+
         // Delete removed reminders.
         TE.tap(() =>
             pipe(data.remindersDelete, (toDeleteRts) =>
@@ -107,15 +108,16 @@ function unsafeUpdateExpandedEvent(
                 rawDeleteReminders(db, new Set(toDeleteRts)),
             ),
         ),
+
         // Insert new reminders.
         TE.bindW("insertedRts", ({ id: eventId }) =>
             TE.fromTask(() =>
                 rawInsertReminders(
                     db,
-                    data.remindersInsert.map((reminder) => ({
+                    data.remindersInsert?.map((reminder) => ({
                         eventId,
                         ...reminder,
-                    })),
+                    })) ?? [],
                 ),
             ),
         ),
