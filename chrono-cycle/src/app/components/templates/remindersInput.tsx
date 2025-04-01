@@ -12,6 +12,7 @@ import {
     type NumberInputProps,
 } from "@mantine/core";
 import { TimeInput, type TimeInputProps } from "@mantine/dates";
+import { randomId } from "@mantine/hooks";
 import { Calendar, Clock, Plus, Trash } from "lucide-react";
 
 import { theme } from "@/app/provider";
@@ -21,26 +22,26 @@ import { Payload as ReminderCreate } from "@/features/reminder-templates/create/
 export type RemindersInputEntry = Omit<
     ReminderCreate,
     "eventTemplateId" | "projectTemplateId" | "desktopNotifications"
->;
+> & { key: string };
 
 export function RemindersInput({
     entries,
-    disabled,
     daysBeforeEventInputProps,
     triggerTimeInputProps,
     emailNotificationsInputProps,
     onReminderDelete,
     onReminderAdd,
+    disabled,
 }: {
     entries: RemindersInputEntry[];
-    disabled?: boolean;
     daysBeforeEventInputProps?: (index: number) => NumberInputProps;
     triggerTimeInputProps?: (index: number) => TimeInputProps;
     emailNotificationsInputProps?: (index: number) => CheckboxProps;
     onReminderDelete?: (index: number) => void;
     onReminderAdd?: (defaultEntry: RemindersInputEntry) => void;
+    disabled?: boolean;
 }) {
-    const entryElements = entries.map((_reminder, index) => {
+    const entryElements = entries.map((reminder, index) => {
         const { key: rDaysBeforeEventInputKey, ...rDaysBeforeEventInputProps } =
             daysBeforeEventInputProps ? daysBeforeEventInputProps(index) : {};
 
@@ -56,7 +57,7 @@ export function RemindersInput({
 
         return (
             <Stack
-                key={`reminder-${index}`}
+                key={reminder.key}
                 styles={{
                     root: {
                         border: "1px solid",
@@ -129,6 +130,7 @@ export function RemindersInput({
                         onClick={() =>
                             onReminderAdd
                                 ? onReminderAdd({
+                                      key: randomId(),
                                       daysBeforeEvent: 0,
                                       time: "09:00",
                                       emailNotifications: true,

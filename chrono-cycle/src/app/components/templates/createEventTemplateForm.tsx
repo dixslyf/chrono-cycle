@@ -30,18 +30,16 @@ import {
     refineRawPayloadSchema,
 } from "@/features/event-templates/create/data";
 
-import { RemindersInput } from "./remindersInput";
+import { RemindersInput, RemindersInputEntry } from "./remindersInput";
 
-type ReminderData = Required<Payload["reminders"][number]>;
+type FormValues = Omit<Payload, "projectTemplateId" | "reminders"> & {
+    reminders: RemindersInputEntry[];
+};
 
 export interface CreateEventTemplateFormState {
-    form: ReturnType<typeof useForm<Omit<Payload, "projectTemplateId">>>;
+    form: ReturnType<typeof useForm<FormValues>>;
     mutation: ReturnType<
-        typeof useMutation<
-            EventTemplate,
-            Failure,
-            Omit<Payload, "projectTemplateId">
-        >
+        typeof useMutation<EventTemplate, Failure, FormValues>
     >;
     durationDisabled: boolean;
 }
@@ -53,7 +51,7 @@ export function CreateEventTemplateFormState({
     projectTemplateId: string;
     onSuccess: () => void;
 }): CreateEventTemplateFormState {
-    const form = useForm<Omit<Payload, "projectTemplateId">>({
+    const form = useForm<FormValues>({
         mode: "uncontrolled",
         initialValues: {
             name: "",
@@ -62,7 +60,7 @@ export function CreateEventTemplateFormState({
             duration: 1,
             note: "",
             autoReschedule: true,
-            reminders: [] as ReminderData[],
+            reminders: [] as RemindersInputEntry[],
             tags: [] as string[],
         },
         validate: {
@@ -90,7 +88,6 @@ export function CreateEventTemplateFormState({
             },
         },
     });
-    type FormValues = typeof form.values;
 
     const queryClient = useQueryClient();
     const mutation = useMutation({
