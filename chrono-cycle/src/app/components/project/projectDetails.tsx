@@ -72,6 +72,20 @@ function ProjectDetailsLeft({
 }): React.ReactNode {
     return (
         <Stack className="h-full overflow-y-auto" align="stretch" gap="xl">
+            <Skeleton visible={isLoading}>
+                <Text className="text-palette5 text-xl">
+                    <Text span className="text-xl font-semibold">
+                        Project Template:{" "}
+                    </Text>
+                    {pipe(
+                        projectTemplate,
+                        O.fromNullable,
+                        O.flatten,
+                        O.map((pt) => `${pt.name} (${pt.id})`),
+                        O.getOrElse(() => "None"),
+                    )}
+                </Text>
+            </Skeleton>
             {/* description */}
             <Skeleton visible={isLoading}>
                 <Stack align="stretch">
@@ -85,20 +99,6 @@ function ProjectDetailsLeft({
                         disabled={isLoading || updatePending}
                         {...updateForm.getInputProps("description")}
                     />
-                </Stack>
-            </Skeleton>
-            <Skeleton visible={isLoading}>
-                <Stack>
-                    <Text>Project Template:</Text>
-                    <Text>
-                        {pipe(
-                            projectTemplate,
-                            O.fromNullable,
-                            O.flatten,
-                            O.map((pt) => `${pt.name} (${pt.id})`),
-                            O.getOrElse(() => "None"),
-                        )}
-                    </Text>
                 </Stack>
             </Skeleton>
         </Stack>
