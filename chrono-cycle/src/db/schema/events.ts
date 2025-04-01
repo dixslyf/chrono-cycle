@@ -27,7 +27,7 @@ import {
     reminderInsertSchema,
     reminderUpdateSchema,
 } from "./reminders";
-import { DbTag, DbTagInsert } from "./tags";
+import { DbTag, DbTagInsert, tagInsertSchema } from "./tags";
 
 export const statusEnum = pgEnum("status", [
     "none",
@@ -95,6 +95,7 @@ export type DbExpandedEventUpdate = DbEventUpdate & {
     remindersDelete?: number[];
     remindersUpdate?: DbReminderUpdate[];
     remindersInsert?: Omit<DbReminderInsert, "eventId">[];
+    tags?: DbTagInsert[];
 };
 
 export const eventSelectSchema = createSelectSchema(events);
@@ -130,4 +131,5 @@ export const expandedEventUpdateSchema = eventUpdateSchema.extend({
     remindersDelete: z.array(z.number()),
     remindersUpdate: z.array(reminderUpdateSchema),
     remindersInsert: z.array(reminderInsertSchema),
+    tags: z.array(tagInsertSchema),
 });

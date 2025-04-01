@@ -155,6 +155,7 @@ function unsafeBridge(
                     id,
                     remindersDelete: _remindersDelete,
                     remindersUpdate: _remindersUpdate,
+                    tags: _tags,
                     ...rest
                 } = payloadP;
 
@@ -162,6 +163,11 @@ function unsafeBridge(
                     id: decodeEventId(id),
                     remindersDelete: decodedRemindersDelete,
                     remindersUpdate: decodedRemindersUpdate,
+                    tags:
+                        payloadP.tags?.map((tagName) => ({
+                            userId,
+                            name: tagName,
+                        })) ?? [],
                     ...rest,
                 });
             },

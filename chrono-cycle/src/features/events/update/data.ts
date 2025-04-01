@@ -1,7 +1,7 @@
 import * as E from "fp-ts/Either";
 import { z } from "zod";
 
-import { Event } from "@/common/data/domain";
+import { Event, tagNameSchema } from "@/common/data/domain";
 import {
     DoesNotExistError,
     DuplicateNameError,
@@ -45,6 +45,7 @@ export const payloadSchema = z.object({
             }),
         )
         .optional(),
+    tags: z.array(tagNameSchema).optional(),
 });
 
 export type Payload = z.input<typeof payloadSchema>;
@@ -63,6 +64,7 @@ export type Failure =
           | "remindersDelete"
           | "remindersInsert"
           | "remindersUpdate"
+          | "tags"
       >
     | DoesNotExistError
     | DuplicateNameError
