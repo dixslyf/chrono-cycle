@@ -1,15 +1,10 @@
 "use client";
 
 import {
-    Badge,
     Box,
     Button,
-    Checkbox,
-    Fieldset,
     Group,
     NumberInput,
-    Select,
-    SimpleGrid,
     Stack,
     TagsInput,
     Text,
@@ -24,28 +19,38 @@ import {
 } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
-import { Calendar, Clock } from "lucide-react";
 import { useEffect } from "react";
 
 import { EditableTitle } from "@/app/components/customComponent/editableTitle";
 import { SplitModal } from "@/app/components/customComponent/splitModal";
-import { formatReminderTemplateTime } from "@/app/utils/dates";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { queryKeys } from "@/app/utils/queries/keys";
 
-import { EventTemplate, ReminderTemplate, Tag } from "@/common/data/domain";
+import { EventTemplate, ReminderTemplate } from "@/common/data/domain";
 
 import { updateEventTemplateAction } from "@/features/event-templates/update/action";
 import {
     Failure,
-    Payload,
     payloadSchema,
+    Payload as UpdatePayload,
 } from "@/features/event-templates/update/data";
 
 import { DeleteEventTemplateButton } from "./deleteEventTemplateButton";
+import { RemindersInput, RemindersInputEntry } from "./remindersInput";
 
 // Removing auto-scheduling because we don't have time to implement it.
-type UpdateFormValues = Required<Omit<Payload, "id" | "autoReschedule">>;
+type UpdateFormValues = Required<
+    Omit<
+        UpdatePayload,
+        | "id"
+        | "autoReschedule"
+        | "remindersDelete"
+        | "remindersUpdate"
+        | "remindersInsert"
+    >
+> & {
+    reminders: (RemindersInputEntry & Partial<ReminderTemplate>)[];
+};
 
 interface EventTemplateDetailsLeftProps {
     eventTemplate: EventTemplate;
@@ -134,88 +139,35 @@ export function EventTemplateDetailsRight<T extends string>({
 }: EventTemplateDetailsRightProps<T>) {
     return (
         <Stack className="h-full" justify="space-between">
-            <Stack>
-                <Group justify="space-between" className="pb-4">
-                    <Group>
-                        <Text className="font-semibold text-xl text-palette3">
-                            Event ID
-                        </Text>
-                        <Badge className="bg-stone-500 bg-opacity-50 text-gray-300">
-                            {eventTemplate.id}
-                        </Badge>
-                    </Group>
-                </Group>
-                <SimpleGrid cols={2}>
-                    <Group justify="space-between" className="py-4">
-                        <Text className="text-md font-semibold text-palette3">
-                            Offset Days
-                        </Text>
-                        <Text className="text-md font-semibold text-red-500">
-                            {eventTemplate.offsetDays}
-                        </Text>
-                    </Group>
-                    <Group justify="space-between" className="py-4">
-                        <Text className="text-md font-semibold text-palette3">
-                            Automatic Reschedule
-                        </Text>
-                        <Checkbox
-                            checked={eventTemplate.autoReschedule}
-                            readOnly
-                        />
-                    </Group>
-                    <Group justify="space-between" className="py-4">
-                        <Text className="text-md font-semibold text-palette3">
-                            Event Type
-                        </Text>
-                        <Text
-                            className={`text-md font-semibold ${
-                                eventTemplate.eventType === "task"
-                                    ? "text-fuchsia-500"
-                                    : "text-blue-400"
-                            }`}
-                        >
-                            {eventTemplate.eventType === "task"
-                                ? "Task"
-                                : "Activity"}
-                        </Text>
-                    </Group>
-                    <Group justify="space-between" className="py-4">
-                        <Text className="text-md font-semibold text-palette3">
-                            Duration (days)
-                        </Text>
-                        <Text className="text-md font-semibold text-green-400">
-                            {eventTemplate.eventType === "activity"
-                                ? eventTemplate.duration !== null
-                                    ? eventTemplate.duration
-                                    : "-"
-                                : "-"}
-                        </Text>
-                    </Group>
-                </SimpleGrid>
-                <Stack gap="sm" className="py-4">
-                    <Text className="text-md font-semibold text-palette3">
-                        Tags
-                    </Text>
-                    <Group>
-                        {eventTemplate.tags.length > 0 ? (
-                            <Group>
-                                {eventTemplate.tags.map((tag: Tag) => (
-                                    <Badge
-                                        key={tag.id}
-                                        className="bg-stone-500 bg-opacity-50 text-gray-300"
-                                    >
-                                        {tag.name}
-                                    </Badge>
-                                ))}
-                            </Group>
-                        ) : (
-                            <Text className="text-gray-300">
-                                No tags assigned
-                            </Text>
-                        )}
-                    </Group>
-                </Stack>
-            </Stack>
+            <RemindersInput
+                entries={updateForm.getValues().reminders}
+                daysBeforeEventInputProps={(index) => ({
+                    key: updateForm.key(`reminders.${index}.daysBeforeEvent`),
+                    ...updateForm.getInputProps(
+                        `reminders.${index}.daysBeforeEvent`,
+                    ),
+                })}
+                triggerTimeInputProps={(index) => ({
+                    key: updateForm.key(`reminders.${index}.time`),
+                    ...updateForm.getInputProps(`reminders.${index}.time`),
+                })}
+                emailNotificationsInputProps={(index) => ({
+                    key: updateForm.key(
+                        `reminders.${index}.emailNotifications`,
+                    ),
+                    ...updateForm.getInputProps(
+                        `reminders.${index}.emailNotifications`,
+                        { type: "checkbox" },
+                    ),
+                })}
+                onReminderDelete={(index) =>
+                    updateForm.removeListItem("reminders", index)
+                }
+                onReminderAdd={(defaultEntry) =>
+                    updateForm.insertListItem("reminders", defaultEntry)
+                }
+                disabled={updateMutation.isPending}
+            />
             <Group justify="flex-end">
                 <DeleteEventTemplateButton
                     eventTemplateId={eventTemplate.id}
@@ -246,16 +198,18 @@ export function EventTemplateDetailsModal<T extends string>({
     >;
     eventTemplate?: EventTemplate;
 }) {
-    const updateForm = useForm({
+    const updateForm = useForm<UpdateFormValues>({
         mode: "uncontrolled",
         initialValues: {
             name: eventTemplate?.name ?? "",
             offsetDays: eventTemplate?.offsetDays ?? 0,
             duration: eventTemplate?.duration ?? 0,
             note: eventTemplate?.note ?? "",
-            remindersDelete: [] as NonNullable<Payload["remindersDelete"]>,
-            remindersUpdate: [] as NonNullable<Payload["remindersUpdate"]>,
-            remindersInsert: [] as NonNullable<Payload["remindersInsert"]>,
+            // Note: This requires pre-processing before sending to the server.
+            // Also, we re-use the reminder template's ID as the key.
+            reminders:
+                eventTemplate?.reminders.map((rt) => ({ key: rt.id, ...rt })) ??
+                [],
             tags:
                 eventTemplate?.tags.map((tag) => tag.name) ?? ([] as string[]),
         } satisfies UpdateFormValues,
@@ -275,25 +229,65 @@ export function EventTemplateDetailsModal<T extends string>({
                 offsetDays: eventTemplate.offsetDays,
                 duration: eventTemplate.duration,
                 note: eventTemplate.note,
-                remindersDelete: [] as NonNullable<Payload["remindersDelete"]>,
-                remindersUpdate: [] as NonNullable<Payload["remindersUpdate"]>,
-                remindersInsert: [] as NonNullable<Payload["remindersInsert"]>,
+                reminders: eventTemplate.reminders.map((rt) => ({
+                    key: rt.id,
+                    ...rt,
+                })),
                 tags: eventTemplate.tags.map((tag) => tag.name),
             });
             resetForm();
         }
     }, [eventTemplate, setFormInitialValues, resetForm]);
 
-    useEffect(() => {
-        console.log(updateForm.values);
-    }, [updateForm.values]);
-
     const queryClient = useQueryClient();
     const updateMutation = useMutation({
         mutationFn: async (values: UpdateFormValues) => {
+            // Safety: If we've reached this point, eventTemplate should be defined.
+            const et = eventTemplate as EventTemplate;
+
+            const { reminders: newReminders, ...rest } = values;
+
+            // The ones to insert are those without an ID.
+            const remindersInsert = newReminders.filter(
+                (rt) => rt.id === undefined,
+            );
+
+            // "Survivors" means those existing reminder templates that
+            // have not been removed.
+            const newRemindersSurvivors = newReminders.filter(
+                (rt) => rt.id !== undefined,
+            ) as ReminderTemplate[];
+
+            // The ones to delete are those that are not in the survivors list.
+            const newRemindersSurvivorIds = new Set(
+                newRemindersSurvivors.map((rt) => rt.id),
+            );
+            const remindersDelete = et.reminders
+                .map((rt) => rt.id)
+                .filter((id) => !newRemindersSurvivorIds.has(id));
+
+            // The ones that need to be updated are those in the survivors list
+            // that are dirty.
+            const etRtMap = new Map(
+                et.reminders.map((rt) => [rt.id, rt] as const),
+            );
+            const remindersUpdate = newRemindersSurvivors.filter((rt) => {
+                const etRt = etRtMap.get(rt.id) as ReminderTemplate;
+                return (
+                    rt.desktopNotifications !== etRt.desktopNotifications ||
+                    rt.time !== etRt.time ||
+                    rt.daysBeforeEvent !== etRt.daysBeforeEvent ||
+                    rt.eventTemplateId !== etRt.eventTemplateId ||
+                    rt.emailNotifications !== etRt.emailNotifications
+                );
+            });
+
             const result = await updateEventTemplateAction(null, {
                 id: eventTemplate?.id as string,
-                ...values,
+                remindersInsert,
+                remindersDelete,
+                remindersUpdate,
+                ...rest,
             });
 
             return pipe(
@@ -347,7 +341,7 @@ export function EventTemplateDetailsModal<T extends string>({
                             updateMutation={updateMutation}
                         />
                     </SplitModal.Left>
-                    <SplitModal.Right>
+                    <SplitModal.Right title="Reminders">
                         <EventTemplateDetailsRight
                             eventTemplate={eventTemplate}
                             modalStack={modalStack}
