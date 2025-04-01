@@ -10,6 +10,7 @@ import {
     Textarea,
     useModalsStack,
 } from "@mantine/core";
+import { DatePickerInput } from "@mantine/dates";
 import { useForm, zodResolver, type UseFormReturnType } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
@@ -18,6 +19,7 @@ import * as O from "fp-ts/Option";
 import { DateTime } from "luxon";
 import React, { useEffect } from "react";
 import { match } from "ts-pattern";
+import { z } from "zod";
 
 import { EditableTitle } from "@/app/components/customComponent/editableTitle";
 import { SplitModal } from "@/app/components/customComponent/splitModal";
@@ -28,7 +30,11 @@ import { queryKeys } from "@/app/utils/queries/keys";
 import { Project, ProjectTemplate } from "@/common/data/domain";
 
 import { updateProjectAction } from "@/features/projects/update/action";
-import { Failure, Payload } from "@/features/projects/update/data";
+import {
+    Failure,
+    Payload,
+    payloadSchema,
+} from "@/features/projects/update/data";
 
 import { DeleteProjectButton } from "./deleteProjectButton";
 
@@ -86,6 +92,19 @@ function ProjectDetailsLeft({
                     )}
                 </Text>
             </Skeleton>
+            <Skeleton visible={isLoading}>
+                <DatePickerInput
+                    key={updateForm.key("startsAt")}
+                    label="Start Date"
+                    placeholder="Project start date"
+                    disabled={updatePending}
+                    classNames={{
+                        label: "text-palette5 font-semibold text-xl mb-2",
+                        input: "text-base border border-gray-400 rounded-xl",
+                    }}
+                    {...updateForm.getInputProps("startsAt")}
+                />
+            </Skeleton>
             {/* description */}
             <Skeleton visible={isLoading}>
                 <Stack align="stretch">
@@ -96,7 +115,7 @@ function ProjectDetailsLeft({
                             label: "text-palette5 font-semibold text-xl mb-2",
                             input: "text-base border border-gray-400 rounded-xl",
                         }}
-                        disabled={isLoading || updatePending}
+                        disabled={updatePending}
                         {...updateForm.getInputProps("description")}
                     />
                 </Stack>
@@ -131,16 +150,6 @@ function ProjectDetailsRight<T extends string>({
                         <Badge size="lg" color="brown">
                             {project?.id}
                         </Badge>
-                    </Group>
-                </Skeleton>
-                <Skeleton visible={isLoading}>
-                    <Group>
-                        <Text className="text-palette3 font-semibold text-xl">
-                            Starts At:
-                        </Text>
-                        <Text className="text-lg font-medium text-gray-300">
-                            {project ? formatDate(project.startsAt) : undefined}
-                        </Text>
                     </Group>
                 </Skeleton>
                 <Skeleton visible={isLoading}>
@@ -212,7 +221,9 @@ export function ProjectDetailsModal<T extends string>({
             description: project?.description ?? "",
             startsAt: project?.startsAt ?? new Date(),
         },
-        // validate: zodResolver(payloadSchema.omit({ id: true })),
+        validate: zodResolver(
+            payloadSchema.omit({ id: true }).setKey("startsAt", z.date()),
+        ),
     });
 
     // Needed for the initial values to show properly. The reason is that,
@@ -273,12 +284,10 @@ export function ProjectDetailsModal<T extends string>({
                 queryKey: queryKeys.projects.listAll(),
             });
 
-            // Safety: Project should not be undefined if we've reached here.
-            queryClient.invalidateQueries({
-                queryKey: queryKeys.projects.retrieveProjectTemplate(
-                    project?.id as string,
-                ),
-            });
+            // Unlike project templates, there is no "retrieve project" query
+            // that will cause the form to reset, so we have to manually reset
+            // the dirty state.
+            updateForm.resetDirty();
         },
         onError: (err: Failure) => {
             notifyError({ message: extractUpdateErrorMessage(err) });
