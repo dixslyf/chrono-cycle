@@ -30,10 +30,13 @@ import {
     refineRawPayloadSchema,
 } from "@/features/event-templates/create/data";
 
-import { RemindersInput, RemindersInputEntry } from "./remindersInput";
+import {
+    ReminderTemplatesInput,
+    ReminderTemplatesInputEntry,
+} from "./reminderTemplatesInput";
 
 type FormValues = Omit<Payload, "projectTemplateId" | "reminders"> & {
-    reminders: RemindersInputEntry[];
+    reminders: ReminderTemplatesInputEntry[];
 };
 
 export interface CreateEventTemplateFormState {
@@ -60,7 +63,7 @@ export function CreateEventTemplateFormState({
             duration: 1,
             note: "",
             autoReschedule: true,
-            reminders: [] as RemindersInputEntry[],
+            reminders: [] as ReminderTemplatesInputEntry[],
             tags: [] as string[],
         },
         validate: {
@@ -243,7 +246,7 @@ export function CreateEventTemplateFormRight({
 }): React.ReactNode {
     return (
         <Stack className="h-full" justify="space-between">
-            <RemindersInput
+            <ReminderTemplatesInput
                 entries={form.getValues().reminders}
                 daysBeforeEventInputProps={(index) => ({
                     key: form.key(`reminders.${index}.daysBeforeEvent`),

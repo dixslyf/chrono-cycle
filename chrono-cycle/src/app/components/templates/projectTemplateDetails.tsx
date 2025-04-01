@@ -57,7 +57,7 @@ export function ProjectTemplateDetailsLeft<T extends string>({
         typeof useModalsStack<
             | "project-template-details"
             | "add-event"
-            | "event-details"
+            | "event-template-details"
             | "confirm-delete-event-template"
             | T
         >
@@ -208,7 +208,7 @@ export function ProjectTemplateDetailsModal<T extends string>({
         typeof useModalsStack<
             | "project-template-details"
             | "add-event"
-            | "event-details"
+            | "event-template-details"
             | "confirm-delete-event-template"
             | "confirm-delete-project-template"
             | T

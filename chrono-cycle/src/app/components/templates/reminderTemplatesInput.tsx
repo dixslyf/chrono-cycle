@@ -17,14 +17,14 @@ import { Calendar, Clock, Plus, Trash } from "lucide-react";
 
 import { theme } from "@/app/provider";
 
-import { Payload as ReminderCreate } from "@/features/reminder-templates/create/data";
+import { Payload as ReminderTemplateCreate } from "@/features/reminder-templates/create/data";
 
-export type RemindersInputEntry = Omit<
-    ReminderCreate,
+export type ReminderTemplatesInputEntry = Omit<
+    ReminderTemplateCreate,
     "eventTemplateId" | "projectTemplateId" | "desktopNotifications"
 > & { key: string };
 
-export function RemindersInput({
+export function ReminderTemplatesInput({
     entries,
     daysBeforeEventInputProps,
     triggerTimeInputProps,
@@ -33,12 +33,12 @@ export function RemindersInput({
     onReminderAdd,
     disabled,
 }: {
-    entries: RemindersInputEntry[];
+    entries: ReminderTemplatesInputEntry[];
     daysBeforeEventInputProps?: (index: number) => NumberInputProps;
     triggerTimeInputProps?: (index: number) => TimeInputProps;
     emailNotificationsInputProps?: (index: number) => CheckboxProps;
     onReminderDelete?: (index: number) => void;
-    onReminderAdd?: (defaultEntry: RemindersInputEntry) => void;
+    onReminderAdd?: (defaultEntry: ReminderTemplatesInputEntry) => void;
     disabled?: boolean;
 }) {
     const entryElements = entries.map((reminder, index) => {
@@ -134,7 +134,7 @@ export function RemindersInput({
                                       daysBeforeEvent: 0,
                                       time: "09:00",
                                       emailNotifications: true,
-                                  } satisfies RemindersInputEntry)
+                                  } satisfies ReminderTemplatesInputEntry)
                                 : undefined
                         }
                     >

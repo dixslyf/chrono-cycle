@@ -40,7 +40,10 @@ import {
 } from "@/features/event-templates/update/data";
 
 import { DeleteEventTemplateButton } from "./deleteEventTemplateButton";
-import { RemindersInput, RemindersInputEntry } from "./remindersInput";
+import {
+    ReminderTemplatesInput,
+    ReminderTemplatesInputEntry,
+} from "./reminderTemplatesInput";
 
 // Removing auto-scheduling because we don't have time to implement it.
 type UpdateFormValues = Required<
@@ -53,7 +56,7 @@ type UpdateFormValues = Required<
         | "remindersInsert"
     >
 > & {
-    reminders: (RemindersInputEntry & Partial<ReminderTemplate>)[];
+    reminders: (ReminderTemplatesInputEntry & Partial<ReminderTemplate>)[];
 };
 
 interface EventTemplateDetailsLeftProps {
@@ -143,7 +146,7 @@ export function EventTemplateDetailsRight<T extends string>({
 }: EventTemplateDetailsRightProps<T>) {
     return (
         <Stack className="h-full" justify="space-between">
-            <RemindersInput
+            <ReminderTemplatesInput
                 entries={updateForm.getValues().reminders}
                 daysBeforeEventInputProps={(index) => ({
                     key: updateForm.key(`reminders.${index}.daysBeforeEvent`),
@@ -197,7 +200,7 @@ export function EventTemplateDetailsModal<T extends string>({
 }: {
     modalStack: ReturnType<
         typeof useModalsStack<
-            "event-details" | "confirm-delete-event-template" | T
+            "event-template-details" | "confirm-delete-event-template" | T
         >
     >;
     eventTemplate?: EventTemplate;
@@ -341,7 +344,7 @@ export function EventTemplateDetailsModal<T extends string>({
     });
 
     return (
-        <SplitModal {...modalStack.register("event-details")}>
+        <SplitModal {...modalStack.register("event-template-details")}>
             <form
                 id="update-event-template-form"
                 onSubmit={updateForm.onSubmit((values) =>
@@ -372,7 +375,9 @@ export function EventTemplateDetailsModal<T extends string>({
                             modalStack={modalStack}
                             updateMutation={updateMutation}
                             updateForm={updateForm}
-                            onClose={() => modalStack.close("event-details")}
+                            onClose={() =>
+                                modalStack.close("event-template-details")
+                            }
                         />
                     </SplitModal.Right>
                 </>

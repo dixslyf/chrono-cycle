@@ -44,7 +44,7 @@ export function ProjectTemplatesTable(): React.ReactNode {
     const modalStack = useModalsStack([
         "project-template-details",
         "add-event",
-        "event-details",
+        "event-template-details",
         "confirm-delete-event-template",
         "confirm-delete-project-template",
     ]);
