@@ -17,6 +17,7 @@ import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
+import { DateTime } from "luxon";
 
 import {
     CancelReminderError,
@@ -96,6 +97,27 @@ export function extractTimeStringComponents(
     }
 
     return E.right({ hours, minutes });
+}
+
+export function extractTimeStringFromJSDate(date: Date): string {
+    const timeStr = DateTime.fromJSDate(date).toISOTime({
+        suppressSeconds: true,
+        suppressMilliseconds: true,
+        includeOffset: false,
+    }) as string;
+    return timeStr;
+}
+
+export function calculateDaysDiff(dateEarlier: Date, dateLater: Date): number {
+    // Throw away the time components just to be sure.
+    const ldateEarlier = DateTime.fromISO(
+        DateTime.fromJSDate(dateEarlier).toISODate() as string,
+    );
+    const ldateLater = DateTime.fromISO(
+        DateTime.fromJSDate(dateLater).toISODate() as string,
+    );
+
+    return ldateLater.diff(ldateEarlier, "days").toObject().days as number;
 }
 
 export type ScheduledDbReminder = {
