@@ -25,13 +25,7 @@ export type DbLike = Db | DbTransaction;
 
 async function dbNodePg(connectionString: string): Promise<NodePgDatabase> {
     const { drizzle } = await import("drizzle-orm/node-postgres");
-    const { Pool } = await import("pg");
-
-    return drizzle(
-        new Pool({
-            connectionString,
-        }),
-    );
+    return drizzle(connectionString);
 }
 
 async function dbPglite(): Promise<PgliteDatabase> {
