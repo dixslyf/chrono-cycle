@@ -36,10 +36,9 @@ export const payloadSchema = z.object({
         }),
     ),
     remindersUpdate: z.array(
-        expandedEventUpdateSchema.shape.remindersUpdate.element.setKey(
-            "id",
-            encodedIdSchema,
-        ),
+        expandedEventUpdateSchema.shape.remindersUpdate.element.extend({
+            id: encodedIdSchema,
+        }),
     ),
 });
 

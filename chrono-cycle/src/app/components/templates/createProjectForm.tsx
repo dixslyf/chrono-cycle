@@ -88,12 +88,12 @@ export function CreateProjectForm({
             startsAt: new Date(),
         },
         validate: zodResolver(
-            payloadSchema
-                .setKey(
-                    "projectTemplateId",
-                    z.string().nonempty("Please select a template."),
-                )
-                .setKey("startsAt", z.date()),
+            payloadSchema.extend({
+                projectTemplateId: z
+                    .string()
+                    .nonempty("Please select a template."),
+                startsAt: z.date(),
+            }),
         ),
     });
     type FormValues = typeof form.values;

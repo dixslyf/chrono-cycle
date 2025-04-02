@@ -218,7 +218,7 @@ export function ProjectDetailsModal<T extends string>({
             startsAt: project?.startsAt ?? new Date(),
         },
         validate: zodResolver(
-            payloadSchema.omit({ id: true }).setKey("startsAt", z.date()),
+            payloadSchema.omit({ id: true }).extend({ startsAt: z.date() }),
         ),
     });
 
