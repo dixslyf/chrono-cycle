@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Group, Modal, Stack, Text, useModalsStack } from "@mantine/core";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
@@ -12,10 +12,7 @@ import {
     DisplayEventDetailsLeft,
     DisplayEventDetailsRight,
 } from "@/app/components/event/eventDetails";
-import {
-    ProjectDetailsLeft,
-    ProjectDetailsRight,
-} from "@/app/components/project/projectDetails";
+import { ProjectDetailsModal } from "@/app/components/project/projectDetails";
 import { areSameDay } from "@/app/utils/dates";
 import { queryKeys } from "@/app/utils/queries/keys";
 
@@ -200,8 +197,6 @@ function Timeline({
     // calculate a cumulative vertical offset for each project row.
     // each row's height is the header height plus additionnal height for expanded events.
 
-    const queryClient = useQueryClient();
-
     const modalStack = useModalsStack([
         "project-details",
         "event-details",
@@ -269,39 +264,12 @@ function Timeline({
                     )}
                 </SplitModal>
                 {/* project details modal */}
-                <SplitModal {...modalStack.register("project-details")}>
-                    {clickedProject && (
-                        <>
-                            <SplitModal.Left title={`${clickedProject.name}`}>
-                                <ProjectDetailsLeft
-                                    project={clickedProject}
-                                    projectTemplate={
-                                        retrieveProjectTemplateQuery.data
-                                    }
-                                    isLoading={
-                                        retrieveProjectTemplateQuery.isPending
-                                    }
-                                />
-                            </SplitModal.Left>
-                            <SplitModal.Right>
-                                <ProjectDetailsRight
-                                    project={clickedProject}
-                                    modalStack={modalStack}
-                                    isLoading={
-                                        retrieveProjectTemplateQuery.isPending
-                                    }
-                                    onDeleteSuccess={() => {
-                                        modalStack.close("project-details");
-                                        queryClient.invalidateQueries({
-                                            queryKey:
-                                                queryKeys.projects.listAll(),
-                                        });
-                                    }}
-                                />
-                            </SplitModal.Right>
-                        </>
-                    )}
-                </SplitModal>
+                <ProjectDetailsModal
+                    modalStack={modalStack}
+                    project={clickedProject ?? undefined}
+                    projectTemplate={retrieveProjectTemplateQuery.data}
+                    isLoading={retrieveProjectTemplateQuery.isPending}
+                />
             </Modal.Stack>
             <Group className="h-full flex-1 relative" align="stretch">
                 {days.map((day, i) => {

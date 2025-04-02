@@ -1,12 +1,13 @@
 "use client";
 
 import { useModalsStack } from "@mantine/core";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 
 import { DeleteConfirmButton } from "@/app/components/customComponent/deleteConfirmButton";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
+import { queryKeys } from "@/app/utils/queries/keys";
 
 import { deleteProjectAction } from "@/features/projects/delete/action";
 
@@ -16,11 +17,12 @@ export function DeleteProjectButton<T extends string>({
     onSuccess,
     disabled,
 }: {
-    projectId: string;
+    projectId?: string;
     modalStack: ReturnType<typeof useModalsStack<"confirm-delete-project" | T>>;
     onSuccess: () => void;
     disabled?: boolean;
 }): React.ReactNode {
+    const queryClient = useQueryClient();
     const deleteMutation = useMutation({
         mutationFn: async (projectId: string) => {
             const result = await deleteProjectAction(null, { projectId });
@@ -35,6 +37,9 @@ export function DeleteProjectButton<T extends string>({
             notifySuccess({
                 message: "Successfully deleted project.",
             });
+            queryClient.invalidateQueries({
+                queryKey: queryKeys.projects.listAll(),
+            });
             onSuccess();
         },
         onError: () => {
@@ -48,9 +53,12 @@ export function DeleteProjectButton<T extends string>({
         <DeleteConfirmButton
             modalStack={modalStack}
             modalStackId={"confirm-delete-project"}
-            onDelete={() => deleteMutation.mutate(projectId)}
+            onDelete={() => {
+                // Safety: Button is only enabled when projectId is not undefined.
+                return deleteMutation.mutate(projectId as string);
+            }}
             itemType="project"
-            disabled={disabled}
+            disabled={!projectId || disabled}
             loading={deleteMutation.isPending}
         />
     );
