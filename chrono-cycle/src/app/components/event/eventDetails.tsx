@@ -261,10 +261,10 @@ export function EventDetailsModal<T extends string>({
         },
     });
 
-    // Similar to project template details. Needed for the initial values to show properly.
-    // By the time the project template data has been loaded, the form has already
+    // Similar to project details. Needed for the initial values to show properly.
+    // By the time the project data has been loaded, the form has already
     // been created (with empty strings since those are the fallback). We need to manually
-    // reset the form once the event template data has loaded to set the initial values.
+    // reset the form once the event data has loaded to set the initial values.
     const setFormInitialValues = updateForm.setInitialValues;
     const resetForm = updateForm.reset;
     useEffect(() => {
@@ -336,7 +336,7 @@ export function EventDetailsModal<T extends string>({
                 (r) => r.id === undefined,
             );
 
-            // "Survivors" means those existing reminder templates that
+            // "Survivors" means those existing reminder that
             // have not been removed.
             const newRemindersSurvivors = newReminders.filter(
                 (r) => r.id !== undefined,
@@ -392,7 +392,7 @@ export function EventDetailsModal<T extends string>({
         },
         onSuccess: () => {
             notifySuccess({
-                message: "Successfully updated event template!",
+                message: "Successfully updated event!",
             });
 
             queryClient.invalidateQueries({
@@ -402,7 +402,7 @@ export function EventDetailsModal<T extends string>({
             updateForm.resetDirty();
         },
         onError: (_err: Failure) => {
-            notifyError({ message: "Failed to update event template." });
+            notifyError({ message: "Failed to update event." });
         },
     });
 
