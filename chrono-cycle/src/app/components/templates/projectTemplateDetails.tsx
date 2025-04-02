@@ -8,7 +8,6 @@ import {
     Stack,
     Text,
     Textarea,
-    TextInput,
     useModalsStack,
 } from "@mantine/core";
 import { useForm, zodResolver, type UseFormReturnType } from "@mantine/form";
@@ -21,6 +20,7 @@ import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
 import { useEffect } from "react";
 
+import { EditableTitle } from "@/app/components/customComponent/editableTitle";
 import { SplitModal } from "@/app/components/customComponent/splitModal";
 import brownSkeletonClasses from "@/app/skeleton-brown-bg.module.css";
 import { formatDate } from "@/app/utils/dates";
@@ -48,6 +48,7 @@ export function ProjectTemplateDetailsLeft<T extends string>({
     projectTemplate,
     modalStack,
     form,
+    mutation,
     isLoading,
 }: {
     projectTemplate?: ProjectTemplate | undefined;
@@ -61,6 +62,12 @@ export function ProjectTemplateDetailsLeft<T extends string>({
         >
     >;
     form: UseFormReturnType<FormValues>;
+    mutation: UseMutationResult<
+        ProjectTemplateOverview,
+        Failure,
+        FormValues,
+        unknown
+    >;
     isLoading?: boolean | undefined;
 }): React.ReactNode {
     return (
@@ -69,12 +76,13 @@ export function ProjectTemplateDetailsLeft<T extends string>({
             <Skeleton visible={isLoading}>
                 <Stack className="h-1/4" align="stretch">
                     <Textarea
+                        key={form.key("description")}
                         label="Description"
                         classNames={{
                             label: "text-palette5 font-semibold text-xl mb-2",
                             input: "text-base border border-gray-400 rounded-xl",
                         }}
-                        key={form.key("description")}
+                        disabled={isLoading || mutation.isPending}
                         {...form.getInputProps("description")}
                     />
                 </Stack>
@@ -287,12 +295,9 @@ export function ProjectTemplateDetailsModal<T extends string>({
             <SplitModal.Left
                 title={projectTemplate?.name}
                 titleComponent={() => (
-                    <TextInput
-                        variant="unstyled"
-                        classNames={{
-                            input: "text-3xl pt-4 pb-4 font-bold hover:bg-gray-200 focus:border focus:border-gray-400 focus:bg-gray-200",
-                        }}
+                    <EditableTitle
                         key={form.key("name")}
+                        disabled={isLoading || mutation.isPending}
                         {...form.getInputProps("name")}
                     />
                 )}
@@ -301,6 +306,7 @@ export function ProjectTemplateDetailsModal<T extends string>({
                     modalStack={modalStack}
                     projectTemplate={projectTemplate}
                     form={form}
+                    mutation={mutation}
                     isLoading={isLoading}
                 />
             </SplitModal.Left>

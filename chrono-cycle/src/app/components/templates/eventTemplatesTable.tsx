@@ -1,17 +1,12 @@
 "use client";
 
 import { Box, Group, Pagination, Table, useModalsStack } from "@mantine/core";
-import React, { useCallback, useState } from "react";
-
-import { SplitModal } from "@/app/components/customComponent/splitModal";
+import React, { useState } from "react";
 
 import { EventTemplate } from "@/common/data/domain";
 
 import { CreateEventTemplateButton } from "./createEventTemplateButton";
-import {
-    EventTemplateDetailsLeft,
-    EventTemplateDetailsRight,
-} from "./eventTemplateDetails";
+import { EventTemplateDetailsModal } from "./eventTemplateDetails";
 
 interface EventsTableProps<T extends string> {
     projectTemplateId: string;
@@ -133,40 +128,16 @@ export function EventTemplatesTable<T extends string>({
     eventTemplates,
     rowsPerPage = 7,
 }: EventsTableProps<T>): React.ReactNode {
-    const { close: modalStackClose } = modalStack;
-    const closeEventDetailsModal = useCallback(
-        () => modalStackClose("event-details"),
-        [modalStackClose],
-    );
-
     // local state to track the event
     const [selectedEventTemplate, setSelectedEventTemplate] =
         useState<EventTemplate | null>(null);
 
     return (
         <>
-            <SplitModal {...modalStack.register("event-details")}>
-                {selectedEventTemplate ? (
-                    <>
-                        <SplitModal.Left title={selectedEventTemplate.name}>
-                            <EventTemplateDetailsLeft
-                                eventTemplate={selectedEventTemplate}
-                                onClose={closeEventDetailsModal}
-                            />
-                        </SplitModal.Left>
-                        <SplitModal.Right>
-                            <EventTemplateDetailsRight
-                                eventTemplate={selectedEventTemplate}
-                                modalStack={modalStack}
-                                onClose={closeEventDetailsModal}
-                            />
-                        </SplitModal.Right>
-                    </>
-                ) : (
-                    <Box>Loading event details...</Box>
-                )}
-            </SplitModal>
-
+            <EventTemplateDetailsModal
+                modalStack={modalStack}
+                eventTemplate={selectedEventTemplate ?? undefined}
+            />
             <InnerEventTemplatesTable
                 projectTemplateId={projectTemplateId}
                 modalStack={modalStack}
