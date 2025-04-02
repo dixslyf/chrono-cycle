@@ -433,7 +433,8 @@ describe("Update event server action", () => {
                         id: event.reminders[0].id,
                         emailNotifications: true,
                         eventId: event.id,
-                        reminderTemplateId: event.reminders[0].reminderTemplateId,
+                        reminderTemplateId:
+                            event.reminders[0].reminderTemplateId,
                         desktopNotifications: false,
                         triggerTime: new Date("2025-01-01T05:00:00.000Z"),
                     },
