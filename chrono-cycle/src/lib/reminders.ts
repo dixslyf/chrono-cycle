@@ -31,7 +31,8 @@ import { encodeEventId, encodeReminderId } from "./identifiers";
 
 // Implementation changes to a stub in `dev`.
 const cancelRun =
-    process.env.NODE_ENV === "development"
+    process.env.NODE_ENV === "development" &&
+    process.env.TRIGGER_DEV === undefined
         ? async (runId: string) => {
               const ret = { id: runId };
               stubTriggerLog.trace(
@@ -47,7 +48,8 @@ const cancelRun =
 
 // Implementation changes to a stub in `dev`.
 const triggerTask =
-    process.env.NODE_ENV === "development"
+    process.env.NODE_ENV === "development" &&
+    process.env.TRIGGER_DEV === undefined
         ? async <TTask extends AnyTask>( // Stub
               taskIdentifier: TaskIdentifier<TTask>,
               payload: TaskPayload<TTask>,
