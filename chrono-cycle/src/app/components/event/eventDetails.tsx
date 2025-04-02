@@ -11,7 +11,6 @@ import {
     Textarea,
     useModalsStack,
 } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
 import { useForm, zodResolver, type UseFormReturnType } from "@mantine/form";
 import {
     useMutation,
@@ -22,7 +21,6 @@ import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { DateTime } from "luxon";
 import React, { useEffect } from "react";
-import { z } from "zod";
 
 import { EditableTitle } from "@/app/components/customComponent/editableTitle";
 import {
@@ -30,6 +28,7 @@ import {
     RemindersInputEntry,
 } from "@/app/components/customComponent/remindersInput";
 import { SplitModal } from "@/app/components/customComponent/splitModal";
+import { StringDatePickerInput } from "@/app/components/customComponent/stringDatePickerInput";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { queryKeys } from "@/app/utils/queries/keys";
 
@@ -60,7 +59,7 @@ type UpdateFormValues = Required<
         | "remindersInsert"
     >
 > & {
-    startDate: Date;
+    startDate: string;
     reminders: (RemindersInputEntry & Partial<Reminder>)[];
 };
 
@@ -114,7 +113,7 @@ function EventDetailsLeft({
                 </Group>
             </Group>
             <Group grow>
-                <DatePickerInput
+                <StringDatePickerInput
                     size="md"
                     label="Start Date"
                     disabled={updateMutation.isPending}
@@ -219,7 +218,9 @@ export function EventDetailsModal<T extends string>({
         mode: "uncontrolled",
         initialValues: {
             name: event?.name ?? "",
-            startDate: event?.startDate ?? new Date(),
+            startDate: event
+                ? (DateTime.fromJSDate(event.startDate).toISODate() as string)
+                : "",
             duration: event?.duration ?? 0,
             note: event?.note ?? "",
             status: event?.status ?? "none",
@@ -239,9 +240,7 @@ export function EventDetailsModal<T extends string>({
                 })) ?? [],
         } satisfies UpdateFormValues,
         validate: {
-            ...zodResolver(
-                payloadSchema.omit({ id: true }).setKey("startDate", z.date()),
-            ),
+            ...zodResolver(payloadSchema.omit({ id: true })),
             tags: (tags) => {
                 const badTags = tags
                     .filter((tag) => !tagNameSchema.safeParse(tag).success)
@@ -272,7 +271,9 @@ export function EventDetailsModal<T extends string>({
         if (event) {
             setFormInitialValues({
                 name: event.name,
-                startDate: event.startDate,
+                startDate: DateTime.fromJSDate(
+                    event.startDate,
+                ).toISODate() as string,
                 duration: event.duration,
                 note: event.note,
                 status: event.status,
@@ -300,12 +301,12 @@ export function EventDetailsModal<T extends string>({
             const oldEv = event as Event;
 
             const {
-                startDate: startDateJS,
+                startDate: startDateString,
                 reminders: formReminders,
                 ...rest
             } = values;
 
-            const newStartDate = DateTime.fromJSDate(startDateJS);
+            const newStartDate = DateTime.fromISO(startDateString);
 
             // Convert the time and date into a single ISO date time string.
             const newReminders = formReminders.map((r) =>
@@ -329,8 +330,6 @@ export function EventDetailsModal<T extends string>({
                     }),
                 ),
             );
-
-            console.log("newReminders", newReminders);
 
             // The ones to insert are those without an ID.
             const remindersInsert = newReminders.filter(
