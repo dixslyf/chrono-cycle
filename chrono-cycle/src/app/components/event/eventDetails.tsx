@@ -2,11 +2,8 @@
 
 import {
     Button,
-    Checkbox,
-    Fieldset,
     Group,
     NumberInput,
-    ScrollArea,
     SegmentedControl,
     Stack,
     TagsInput,
@@ -23,18 +20,25 @@ import {
 } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
-import { Clock } from "lucide-react";
 import { DateTime } from "luxon";
 import React, { useEffect } from "react";
 import { z } from "zod";
 
 import { EditableTitle } from "@/app/components/customComponent/editableTitle";
+import {
+    RemindersInput,
+    RemindersInputEntry,
+} from "@/app/components/customComponent/remindersInput";
 import { SplitModal } from "@/app/components/customComponent/splitModal";
-import { theme } from "@/app/provider";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { queryKeys } from "@/app/utils/queries/keys";
 
-import { Event, Reminder, Tag, tagNameSchema } from "@/common/data/domain";
+import { Event, Reminder, tagNameSchema } from "@/common/data/domain";
+import {
+    calculateDaysDiff,
+    extractTimeStringComponents,
+    extractTimeStringFromJSDate,
+} from "@/common/dates";
 
 import { updateEventAction } from "@/features/events/update/action";
 import {
@@ -42,17 +46,6 @@ import {
     payloadSchema,
     Payload as UpdatePayload,
 } from "@/features/events/update/data";
-
-import {
-    calculateDaysDiff,
-    extractTimeStringComponents,
-    extractTimeStringFromJSDate,
-} from "@/lib/reminders";
-
-import {
-    RemindersInput,
-    RemindersInputEntry,
-} from "../customComponent/remindersInput";
 
 // Removing auto-scheduling because we don't have time to implement it.
 type UpdateFormValues = Required<
@@ -163,11 +156,9 @@ function EventDetailsLeft({
 }
 
 function EventDetailsRight({
-    event,
     updateMutation,
     updateForm,
 }: {
-    event: Event;
     updateMutation: UseMutationResult<Event, Failure, UpdateFormValues>;
     updateForm: UseFormReturnType<UpdateFormValues>;
 }) {
@@ -444,7 +435,6 @@ export function EventDetailsModal<T extends string>({
                     </SplitModal.Left>
                     <SplitModal.Right title="Reminders">
                         <EventDetailsRight
-                            event={event}
                             updateForm={updateForm}
                             updateMutation={updateMutation}
                         />

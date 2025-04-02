@@ -14,11 +14,11 @@ import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { useState } from "react";
 
-import { formatDate } from "@/app/utils/dates";
 import { queryKeys } from "@/app/utils/queries/keys";
 import { listProjectTemplatesOptions } from "@/app/utils/queries/listProjectTemplates";
 
 import { ProjectTemplate } from "@/common/data/domain";
+import { formatDate } from "@/common/dates";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 

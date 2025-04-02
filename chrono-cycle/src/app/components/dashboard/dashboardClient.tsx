@@ -6,15 +6,15 @@ import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import { useState } from "react";
 
-import { generateDaysInRange } from "@/app/utils/dates";
 import { queryKeys } from "@/app/utils/queries/keys";
 
 import { Project } from "@/common/data/domain";
+import { Day, generateDaysInRange } from "@/common/dates";
 
 import { listAllProjectsAction } from "@/features/projects/listAll/action";
 
 import DashNav from "./dashNav";
-import Timeline, { Day } from "./timeline";
+import Timeline from "./timeline";
 
 interface DashboardProps {
     initialDays: Day[];

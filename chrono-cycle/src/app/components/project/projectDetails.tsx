@@ -22,11 +22,11 @@ import { z } from "zod";
 
 import { EditableTitle } from "@/app/components/customComponent/editableTitle";
 import { SplitModal } from "@/app/components/customComponent/splitModal";
-import { formatDate } from "@/app/utils/dates";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { queryKeys } from "@/app/utils/queries/keys";
 
 import { Project, ProjectTemplate } from "@/common/data/domain";
+import { formatDate } from "@/common/dates";
 
 import { updateProjectAction } from "@/features/projects/update/action";
 import {

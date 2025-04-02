@@ -23,11 +23,11 @@ import { useEffect } from "react";
 import { EditableTitle } from "@/app/components/customComponent/editableTitle";
 import { SplitModal } from "@/app/components/customComponent/splitModal";
 import brownSkeletonClasses from "@/app/skeleton-brown-bg.module.css";
-import { formatDate } from "@/app/utils/dates";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { queryKeys } from "@/app/utils/queries/keys";
 
 import { ProjectTemplate, ProjectTemplateOverview } from "@/common/data/domain";
+import { formatDate } from "@/common/dates";
 
 import { updateProjectTemplateAction } from "@/features/project-templates/update/action";
 import {

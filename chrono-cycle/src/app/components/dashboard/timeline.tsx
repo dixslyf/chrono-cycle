@@ -7,22 +7,16 @@ import { pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
 import { useEffect, useRef, useState } from "react";
 
-import { SplitModal } from "@/app/components/customComponent/splitModal";
 import { EventDetailsModal } from "@/app/components/event/eventDetails";
 import { ProjectDetailsModal } from "@/app/components/project/projectDetails";
-import { areSameDay } from "@/app/utils/dates";
 import { queryKeys } from "@/app/utils/queries/keys";
 
 import { Event, Project } from "@/common/data/domain";
+import { areSameDay, Day } from "@/common/dates";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 
 import ProjectRow from "./projectRow";
-
-export interface Day {
-    date: Date;
-    label: string;
-}
 
 interface TimelineProps {
     days: Day[];
