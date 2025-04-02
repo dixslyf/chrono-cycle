@@ -201,7 +201,22 @@ function Timeline({
     ]);
 
     // States for showing event details in a modal window.
-    const [clickedEvent, setClickedEvent] = useState<Event | null>(null);
+    const [clickedEventData, setClickedEventData] = useState<{
+        eventId: string;
+        projectId: string;
+    } | null>(null);
+
+    // To always have the latest event data, we find the clicked event from the projects list
+    // because that list always reflects the latest data (due to the Tanstack Query).
+    const clickedEventProject = clickedEventData
+        ? (projects.find((p) => p.id === clickedEventData.projectId) as Project)
+        : null;
+    const clickedEvent =
+        clickedEventProject && clickedEventData
+            ? (clickedEventProject.events.find(
+                  (e) => e.id === clickedEventData.eventId,
+              ) as Event)
+            : null;
 
     // States for showing project details in a modal window.
     const [clickedProject, setClickedProject] = useState<Project | null>(null);
@@ -311,7 +326,10 @@ function Timeline({
                                 }}
                                 toggleProject={toggleProject}
                                 onEventClick={(event) => {
-                                    setClickedEvent(event);
+                                    setClickedEventData({
+                                        eventId: event.id,
+                                        projectId: event.projectId,
+                                    });
                                     modalStack.open("event-details");
                                 }}
                             />
