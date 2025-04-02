@@ -26,7 +26,11 @@ import { SplitModal } from "@/app/components/customComponent/splitModal";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { queryKeys } from "@/app/utils/queries/keys";
 
-import { EventTemplate, ReminderTemplate } from "@/common/data/domain";
+import {
+    EventTemplate,
+    ReminderTemplate,
+    tagNameSchema,
+} from "@/common/data/domain";
 
 import { updateEventTemplateAction } from "@/features/event-templates/update/action";
 import {
@@ -213,7 +217,26 @@ export function EventTemplateDetailsModal<T extends string>({
             tags:
                 eventTemplate?.tags.map((tag) => tag.name) ?? ([] as string[]),
         } satisfies UpdateFormValues,
-        validate: zodResolver(payloadSchema.omit({ id: true })),
+        validate: {
+            ...zodResolver(payloadSchema.omit({ id: true })),
+            tags: (tags) => {
+                const badTags = tags
+                    .filter((tag) => !tagNameSchema.safeParse(tag).success)
+                    .map((tag) => `"${tag}"`);
+
+                if (badTags.length > 0) {
+                    const badTagsString =
+                        badTags.length > 1
+                            ? badTags.slice(0, -1).join(", ") +
+                              " and " +
+                              badTags.at(-1)
+                            : badTags[0];
+                    return `Tags can only contain alphanumeric characters, dashes and underscores. Invalid tag(s): ${badTagsString}.`;
+                }
+
+                return null;
+            },
+        },
     });
 
     // Similar to project template details. Needed for the initial values to show properly.
