@@ -1,7 +1,6 @@
 "use client";
 
 import {
-    Badge,
     Button,
     Checkbox,
     Fieldset,
@@ -44,6 +43,17 @@ import {
     Payload as UpdatePayload,
 } from "@/features/events/update/data";
 
+import {
+    calculateDaysDiff,
+    extractTimeStringComponents,
+    extractTimeStringFromJSDate,
+} from "@/lib/reminders";
+
+import {
+    RemindersInput,
+    RemindersInputEntry,
+} from "../customComponent/remindersInput";
+
 // Removing auto-scheduling because we don't have time to implement it.
 type UpdateFormValues = Required<
     Omit<
@@ -58,6 +68,7 @@ type UpdateFormValues = Required<
     >
 > & {
     startDate: Date;
+    reminders: (RemindersInputEntry & Partial<Reminder>)[];
 };
 
 function EventDetailsLeft({
@@ -162,49 +173,35 @@ function EventDetailsRight({
 }) {
     return (
         <Stack className="h-full" justify="space-between">
-            <Fieldset c="white" unstyled className="flex">
-                <Stack gap="lg" w="100%">
-                    <ScrollArea style={{ root: { flex: 1 } }}>
-                        {event.reminders.length > 0 ? (
-                            event.reminders.map((reminder: Reminder, index) => (
-                                <Stack
-                                    key={`reminder-${index}`}
-                                    styles={{
-                                        root: {
-                                            border: "1px solid",
-                                            borderColor: theme.white,
-                                        },
-                                    }}
-                                    className="rounded-lg p-4"
-                                    justify="center"
-                                >
-                                    <Group>
-                                        <Group>
-                                            <Clock className="w-8 h-8" />
-                                            <Text>Trigger time:</Text>
-                                        </Group>
-                                        <Text>
-                                            {reminder.triggerTime.toString()}
-                                        </Text>
-                                    </Group>
-
-                                    <Group>
-                                        <Checkbox
-                                            checked={
-                                                reminder.emailNotifications
-                                            }
-                                            readOnly
-                                            label="Email Notification"
-                                        />
-                                    </Group>
-                                </Stack>
-                            ))
-                        ) : (
-                            <Text>No reminders set</Text>
-                        )}
-                    </ScrollArea>
-                </Stack>
-            </Fieldset>
+            <RemindersInput
+                entries={updateForm.getValues().reminders}
+                daysBeforeEventInputProps={(index) => ({
+                    key: updateForm.key(`reminders.${index}.daysBeforeEvent`),
+                    ...updateForm.getInputProps(
+                        `reminders.${index}.daysBeforeEvent`,
+                    ),
+                })}
+                triggerTimeInputProps={(index) => ({
+                    key: updateForm.key(`reminders.${index}.time`),
+                    ...updateForm.getInputProps(`reminders.${index}.time`),
+                })}
+                emailNotificationsInputProps={(index) => ({
+                    key: updateForm.key(
+                        `reminders.${index}.emailNotifications`,
+                    ),
+                    ...updateForm.getInputProps(
+                        `reminders.${index}.emailNotifications`,
+                        { type: "checkbox" },
+                    ),
+                })}
+                onReminderDelete={(index) =>
+                    updateForm.removeListItem("reminders", index)
+                }
+                onReminderAdd={(defaultEntry) =>
+                    updateForm.insertListItem("reminders", defaultEntry)
+                }
+                disabled={updateMutation.isPending}
+            />
 
             <Group justify="flex-end">
                 <Button
@@ -236,6 +233,19 @@ export function EventDetailsModal<T extends string>({
             note: event?.note ?? "",
             status: event?.status ?? "none",
             tags: event?.tags.map((t) => t.name) ?? [],
+            // Note: This requires pre-processing before sending to the server.
+            // Also, we re-use the reminder's ID as the key.
+            reminders:
+                event?.reminders.map((r) => ({
+                    key: r.id,
+                    id: r.id,
+                    daysBeforeEvent: calculateDaysDiff(
+                        r.triggerTime,
+                        event.startDate,
+                    ),
+                    time: extractTimeStringFromJSDate(r.triggerTime),
+                    emailNotifications: r.emailNotifications,
+                })) ?? [],
         } satisfies UpdateFormValues,
         validate: {
             ...zodResolver(
@@ -276,6 +286,17 @@ export function EventDetailsModal<T extends string>({
                 note: event.note,
                 status: event.status,
                 tags: event.tags.map((t) => t.name),
+                reminders:
+                    event.reminders.map((r) => ({
+                        key: r.id,
+                        id: r.id,
+                        daysBeforeEvent: calculateDaysDiff(
+                            r.triggerTime,
+                            event.startDate,
+                        ),
+                        time: extractTimeStringFromJSDate(r.triggerTime),
+                        emailNotifications: r.emailNotifications,
+                    })) ?? [],
             });
             resetForm();
         }
@@ -284,19 +305,91 @@ export function EventDetailsModal<T extends string>({
     const queryClient = useQueryClient();
     const updateMutation = useMutation({
         mutationFn: async (values: UpdateFormValues) => {
-            // Convert start date to string.
-            const { startDate: startDateJS, ...rest } = values;
-            const startDate = DateTime.fromJSDate(
-                startDateJS,
-            ).toISODate() as string;
+            // Safety: If we've reached this point, event cannot be undefined.
+            const oldEv = event as Event;
+
+            const {
+                startDate: startDateJS,
+                reminders: formReminders,
+                ...rest
+            } = values;
+
+            const newStartDate = DateTime.fromJSDate(startDateJS);
+
+            // Convert the time and date into a single ISO date time string.
+            const newReminders = formReminders.map((r) =>
+                pipe(
+                    extractTimeStringComponents(r.time),
+                    E.map(
+                        ({ hours: hour, minutes: minute }) =>
+                            newStartDate
+                                .minus({ days: r.daysBeforeEvent })
+                                .set({ hour, minute })
+                                .toUTC()
+                                .toISO() as string,
+                    ),
+                    E.getOrElseW((err) => {
+                        throw err;
+                    }),
+                    (triggerTime) => ({
+                        id: r.id,
+                        triggerTime,
+                        emailNotifications: r.emailNotifications,
+                    }),
+                ),
+            );
+
+            console.log("newReminders", newReminders);
+
+            // The ones to insert are those without an ID.
+            const remindersInsert = newReminders.filter(
+                (r) => r.id === undefined,
+            );
+
+            // "Survivors" means those existing reminder templates that
+            // have not been removed.
+            const newRemindersSurvivors = newReminders.filter(
+                (r) => r.id !== undefined,
+            ) as {
+                id: string;
+                triggerTime: string;
+                emailNotifications: boolean;
+            }[];
+
+            // The ones to delete are those that are not in the survivors list.
+            const newRemindersSurvivorIds = new Set(
+                newRemindersSurvivors.map((r) => r.id),
+            );
+            const remindersDelete = oldEv.reminders
+                .map((r) => r.id)
+                .filter((id) => !newRemindersSurvivorIds.has(id));
+
+            // The ones that need to be updated are those in the survivors list
+            // that are dirty.
+            // Note that if the event's date has been modified, then all survivors
+            // need to be updated.
+            const eventReminderMap = new Map(
+                oldEv.reminders.map((r) => [r.id, r] as const),
+            );
+            const remindersUpdate = newRemindersSurvivors.filter((r) => {
+                // Safety: Guaranteed to be defined since we constructed the map earlier.
+                const evReminder = eventReminderMap.get(r.id) as Reminder;
+                return (
+                    r.triggerTime !==
+                        DateTime.fromJSDate(evReminder.triggerTime)
+                            .toUTC()
+                            .toISO() ||
+                    r.emailNotifications !== evReminder.emailNotifications
+                );
+            });
 
             // Safety: If we've reached this point, event should be defined.
             const result = await updateEventAction(null, {
                 id: event?.id as string,
-                startDate,
-                remindersDelete: [],
-                remindersInsert: [],
-                remindersUpdate: [],
+                startDate: newStartDate.toISODate() as string,
+                remindersDelete,
+                remindersInsert,
+                remindersUpdate,
                 ...rest,
             });
 
