@@ -14,6 +14,11 @@ import { encodedIdSchema } from "@/lib/identifiers";
 
 import { expandedEventUpdateSchema, reminderInsertSchema } from "@/db/schema";
 
+export const triggerTimeSchema = z
+    .string()
+    .datetime({ offset: false, local: false })
+    .pipe(z.coerce.date());
+
 export const payloadSchema = z.object({
     id: encodedIdSchema,
     name: expandedEventUpdateSchema.shape.name,
@@ -27,10 +32,7 @@ export const payloadSchema = z.object({
     remindersInsert: z
         .array(
             z.object({
-                triggerTime: z
-                    .string()
-                    .datetime({ offset: true, local: false })
-                    .pipe(z.coerce.date()),
+                triggerTime: triggerTimeSchema,
                 emailNotifications:
                     reminderInsertSchema.shape.emailNotifications,
                 desktopNotifications:
@@ -40,9 +42,12 @@ export const payloadSchema = z.object({
         .optional(),
     remindersUpdate: z
         .array(
-            expandedEventUpdateSchema.shape.remindersUpdate.element.extend({
-                id: encodedIdSchema,
-            }),
+            expandedEventUpdateSchema.shape.remindersUpdate.element
+                .extend({
+                    id: encodedIdSchema,
+                    triggerTime: triggerTimeSchema,
+                })
+                .omit({ triggerRunId: true }),
         )
         .optional(),
     tags: z.array(tagNameSchema).optional(),
