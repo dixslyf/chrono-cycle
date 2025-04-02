@@ -36,6 +36,10 @@ export function extractTimeStringFromJSDate(date: Date): string {
     return timeStr;
 }
 
+export function extractDateStringFromJSDate(date: Date): string {
+    return DateTime.fromJSDate(date).toISODate() as string;
+}
+
 export function calculateDaysDiff(dateEarlier: Date, dateLater: Date): number {
     // Throw away the time components just to be sure.
     const ldateEarlier = DateTime.fromISO(
