@@ -22,6 +22,10 @@ import { pipe } from "fp-ts/function";
 import { useEffect } from "react";
 
 import { EditableTitle } from "@/app/components/customComponent/editableTitle";
+import {
+    RemindersInput,
+    RemindersInputEntry,
+} from "@/app/components/customComponent/remindersInput";
 import { SplitModal } from "@/app/components/customComponent/splitModal";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { queryKeys } from "@/app/utils/queries/keys";
@@ -40,10 +44,6 @@ import {
 } from "@/features/event-templates/update/data";
 
 import { DeleteEventTemplateButton } from "./deleteEventTemplateButton";
-import {
-    ReminderTemplatesInput,
-    ReminderTemplatesInputEntry,
-} from "./reminderTemplatesInput";
 
 // Removing auto-scheduling because we don't have time to implement it.
 type UpdateFormValues = Required<
@@ -56,7 +56,7 @@ type UpdateFormValues = Required<
         | "remindersInsert"
     >
 > & {
-    reminders: (ReminderTemplatesInputEntry & Partial<ReminderTemplate>)[];
+    reminders: (RemindersInputEntry & Partial<ReminderTemplate>)[];
 };
 
 interface EventTemplateDetailsLeftProps {
@@ -146,7 +146,7 @@ export function EventTemplateDetailsRight<T extends string>({
 }: EventTemplateDetailsRightProps<T>) {
     return (
         <Stack className="h-full" justify="space-between">
-            <ReminderTemplatesInput
+            <RemindersInput
                 entries={updateForm.getValues().reminders}
                 daysBeforeEventInputProps={(index) => ({
                     key: updateForm.key(`reminders.${index}.daysBeforeEvent`),

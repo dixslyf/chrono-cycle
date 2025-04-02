@@ -17,6 +17,10 @@ import { pipe } from "fp-ts/lib/function";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useState } from "react";
 
+import {
+    RemindersInput,
+    RemindersInputEntry,
+} from "@/app/components/customComponent/remindersInput";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { queryKeys } from "@/app/utils/queries/keys";
 
@@ -30,13 +34,8 @@ import {
     refineRawPayloadSchema,
 } from "@/features/event-templates/create/data";
 
-import {
-    ReminderTemplatesInput,
-    ReminderTemplatesInputEntry,
-} from "./reminderTemplatesInput";
-
 type FormValues = Omit<Payload, "projectTemplateId" | "reminders"> & {
-    reminders: ReminderTemplatesInputEntry[];
+    reminders: RemindersInputEntry[];
 };
 
 export interface CreateEventTemplateFormState {
@@ -63,7 +62,7 @@ export function CreateEventTemplateFormState({
             duration: 1,
             note: "",
             autoReschedule: true,
-            reminders: [] as ReminderTemplatesInputEntry[],
+            reminders: [] as RemindersInputEntry[],
             tags: [] as string[],
         },
         validate: {
@@ -246,7 +245,7 @@ export function CreateEventTemplateFormRight({
 }): React.ReactNode {
     return (
         <Stack className="h-full" justify="space-between">
-            <ReminderTemplatesInput
+            <RemindersInput
                 entries={form.getValues().reminders}
                 daysBeforeEventInputProps={(index) => ({
                     key: form.key(`reminders.${index}.daysBeforeEvent`),
