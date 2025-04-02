@@ -118,7 +118,14 @@ export function toEvent(dbE: DbExpandedEvent): Event {
 }
 
 export function toReminder(dbR: DbReminder): Reminder {
-    const { id, eventId, reminderTemplateId, ...rest } = dbR;
+    const {
+        id,
+        eventId,
+        reminderTemplateId,
+        triggerRunId: _triggerRunId,
+        ...rest
+    } = dbR;
+
     return {
         id: encodeReminderId(id),
         eventId: encodeEventId(eventId),
