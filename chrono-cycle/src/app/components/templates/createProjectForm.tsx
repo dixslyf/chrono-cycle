@@ -9,15 +9,16 @@ import {
     Textarea,
     TextInput,
 } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
+import { DateTime } from "luxon";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { match } from "ts-pattern";
 import { z } from "zod";
 
+import { StringDatePickerInput } from "@/app/components/customComponent/stringDatePickerInput";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { queryKeys } from "@/app/utils/queries/keys";
 
@@ -85,14 +86,13 @@ export function CreateProjectForm({
             projectTemplateId: "",
             name: "",
             description: "",
-            startsAt: new Date(),
+            startsAt: DateTime.now().toISODate(),
         },
         validate: zodResolver(
             payloadSchema.extend({
                 projectTemplateId: z
                     .string()
                     .nonempty("Please select a template."),
-                startsAt: z.date(),
             }),
         ),
     });
@@ -104,7 +104,7 @@ export function CreateProjectForm({
             const { startsAt, ...rest } = values;
             const result = await createProjectAction({
                 ...rest,
-                startsAt: startsAt.toISOString().split("T")[0], // Extract YYYY-MM-DD.
+                startsAt,
                 projectTemplateId: values.projectTemplateId,
             });
             return pipe(
@@ -174,7 +174,7 @@ export function CreateProjectForm({
                 disabled={createProjectMutation.isPending}
                 {...form.getInputProps("description")}
             />
-            <DatePickerInput
+            <StringDatePickerInput
                 label="Start Date"
                 required
                 description="The project's start date"
