@@ -7,25 +7,16 @@ import { pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
 import { useEffect, useRef, useState } from "react";
 
-import { SplitModal } from "@/app/components/customComponent/splitModal";
-import {
-    DisplayEventDetailsLeft,
-    DisplayEventDetailsRight,
-} from "@/app/components/event/eventDetails";
+import { EventDetailsModal } from "@/app/components/event/eventDetails";
 import { ProjectDetailsModal } from "@/app/components/project/projectDetails";
-import { areSameDay } from "@/app/utils/dates";
 import { queryKeys } from "@/app/utils/queries/keys";
 
 import { Event, Project } from "@/common/data/domain";
+import { areSameDay, Day } from "@/common/dates";
 
 import { retrieveProjectTemplateAction } from "@/features/project-templates/retrieve/action";
 
 import ProjectRow from "./projectRow";
-
-export interface Day {
-    date: Date;
-    label: string;
-}
 
 interface TimelineProps {
     days: Day[];
@@ -204,7 +195,22 @@ function Timeline({
     ]);
 
     // States for showing event details in a modal window.
-    const [clickedEvent, setClickedEvent] = useState<Event | null>(null);
+    const [clickedEventData, setClickedEventData] = useState<{
+        eventId: string;
+        projectId: string;
+    } | null>(null);
+
+    // To always have the latest event data, we find the clicked event from the projects list
+    // because that list always reflects the latest data (due to the Tanstack Query).
+    const clickedEventProject = clickedEventData
+        ? (projects.find((p) => p.id === clickedEventData.projectId) as Project)
+        : null;
+    const clickedEvent =
+        clickedEventProject && clickedEventData
+            ? (clickedEventProject.events.find(
+                  (e) => e.id === clickedEventData.eventId,
+              ) as Event)
+            : null;
 
     // States for showing project details in a modal window.
     const [clickedProject, setClickedProject] = useState<Project | null>(null);
@@ -249,20 +255,10 @@ function Timeline({
             className="overflow-x-auto w-full flex-1 h-full relative z-0"
         >
             <Modal.Stack>
-                <SplitModal {...modalStack.register("event-details")}>
-                    {clickedEvent && (
-                        <>
-                            <SplitModal.Left title={`${clickedEvent.name}`}>
-                                <DisplayEventDetailsLeft event={clickedEvent} />
-                            </SplitModal.Left>
-                            <SplitModal.Right>
-                                <DisplayEventDetailsRight
-                                    event={clickedEvent}
-                                />
-                            </SplitModal.Right>
-                        </>
-                    )}
-                </SplitModal>
+                <EventDetailsModal
+                    modalStack={modalStack}
+                    event={clickedEvent ?? undefined}
+                />
                 {/* project details modal */}
                 <ProjectDetailsModal
                     modalStack={modalStack}
@@ -324,7 +320,10 @@ function Timeline({
                                 }}
                                 toggleProject={toggleProject}
                                 onEventClick={(event) => {
-                                    setClickedEvent(event);
+                                    setClickedEventData({
+                                        eventId: event.id,
+                                        projectId: event.projectId,
+                                    });
                                     modalStack.open("event-details");
                                 }}
                             />

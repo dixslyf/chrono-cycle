@@ -6,14 +6,13 @@ import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 import { DateTime } from "luxon";
 
+import { extractTimeStringComponents } from "@/common/dates";
 import {
     AssertionError,
     DoesNotExistError,
     DuplicateNameError,
     MalformedTimeStringError,
 } from "@/common/errors";
-
-import { extractTimeStringComponents } from "@/lib/reminders";
 
 import { DbLike } from "@/db";
 import { retrieveExpandedEventTemplatesByProjectTemplateId } from "@/db/queries/event-templates/list";

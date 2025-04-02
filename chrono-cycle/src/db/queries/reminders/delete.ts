@@ -12,6 +12,10 @@ export function rawDeleteReminders(
     db: DbLike,
     ids: Set<number>,
 ): TE.TaskEither<DoesNotExistError, void> {
+    if (ids.size === 0) {
+        return TE.of(undefined);
+    }
+
     return pipe(
         TE.fromTask(() =>
             db

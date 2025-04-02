@@ -12,6 +12,7 @@ import { DbLike } from "@/db";
 import { rawInsertReminders } from "@/db/queries/reminders/create";
 import { rawDeleteReminders } from "@/db/queries/reminders/delete";
 import { updateReminder } from "@/db/queries/reminders/update";
+import { ensureTagsExist } from "@/db/queries/tags/create";
 import { wrapWithTransaction } from "@/db/queries/utils/transaction";
 import {
     DbEvent,
@@ -19,11 +20,12 @@ import {
     DbExpandedEvent,
     DbExpandedEventUpdate,
     events as eventsTable,
-    eventTags as eventTagsTable,
-    tags as tagsTable,
 } from "@/db/schema";
 
 import { checkUserOwnsEvents } from "./checkOwnership";
+import { clearTags } from "./clearTags";
+import { linkTags } from "./linkTags";
+import { retrieveExpandedEvent } from "./retrieveExpanded";
 
 function rawUpdateEvent(
     db: DbLike,
@@ -90,16 +92,37 @@ function unsafeUpdateExpandedEvent(
     DbExpandedEvent
 > {
     return pipe(
+        TE.Do,
+        TE.bind("oldExpandedEvent", () => retrieveExpandedEvent(db, data.id)),
+
         // Try updating the event.
-        rawUpdateEvent(db, data),
+        TE.bind("updatedEvent", () => rawUpdateEvent(db, data)),
+
+        // Update tags.
+        TE.bindW("newTags", ({ oldExpandedEvent }) => {
+            const newDesiredTags = data.tags;
+            return newDesiredTags !== undefined
+                ? pipe(
+                      // Clear the current tags.
+                      TE.fromTask(() => clearTags(db, data.id)),
+                      // Ensure that all new tags exist.
+                      TE.chain(() => ensureTagsExist(db, newDesiredTags)),
+                      // Link the tags with the event template.
+                      TE.tap((newTags) =>
+                          TE.fromTask(() => linkTags(db, data.id, newTags)),
+                      ),
+                  )
+                : TE.of(oldExpandedEvent.tags);
+        }),
 
         // Update existing reminders.
         TE.bindW("updatedRts", () =>
             pipe(
-                data.remindersUpdate,
+                data.remindersUpdate ?? [],
                 TE.traverseArray((rt) => updateReminder(db, rt)),
             ),
         ),
+
         // Delete removed reminders.
         TE.tap(() =>
             pipe(data.remindersDelete, (toDeleteRts) =>
@@ -107,42 +130,25 @@ function unsafeUpdateExpandedEvent(
                 rawDeleteReminders(db, new Set(toDeleteRts)),
             ),
         ),
+
         // Insert new reminders.
-        TE.bindW("insertedRts", ({ id: eventId }) =>
+        TE.bindW("insertedRts", () =>
             TE.fromTask(() =>
                 rawInsertReminders(
                     db,
-                    data.remindersInsert.map((reminder) => ({
-                        eventId,
+                    data.remindersInsert?.map((reminder) => ({
+                        eventId: data.id,
                         ...reminder,
-                    })),
+                    })) ?? [],
                 ),
             ),
         ),
 
-        // Retrieve tags.
-        TE.bindW("tags", () =>
-            TE.fromTask(() =>
-                db
-                    .select({
-                        id: tagsTable.id,
-                        userId: tagsTable.userId,
-                        name: tagsTable.name,
-                    })
-                    .from(eventTagsTable)
-                    .innerJoin(
-                        tagsTable,
-                        eq(eventTagsTable.tagId, tagsTable.id),
-                    )
-                    .where(eq(eventTagsTable.eventId, data.id)),
-            ),
-        ),
-
-        TE.map((ctx) => {
-            const { updatedRts, insertedRts, ...rest } = ctx;
+        TE.map(({ updatedRts, insertedRts, newTags, oldExpandedEvent }) => {
             return {
+                ...oldExpandedEvent,
                 reminders: updatedRts.concat(insertedRts),
-                ...rest,
+                tags: newTags,
             } satisfies DbExpandedEvent;
         }),
     );

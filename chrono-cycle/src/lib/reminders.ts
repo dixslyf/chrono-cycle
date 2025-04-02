@@ -13,14 +13,12 @@ import {
     type TaskPayload,
 } from "@trigger.dev/sdk/v3";
 import * as A from "fp-ts/Array";
-import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 
 import {
     CancelReminderError,
-    MalformedTimeStringError,
     ScheduleReminderError,
     ScheduleReminderIssue,
 } from "@/common/errors";
@@ -76,29 +74,6 @@ const triggerTask =
               return handle;
           }
         : tasks.trigger;
-
-export type TimeComponents = {
-    hours: number;
-    minutes: number;
-};
-
-export function extractTimeStringComponents(
-    timeStr: string,
-): E.Either<MalformedTimeStringError, TimeComponents> {
-    // Match "HH:MM".
-    const match = timeStr.match(/^(\d{2}):(\d{2})/);
-    if (!match) {
-        return E.left(MalformedTimeStringError());
-    }
-
-    // First value is the entire matched part.
-    const [_, hours, minutes] = match.map(Number);
-    if (Number.isNaN(hours) || Number.isNaN(minutes)) {
-        return E.left(MalformedTimeStringError());
-    }
-
-    return E.right({ hours, minutes });
-}
 
 export type ScheduledDbReminder = {
     reminder: DbReminder;

@@ -14,7 +14,7 @@ import {
     ScheduleReminderError,
 } from "@/common/errors";
 
-import { decodeProjectId, decodeReminderId } from "@/lib/identifiers";
+import { decodeEventId, decodeReminderId } from "@/lib/identifiers";
 import { cancelReminder, scheduleReminders } from "@/lib/reminders";
 
 import { DbLike, getDb } from "@/db";
@@ -122,18 +122,19 @@ function unsafeBridge(
         TE.Do,
         TE.bind("decodedRemindersDelete", () =>
             TE.right(
-                payloadP.remindersDelete.map((id) => decodeReminderId(id)),
+                payloadP.remindersDelete?.map((id) => decodeReminderId(id)) ??
+                    [],
             ),
         ),
         TE.bind("decodedRemindersUpdate", () =>
             TE.right(
-                payloadP.remindersUpdate.map((r) => {
+                payloadP.remindersUpdate?.map((r) => {
                     const { id, ...rest } = r;
                     return {
                         id: decodeReminderId(id),
                         ...rest,
                     };
-                }),
+                }) ?? [],
             ),
         ),
 
@@ -154,13 +155,19 @@ function unsafeBridge(
                     id,
                     remindersDelete: _remindersDelete,
                     remindersUpdate: _remindersUpdate,
+                    tags: _tags,
                     ...rest
                 } = payloadP;
 
                 return updateEvent(db, userId, {
-                    id: decodeProjectId(id),
+                    id: decodeEventId(id),
                     remindersDelete: decodedRemindersDelete,
                     remindersUpdate: decodedRemindersUpdate,
+                    tags:
+                        payloadP.tags?.map((tagName) => ({
+                            userId,
+                            name: tagName,
+                        })) ?? [],
                     ...rest,
                 });
             },

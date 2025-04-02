@@ -129,6 +129,7 @@ const eslintConfig = [
                             allow: [
                                 "db",
                                 ["common", { base: "errors" }],
+                                ["common", { base: "dates" }],
                                 ["lib", { base: "reminders" }],
                             ],
                         },

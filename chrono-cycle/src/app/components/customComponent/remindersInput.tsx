@@ -17,12 +17,12 @@ import { Calendar, Clock, Plus, Trash } from "lucide-react";
 
 import { theme } from "@/app/provider";
 
-import { Payload as ReminderCreate } from "@/features/reminder-templates/create/data";
-
-export type RemindersInputEntry = Omit<
-    ReminderCreate,
-    "eventTemplateId" | "projectTemplateId" | "desktopNotifications"
-> & { key: string };
+export type RemindersInputEntry = {
+    key: string;
+    daysBeforeEvent: number;
+    time: string;
+    emailNotifications: boolean;
+};
 
 export function RemindersInput({
     entries,

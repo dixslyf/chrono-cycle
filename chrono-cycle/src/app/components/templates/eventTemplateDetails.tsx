@@ -22,6 +22,10 @@ import { pipe } from "fp-ts/function";
 import { useEffect } from "react";
 
 import { EditableTitle } from "@/app/components/customComponent/editableTitle";
+import {
+    RemindersInput,
+    RemindersInputEntry,
+} from "@/app/components/customComponent/remindersInput";
 import { SplitModal } from "@/app/components/customComponent/splitModal";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { queryKeys } from "@/app/utils/queries/keys";
@@ -40,7 +44,6 @@ import {
 } from "@/features/event-templates/update/data";
 
 import { DeleteEventTemplateButton } from "./deleteEventTemplateButton";
-import { RemindersInput, RemindersInputEntry } from "./remindersInput";
 
 // Removing auto-scheduling because we don't have time to implement it.
 type UpdateFormValues = Required<
@@ -197,7 +200,7 @@ export function EventTemplateDetailsModal<T extends string>({
 }: {
     modalStack: ReturnType<
         typeof useModalsStack<
-            "event-details" | "confirm-delete-event-template" | T
+            "event-template-details" | "confirm-delete-event-template" | T
         >
     >;
     eventTemplate?: EventTemplate;
@@ -341,7 +344,7 @@ export function EventTemplateDetailsModal<T extends string>({
     });
 
     return (
-        <SplitModal {...modalStack.register("event-details")}>
+        <SplitModal {...modalStack.register("event-template-details")}>
             <form
                 id="update-event-template-form"
                 onSubmit={updateForm.onSubmit((values) =>
@@ -372,7 +375,9 @@ export function EventTemplateDetailsModal<T extends string>({
                             modalStack={modalStack}
                             updateMutation={updateMutation}
                             updateForm={updateForm}
-                            onClose={() => modalStack.close("event-details")}
+                            onClose={() =>
+                                modalStack.close("event-template-details")
+                            }
                         />
                     </SplitModal.Right>
                 </>

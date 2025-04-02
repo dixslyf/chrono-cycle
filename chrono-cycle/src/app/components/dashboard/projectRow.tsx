@@ -4,12 +4,10 @@ import { Center, Group, Paper, Stack, Text } from "@mantine/core";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import React from "react";
 
-import { areSameDay } from "@/app/utils/dates";
-
 import { Event, Project } from "@/common/data/domain";
+import { areSameDay, Day } from "@/common/dates";
 
 import EventBar from "./eventBar";
-import { Day } from "./timeline";
 
 interface ProjectRowProps {
     project: Project;

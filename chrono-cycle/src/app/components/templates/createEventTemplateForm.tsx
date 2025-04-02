@@ -17,6 +17,10 @@ import { pipe } from "fp-ts/lib/function";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useState } from "react";
 
+import {
+    RemindersInput,
+    RemindersInputEntry,
+} from "@/app/components/customComponent/remindersInput";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { queryKeys } from "@/app/utils/queries/keys";
 
@@ -29,8 +33,6 @@ import {
     rawPayloadSchema,
     refineRawPayloadSchema,
 } from "@/features/event-templates/create/data";
-
-import { RemindersInput, RemindersInputEntry } from "./remindersInput";
 
 type FormValues = Omit<Payload, "projectTemplateId" | "reminders"> & {
     reminders: RemindersInputEntry[];

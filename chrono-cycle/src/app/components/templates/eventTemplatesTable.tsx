@@ -12,7 +12,10 @@ interface EventsTableProps<T extends string> {
     projectTemplateId: string;
     modalStack: ReturnType<
         typeof useModalsStack<
-            "add-event" | "event-details" | "confirm-delete-event-template" | T
+            | "add-event"
+            | "event-template-details"
+            | "confirm-delete-event-template"
+            | T
         >
     >;
     eventTemplates: EventTemplate[];
@@ -45,7 +48,7 @@ function InnerEventTemplatesTable<T extends string>({
     // handle row click
     const handleRowClick = (eventTemplate: EventTemplate) => {
         setSelectedEventTemplate(eventTemplate);
-        modalStack.open("event-details");
+        modalStack.open("event-template-details");
     };
 
     return (

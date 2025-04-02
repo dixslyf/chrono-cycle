@@ -1,5 +1,6 @@
 import DashboardClient from "@/app/components/dashboard/dashboardClient";
-import { generateDaysInRange } from "@/app/utils/dates";
+
+import { generateDaysInRange } from "@/common/dates";
 
 function getDynamicDateRange(
     referenceDate: Date,
