@@ -163,10 +163,10 @@ describe("Update event server action", () => {
         });
         expect(result).toBeRight();
         expect(revalidatePath).toHaveBeenCalledWith("/dashboard");
-        const ListResult = await listEventsAction(null, {
+        const listResult = await listEventsAction(null, {
             projectId: project.id,
         });
-        expect(ListResult).toEqualRight([
+        expect(listResult).toEqualRight([
             {
                 id: project.events[0].id,
                 projectId: project.id,
@@ -243,10 +243,10 @@ describe("Update event server action", () => {
         if (E.isLeft(result)) {
             throw new Error("Update Event is not implemented correctly!");
         }
-        const ListResult = await listEventsAction(null, {
+        const listResult = await listEventsAction(null, {
             projectId: project.id,
         });
-        expect(ListResult).toEqualRight([
+        expect(listResult).toEqualRight([
             {
                 id: project.events[0].id,
                 projectId: project.id,
@@ -293,6 +293,7 @@ describe("Update event server action", () => {
                 "Create event template action is not implemented correctly!",
             );
         }
+        const eventTemplate = createEventTemplateResult.right;
         const createProjectResult = await createProjectAction({
             name: "Test Project",
             description: "Test Description",
@@ -320,28 +321,37 @@ describe("Update event server action", () => {
         if (E.isLeft(result)) {
             throw new Error("Update Event is not implemented correctly!");
         }
-        const ListResult = await listEventsAction(null, {
+        const listResult = await listEventsAction(null, {
             projectId: project.id,
         });
-        if (E.isRight(ListResult)) {
-            const events = ListResult.right;
-            expect(events[0].id).toBe(project.events[0].id);
-            expect(events[0].projectId).toBe(project.id);
-            expect(events[0].name).toBe("Event");
-            expect(events[0].startDate).toBeInstanceOf(Date);
-            expect(events[0].duration).toBe(1);
-            expect(events[0].note).toBe("Note");
-            expect(events[0].eventType).toBe("task");
-            expect(events[0].autoReschedule).toBe(true);
-            expect(events[0].reminders).toHaveLength(1);
-            const reminder = events[0].reminders[0];
-            expect(reminder.emailNotifications).toBe(true);
-            expect(reminder.desktopNotifications).toBe(false);
-            expect(reminder.triggerTime).toBeInstanceOf(Date);
-            expect(reminder.id).toBeTruthy();
-        } else {
-            throw new Error("Update Event is not implemented correctly!");
-        }
+
+        expect(listResult).toEqualRight([
+            {
+                id: event.id,
+                projectId: project.id,
+                name: "Event",
+                startDate: new Date("2025-01-01T00:00:00.000Z"),
+                duration: 1,
+                eventTemplateId: eventTemplate.id,
+                notificationsEnabled: true,
+                note: "Note",
+                eventType: "task",
+                status: "not started",
+                autoReschedule: true,
+                reminders: [
+                    {
+                        id: expect.any(String),
+                        emailNotifications: true,
+                        eventId: event.id,
+                        reminderTemplateId: null,
+                        desktopNotifications: false,
+                        triggerTime: new Date("2025-01-01T01:00:00.000Z"),
+                    },
+                ],
+                tags: [],
+                updatedAt: expect.any(Date),
+            },
+        ]);
     });
 
     it("should update an event template successfully when updating reminders", async () => {
@@ -371,6 +381,8 @@ describe("Update event server action", () => {
                 "Create event template action is not implemented correctly!",
             );
         }
+        const eventTemplate = createEventTemplateResult.right;
+
         const createProjectResult = await createProjectAction({
             name: "Test Project",
             description: "Test Description",
@@ -390,7 +402,7 @@ describe("Update event server action", () => {
             remindersUpdate: [
                 {
                     id: event.reminders[0].id,
-                    triggerTime: "2025-01-01T01:00:00.000Z",
+                    triggerTime: "2025-01-01T05:00:00.000Z",
                     emailNotifications: true,
                     desktopNotifications: false,
                 },
@@ -399,28 +411,37 @@ describe("Update event server action", () => {
         if (E.isLeft(result)) {
             throw new Error("Update Event is not implemented correctly!");
         }
-        const ListResult = await listEventsAction(null, {
+        const listResult = await listEventsAction(null, {
             projectId: project.id,
         });
-        if (E.isRight(ListResult)) {
-            const events = ListResult.right;
-            expect(events[0].id).toBe(project.events[0].id);
-            expect(events[0].projectId).toBe(project.id);
-            expect(events[0].name).toBe("Event");
-            expect(events[0].startDate).toBeInstanceOf(Date);
-            expect(events[0].duration).toBe(1);
-            expect(events[0].note).toBe("Note");
-            expect(events[0].eventType).toBe("task");
-            expect(events[0].autoReschedule).toBe(true);
-            expect(events[0].reminders).toHaveLength(1);
-            const reminder = events[0].reminders[0];
-            expect(reminder.emailNotifications).toBe(true);
-            expect(reminder.desktopNotifications).toBe(false);
-            expect(reminder.triggerTime).toBeInstanceOf(Date);
-            expect(reminder.id).toBeTruthy();
-        } else {
-            throw new Error("Update Event is not implemented correctly!");
-        }
+
+        expect(listResult).toEqualRight([
+            {
+                id: event.id,
+                projectId: project.id,
+                name: "Event",
+                startDate: new Date("2025-01-01T00:00:00.000Z"),
+                duration: 1,
+                eventTemplateId: eventTemplate.id,
+                notificationsEnabled: true,
+                note: "Note",
+                eventType: "task",
+                status: "not started",
+                autoReschedule: true,
+                reminders: [
+                    {
+                        id: event.reminders[0].id,
+                        emailNotifications: true,
+                        eventId: event.id,
+                        reminderTemplateId: event.reminders[0].reminderTemplateId,
+                        desktopNotifications: false,
+                        triggerTime: new Date("2025-01-01T05:00:00.000Z"),
+                    },
+                ],
+                tags: [],
+                updatedAt: expect.any(Date),
+            },
+        ]);
     });
 
     it("should return validation error if tags have wrong types", async () => {
@@ -688,10 +709,10 @@ describe("Update event server action", () => {
         if (E.isLeft(result)) {
             throw new Error("Update Event is not implemented correctly!");
         }
-        const ListResult = await listEventsAction(null, {
+        const listResult = await listEventsAction(null, {
             projectId: project.id,
         });
-        expect(ListResult).toEqualRight([
+        expect(listResult).toEqualRight([
             {
                 id: project.events[0].id,
                 projectId: project.id,
@@ -762,10 +783,10 @@ describe("Update event server action", () => {
         if (E.isLeft(result)) {
             throw new Error("Update Event is not implemented correctly!");
         }
-        const ListResult = await listEventsAction(null, {
+        const listResult = await listEventsAction(null, {
             projectId: project.id,
         });
-        expect(ListResult).toEqualRight([
+        expect(listResult).toEqualRight([
             {
                 id: project.events[0].id,
                 projectId: project.id,
@@ -836,10 +857,10 @@ describe("Update event server action", () => {
         if (E.isLeft(result)) {
             throw new Error("Update Event is not implemented correctly!");
         }
-        const ListResult = await listEventsAction(null, {
+        const listResult = await listEventsAction(null, {
             projectId: project.id,
         });
-        expect(ListResult).toEqualRight([
+        expect(listResult).toEqualRight([
             {
                 id: project.events[0].id,
                 projectId: project.id,
