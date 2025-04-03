@@ -118,6 +118,7 @@ export function CreateEventTemplateFormState({
             notifySuccess({
                 message: "Successfully created event.",
             });
+            form.reset();
             onSuccess();
         },
         onError: (_err: Failure) =>
