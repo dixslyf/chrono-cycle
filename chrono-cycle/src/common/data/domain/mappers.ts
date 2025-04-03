@@ -1,3 +1,5 @@
+import { formatReminderTemplateTime } from "@/common/dates";
+
 import {
     encodeEventId,
     encodeEventTemplateId,
@@ -61,10 +63,14 @@ export function toTag(dbTag: DbTag): Tag {
 }
 
 export function toReminderTemplate(dbRt: DbReminderTemplate): ReminderTemplate {
-    const { id, eventTemplateId, ...rest } = dbRt;
+    const { id, eventTemplateId, time: rawTime, ...rest } = dbRt;
+    // Remove seconds from time string.
+    const time = formatReminderTemplateTime(rawTime);
+
     return {
         id: encodeReminderTemplateId(id),
         eventTemplateId: encodeEventTemplateId(eventTemplateId),
+        time,
         ...rest,
     };
 }
