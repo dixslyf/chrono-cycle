@@ -9,6 +9,7 @@ import {
     TagsInput,
     Textarea,
     TextInput,
+    useModalsStack,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -21,6 +22,7 @@ import {
     RemindersInput,
     RemindersInputEntry,
 } from "@/app/components/customComponent/remindersInput";
+import { SplitModal } from "@/app/components/customComponent/splitModal";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { queryKeys } from "@/app/utils/queries/keys";
 
@@ -44,7 +46,8 @@ export interface CreateEventTemplateFormState {
     mutation: ReturnType<
         typeof useMutation<EventTemplate, Failure, FormValues>
     >;
-    durationDisabled: boolean;
+    isTask: boolean;
+    setIsTask: (isTask: boolean) => void;
 }
 
 export function CreateEventTemplateFormState({
@@ -93,6 +96,15 @@ export function CreateEventTemplateFormState({
         },
     });
 
+    // Disable duration field and set it to 1 when event type is set to "task".
+    const [isTask, setIsTask] = useState(true);
+    form.watch("eventType", (change) => {
+        setIsTask(change.value === "task");
+        if (isTask) {
+            form.setFieldValue("duration", 1);
+        }
+    });
+
     const queryClient = useQueryClient();
     const mutation = useMutation({
         mutationFn: async (values: FormValues) => {
@@ -118,7 +130,15 @@ export function CreateEventTemplateFormState({
             notifySuccess({
                 message: "Successfully created event.",
             });
+
+            // For some reason, the form watch doesn't trigger when we call form.reset(),
+            // so we need to manually set `isTask` to make sure the duration input is disabled
+            // after resetting. Otherwise, if the user successfully creates an activity,
+            // the duration input will be enabled despite the form resetting and setting the
+            // event type to task.
+            setIsTask(true);
             form.reset();
+
             onSuccess();
         },
         onError: (_err: Failure) =>
@@ -127,26 +147,17 @@ export function CreateEventTemplateFormState({
             }),
     });
 
-    // Disable duration field and set it to 1 when event type is set to "task".
-    const [durationDisabled, setDurationDisabled] = useState(true);
-    form.watch("eventType", (change) => {
-        if (change.value === "task") {
-            form.setFieldValue("duration", 1);
-        }
-        setDurationDisabled(mutation.isPending || change.value === "task");
-    });
-
-    return { form, mutation, durationDisabled };
+    return { form, mutation, isTask, setIsTask };
 }
 
 export function CreateEventTemplateFormLeft({
     form,
     mutation,
-    durationDisabled,
+    isTask,
 }: {
     form: CreateEventTemplateFormState["form"];
     mutation: CreateEventTemplateFormState["mutation"];
-    durationDisabled: CreateEventTemplateFormState["durationDisabled"];
+    isTask: CreateEventTemplateFormState["isTask"];
 }): React.ReactNode {
     return (
         <Stack className="h-full overflow-y-auto" align="stretch" gap="xl">
@@ -220,7 +231,7 @@ export function CreateEventTemplateFormLeft({
                             description="The duration of the event in days"
                             min={1}
                             error="Invalid duration"
-                            disabled={durationDisabled}
+                            disabled={mutation.isPending || isTask}
                             required
                             {...form.getInputProps("duration")}
                         />
@@ -295,5 +306,33 @@ export function CreateEventTemplateFormRight({
                 </Button>
             </Group>
         </Stack>
+    );
+}
+
+export function CreateEventTemplateFormModal<T extends string>({
+    modalStack,
+    projectTemplateId,
+}: {
+    modalStack: ReturnType<typeof useModalsStack<"add-event" | T>>;
+    projectTemplateId: string;
+}) {
+    const { form, mutation, isTask } = CreateEventTemplateFormState({
+        projectTemplateId,
+        onSuccess: () => modalStack.close("add-event"),
+    });
+
+    return (
+        <SplitModal {...modalStack.register("add-event")}>
+            <SplitModal.Left title="Create Event Template">
+                <CreateEventTemplateFormLeft
+                    form={form}
+                    mutation={mutation}
+                    isTask={isTask}
+                />
+            </SplitModal.Left>
+            <SplitModal.Right title="Reminders">
+                <CreateEventTemplateFormRight form={form} mutation={mutation} />
+            </SplitModal.Right>
+        </SplitModal>
     );
 }
