@@ -16,7 +16,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
     RemindersInput,
