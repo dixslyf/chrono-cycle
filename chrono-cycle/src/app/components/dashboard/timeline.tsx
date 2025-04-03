@@ -363,11 +363,21 @@ function Timeline({
             <Group className="h-full flex-1 relative" align="stretch">
                 {days.map((day, i) => {
                     const isToday = areSameDay(new Date(), day.date);
+                    const isFirstDayOfMonth = day.date.getDate() === 1;
+                    const lastDayOfMonth = new Date(
+                        day.date.getFullYear(),
+                        day.date.getMonth() + 1,
+                        0,
+                    ).getDate();
+                    const isLastOfMonth = day.date.getDate() === lastDayOfMonth;
                     return (
                         <Stack
                             key={`${day.date.toISOString()}-${i}`}
-                            // className="flex-none border p-2 text-center flex flex-col gap-2"
-                            className="absolute top-0 bottom-0 border p-2 text-center gap-2"
+                            // className="absolute top-0 bottom-0 border p-2 text-center gap-2"
+                            className={`absolute top-0 bottom-0 border p-2 text-center gap-2
+                                ${isFirstDayOfMonth ? "border-l-2 border-l-black" : ""}
+                                ${isLastOfMonth ? "border-r-2 border-r-black" : ""}
+                                `}
                             style={{
                                 width: `${cellWidth}px`,
                                 left: `${i * cellWidth}px`,
