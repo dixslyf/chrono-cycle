@@ -56,6 +56,7 @@ type UpdateFormValues = Required<
         | "remindersInsert"
     >
 > & {
+    offsetWeeks: number;
     reminders: (RemindersInputEntry & Partial<ReminderTemplate>)[];
 };
 
@@ -80,7 +81,15 @@ export function EventTemplateDetailsLeft({
                 {eventTemplate.eventType === "task" ? " Task" : " Activity"}
             </Text>
             <Group grow>
-                {/* offset days */}
+                {/* offset weeks and days */}
+                <NumberInput
+                    size="md"
+                    label="Offset weeks"
+                    error="Invalid number of offset weeks"
+                    disabled={updateMutation.isPending}
+                    required
+                    {...updateForm.getInputProps("offsetWeeks")}
+                />
                 <NumberInput
                     size="md"
                     label="Offset days"
@@ -209,7 +218,10 @@ export function EventTemplateDetailsModal<T extends string>({
         mode: "uncontrolled",
         initialValues: {
             name: eventTemplate?.name ?? "",
-            offsetDays: eventTemplate?.offsetDays ?? 0,
+            offsetWeeks: eventTemplate
+                ? Math.floor(eventTemplate.offsetDays / 7)
+                : 0,
+            offsetDays: eventTemplate ? eventTemplate.offsetDays % 7 : 0,
             duration: eventTemplate?.duration ?? 0,
             note: eventTemplate?.note ?? "",
             // Note: This requires pre-processing before sending to the server.
@@ -252,7 +264,8 @@ export function EventTemplateDetailsModal<T extends string>({
         if (eventTemplate) {
             setFormInitialValues({
                 name: eventTemplate.name,
-                offsetDays: eventTemplate.offsetDays,
+                offsetWeeks: Math.floor(eventTemplate.offsetDays / 7),
+                offsetDays: eventTemplate.offsetDays % 7,
                 duration: eventTemplate.duration,
                 note: eventTemplate.note,
                 reminders: eventTemplate.reminders.map((rt) => ({
@@ -271,7 +284,13 @@ export function EventTemplateDetailsModal<T extends string>({
             // Safety: If we've reached this point, eventTemplate should be defined.
             const et = eventTemplate as EventTemplate;
 
-            const { reminders: newReminders, ...rest } = values;
+            const {
+                reminders: newReminders,
+                offsetWeeks,
+                offsetDays: mOffsetDays,
+                ...rest
+            } = values;
+            const offsetDays = offsetWeeks * 7 + mOffsetDays;
 
             // The ones to insert are those without an ID.
             const remindersInsert = newReminders.filter(
@@ -310,6 +329,7 @@ export function EventTemplateDetailsModal<T extends string>({
 
             const result = await updateEventTemplateAction(null, {
                 id: eventTemplate?.id as string,
+                offsetDays,
                 remindersInsert,
                 remindersDelete,
                 remindersUpdate,

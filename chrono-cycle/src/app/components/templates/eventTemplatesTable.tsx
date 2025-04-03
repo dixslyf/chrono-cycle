@@ -57,39 +57,50 @@ function InnerEventTemplatesTable<T extends string>({
                 <Table.Thead>
                     <Table.Tr>
                         <Table.Th className="font-semibold">Name</Table.Th>
-                        <Table.Th className="font-semibold">
-                            Offset Days
-                        </Table.Th>
+                        <Table.Th className="font-semibold">Offset</Table.Th>
                         <Table.Th className="font-semibold">Type</Table.Th>
                         <Table.Th className="font-semibold">Duration</Table.Th>
                     </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                    {currentPageData.map((eventTemplate) => (
-                        <Table.Tr
-                            key={eventTemplate.id}
-                            onClick={() => handleRowClick(eventTemplate)}
-                            className="cursor-pointer hover:bg-gray-200"
-                        >
-                            <Table.Td className="w-2/5">
-                                {eventTemplate.name}
-                            </Table.Td>
-                            <Table.Td className="w-1/5">
-                                {eventTemplate.offsetDays}
-                            </Table.Td>
-                            <Table.Td className="w-1/5">
-                                {eventTemplate.eventType[0].toUpperCase() +
-                                    eventTemplate.eventType.slice(1)}
-                            </Table.Td>
-                            <Table.Td className="w-1/5">
-                                {eventTemplate.eventType === "activity"
-                                    ? eventTemplate.duration !== null
-                                        ? eventTemplate.duration.toString()
-                                        : "-"
-                                    : "-"}
-                            </Table.Td>
-                        </Table.Tr>
-                    ))}
+                    {currentPageData.map((eventTemplate) => {
+                        const offsetWeeks = Math.floor(
+                            eventTemplate.offsetDays / 7,
+                        );
+                        const offsetDays = eventTemplate.offsetDays % 7;
+                        const offsetWeeksText = `${offsetWeeks} ${offsetWeeks === 1 ? "week" : "weeks"}`;
+                        const offsetDaysText = `${offsetDays} ${offsetDays === 1 ? "day" : "days"}`;
+                        const offsetText =
+                            offsetWeeks === 0
+                                ? offsetDaysText
+                                : `${offsetWeeksText} ${offsetDaysText}`;
+
+                        return (
+                            <Table.Tr
+                                key={eventTemplate.id}
+                                onClick={() => handleRowClick(eventTemplate)}
+                                className="cursor-pointer hover:bg-gray-200"
+                            >
+                                <Table.Td className="w-2/5">
+                                    {eventTemplate.name}
+                                </Table.Td>
+                                <Table.Td className="w-1/5">
+                                    {offsetText}
+                                </Table.Td>
+                                <Table.Td className="w-1/5">
+                                    {eventTemplate.eventType[0].toUpperCase() +
+                                        eventTemplate.eventType.slice(1)}
+                                </Table.Td>
+                                <Table.Td className="w-1/5">
+                                    {eventTemplate.eventType === "activity"
+                                        ? eventTemplate.duration !== null
+                                            ? eventTemplate.duration.toString()
+                                            : "-"
+                                        : "-"}
+                                </Table.Td>
+                            </Table.Tr>
+                        );
+                    })}
                     {/* add empty rows to maintain fixed height */}
                     {emptyRows.map((_, index) => (
                         <Table.Tr key={`empty-row-${index}`}>
