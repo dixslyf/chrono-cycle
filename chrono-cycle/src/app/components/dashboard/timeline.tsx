@@ -193,14 +193,6 @@ function Timeline({
             (day) => day.date.getMonth() === targetMonthNumber,
         );
 
-        // find the index of the first day with matching month
-        // const targetIndex = days.findIndex((day) => {
-        //     const monthName = day.date.toLocaleDateString("en-US", {
-        //         month: "long",
-        //     });
-        //     return monthName.toLowerCase() === scrollToMonth;
-        // });
-
         if (targetIndex === -1 && onExtendDays) {
             const firstDay = days[0].date;
             const lastDay = days[days.length - 1].date;
