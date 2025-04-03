@@ -52,6 +52,7 @@ interface TimelineProps {
     projects: Project[];
     selectedMonth: string;
     scrollToMonth?: string | null;
+    scrollToToday?: boolean;
     onMonthChange?: (month: string) => void;
     onYearChange?: (year: number) => void;
     onScrolled?: () => void;
@@ -62,8 +63,10 @@ function Timeline({
     days,
     projects,
     scrollToMonth,
+    scrollToToday,
     onMonthChange,
     onYearChange,
+    onScrolled,
     onExtendDays,
 }: TimelineProps) {
     const [isDragging, setIsDragging] = useState(false);
@@ -92,6 +95,28 @@ function Timeline({
             [projectId]: !prev[projectId],
         }));
     };
+
+    // scroll to today if today button is clicked
+    useEffect(() => {
+        if (!scrollToToday) return;
+        const container = containerRef.current;
+        if (!container) return;
+
+        const todayIndex = days.findIndex(
+            (d) => new Date().toDateString() === d.date.toDateString(),
+        );
+        if (todayIndex !== -1) {
+            const containerWidth = container.offsetWidth;
+            const scrollLeft = Math.max(
+                0,
+                todayIndex * cellWidth - containerWidth / 2 + cellWidth / 2,
+            );
+            container.scrollLeft = scrollLeft;
+            if (onScrolled) {
+                onScrolled();
+            }
+        }
+    }, [scrollToToday, days, cellWidth, onScrolled]);
 
     // scroll to current day on initial load
     useEffect(() => {

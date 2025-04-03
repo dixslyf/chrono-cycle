@@ -49,6 +49,7 @@ function DashboardClient({
     const [selectedMonth, setSelectedMonth] = useState(initialMonth);
     const [currentYear, setCurrentYear] = useState(year);
     const [scrollToMonth, setScrollToMonth] = useState<string | null>(null);
+    const [scrollToToday, setScrollToToday] = useState(false);
 
     // extend the days array when the user scrolls
     const extendDays = (direction: "left" | "right") => {
@@ -89,19 +90,21 @@ function DashboardClient({
                     selectedMonth={selectedMonth}
                     onSelectMonth={(month) => handleSelectMonth(month, true)}
                     year={currentYear}
+                    onTodayClick={() => setScrollToToday(true)}
                 />
                 <Timeline
                     days={days}
                     projects={projectsQuery.data ?? []}
                     selectedMonth={selectedMonth}
                     scrollToMonth={scrollToMonth}
+                    scrollToToday={scrollToToday}
                     onMonthChange={(month) => {
                         setSelectedMonth(month.toLowerCase());
                     }}
                     onYearChange={(year) => {
                         setCurrentYear(year);
                     }}
-                    onScrolled={() => setScrollToMonth(null)}
+                    onScrolled={() => setScrollToToday(false)}
                     onExtendDays={extendDays}
                 />
             </div>
