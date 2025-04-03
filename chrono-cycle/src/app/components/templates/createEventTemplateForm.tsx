@@ -129,6 +129,12 @@ export function CreateEventTemplateFormState({
                 message: "Successfully created event.",
             });
 
+            // For some reason, the form watch doesn't trigger when we call form.reset(),
+            // so we need to manually set `isTask` to make sure the duration input is disabled
+            // after resetting. Otherwise, if the user successfully creates an activity,
+            // the duration input will be enabled despite the form resetting and setting the
+            // event type to task.
+            setIsTask(true);
             form.reset();
 
             onSuccess();
