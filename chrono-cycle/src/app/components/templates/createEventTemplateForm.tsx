@@ -9,6 +9,7 @@ import {
     TagsInput,
     Textarea,
     TextInput,
+    useModalsStack,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -21,6 +22,7 @@ import {
     RemindersInput,
     RemindersInputEntry,
 } from "@/app/components/customComponent/remindersInput";
+import { SplitModal } from "@/app/components/customComponent/splitModal";
 import { notifyError, notifySuccess } from "@/app/utils/notifications";
 import { queryKeys } from "@/app/utils/queries/keys";
 
@@ -304,5 +306,33 @@ export function CreateEventTemplateFormRight({
                 </Button>
             </Group>
         </Stack>
+    );
+}
+
+export function CreateEventTemplateFormModal<T extends string>({
+    modalStack,
+    projectTemplateId,
+}: {
+    modalStack: ReturnType<typeof useModalsStack<"add-event" | T>>;
+    projectTemplateId: string;
+}) {
+    const { form, mutation, isTask } = CreateEventTemplateFormState({
+        projectTemplateId,
+        onSuccess: () => modalStack.close("add-event"),
+    });
+
+    return (
+        <SplitModal {...modalStack.register("add-event")}>
+            <SplitModal.Left title="Create Event Template">
+                <CreateEventTemplateFormLeft
+                    form={form}
+                    mutation={mutation}
+                    isTask={isTask}
+                />
+            </SplitModal.Left>
+            <SplitModal.Right title="Reminders">
+                <CreateEventTemplateFormRight form={form} mutation={mutation} />
+            </SplitModal.Right>
+        </SplitModal>
     );
 }
