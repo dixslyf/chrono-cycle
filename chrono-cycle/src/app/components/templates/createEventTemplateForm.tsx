@@ -35,6 +35,7 @@ import {
 } from "@/features/event-templates/create/data";
 
 type FormValues = Omit<Payload, "projectTemplateId" | "reminders"> & {
+    offsetWeeks: number;
     reminders: RemindersInputEntry[];
 };
 
@@ -57,6 +58,7 @@ export function CreateEventTemplateFormState({
         mode: "uncontrolled",
         initialValues: {
             name: "",
+            offsetWeeks: 0,
             offsetDays: 0,
             eventType: "task",
             duration: 1,
@@ -94,9 +96,12 @@ export function CreateEventTemplateFormState({
     const queryClient = useQueryClient();
     const mutation = useMutation({
         mutationFn: async (values: FormValues) => {
+            const { offsetWeeks, offsetDays: mOffsetDays, ...rest } = values;
+            const offsetDays = offsetWeeks * 7 + mOffsetDays;
             const result = await createEventTemplateAction({
                 projectTemplateId,
-                ...values,
+                offsetDays,
+                ...rest,
             });
             return pipe(
                 result,
@@ -187,7 +192,16 @@ export function CreateEventTemplateFormLeft({
                         {...form.getInputProps("eventType")}
                     />
                     <Group grow>
-                        {/* offset days */}
+                        {/* offset weeks and days */}
+                        <NumberInput
+                            size="md"
+                            label="Offset weeks"
+                            description="The number of weeks from the project start date"
+                            error="Invalid number of offset weeks"
+                            disabled={mutation.isPending}
+                            required
+                            {...form.getInputProps("offsetWeeks")}
+                        />
                         <NumberInput
                             size="md"
                             label="Offset days"
