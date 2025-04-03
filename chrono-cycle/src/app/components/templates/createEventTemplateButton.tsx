@@ -30,7 +30,7 @@ export function CreateEventTemplateButton<T extends string>({
         [modalStackClose],
     );
 
-    const { form, mutation, durationDisabled } = CreateEventTemplateFormState({
+    const { form, mutation, isTask } = CreateEventTemplateFormState({
         projectTemplateId,
         onSuccess: closeModal,
     });
@@ -42,7 +42,7 @@ export function CreateEventTemplateButton<T extends string>({
                     <CreateEventTemplateFormLeft
                         form={form}
                         mutation={mutation}
-                        durationDisabled={durationDisabled}
+                        isTask={isTask}
                     />
                 </SplitModal.Left>
                 <SplitModal.Right title="Reminders">

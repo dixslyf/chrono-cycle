@@ -15,7 +15,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
     RemindersInput,
@@ -44,7 +44,8 @@ export interface CreateEventTemplateFormState {
     mutation: ReturnType<
         typeof useMutation<EventTemplate, Failure, FormValues>
     >;
-    durationDisabled: boolean;
+    isTask: boolean;
+    setIsTask: (isTask: boolean) => void;
 }
 
 export function CreateEventTemplateFormState({
@@ -93,6 +94,15 @@ export function CreateEventTemplateFormState({
         },
     });
 
+    // Disable duration field and set it to 1 when event type is set to "task".
+    const [isTask, setIsTask] = useState(true);
+    form.watch("eventType", (change) => {
+        setIsTask(change.value === "task");
+        if (isTask) {
+            form.setFieldValue("duration", 1);
+        }
+    });
+
     const queryClient = useQueryClient();
     const mutation = useMutation({
         mutationFn: async (values: FormValues) => {
@@ -118,7 +128,9 @@ export function CreateEventTemplateFormState({
             notifySuccess({
                 message: "Successfully created event.",
             });
+
             form.reset();
+
             onSuccess();
         },
         onError: (_err: Failure) =>
@@ -127,26 +139,17 @@ export function CreateEventTemplateFormState({
             }),
     });
 
-    // Disable duration field and set it to 1 when event type is set to "task".
-    const [durationDisabled, setDurationDisabled] = useState(true);
-    form.watch("eventType", (change) => {
-        if (change.value === "task") {
-            form.setFieldValue("duration", 1);
-        }
-        setDurationDisabled(mutation.isPending || change.value === "task");
-    });
-
-    return { form, mutation, durationDisabled };
+    return { form, mutation, isTask, setIsTask };
 }
 
 export function CreateEventTemplateFormLeft({
     form,
     mutation,
-    durationDisabled,
+    isTask,
 }: {
     form: CreateEventTemplateFormState["form"];
     mutation: CreateEventTemplateFormState["mutation"];
-    durationDisabled: CreateEventTemplateFormState["durationDisabled"];
+    isTask: CreateEventTemplateFormState["isTask"];
 }): React.ReactNode {
     return (
         <Stack className="h-full overflow-y-auto" align="stretch" gap="xl">
@@ -220,7 +223,7 @@ export function CreateEventTemplateFormLeft({
                             description="The duration of the event in days"
                             min={1}
                             error="Invalid duration"
-                            disabled={durationDisabled}
+                            disabled={mutation.isPending || isTask}
                             required
                             {...form.getInputProps("duration")}
                         />
