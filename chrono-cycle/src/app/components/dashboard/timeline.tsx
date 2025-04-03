@@ -18,6 +18,35 @@ import { retrieveProjectTemplateAction } from "@/features/project-templates/retr
 
 import ProjectRow from "./projectRow";
 
+type MonthKey =
+    | "january"
+    | "february"
+    | "march"
+    | "april"
+    | "may"
+    | "june"
+    | "july"
+    | "august"
+    | "september"
+    | "october"
+    | "november"
+    | "december";
+
+const monthNames: Record<MonthKey, number> = {
+    january: 0,
+    february: 1,
+    march: 2,
+    april: 3,
+    may: 4,
+    june: 5,
+    july: 6,
+    august: 7,
+    september: 8,
+    october: 9,
+    november: 10,
+    december: 11,
+};
+
 interface TimelineProps {
     days: Day[];
     projects: Project[];
@@ -156,13 +185,33 @@ function Timeline({
         const container = containerRef.current;
         if (!container) return;
 
+        const targetMonthNumber =
+            monthNames[scrollToMonth.toLowerCase() as MonthKey];
+        if (targetMonthNumber === undefined) return;
+
+        const targetIndex = days.findIndex(
+            (day) => day.date.getMonth() === targetMonthNumber,
+        );
+
         // find the index of the first day with matching month
-        const targetIndex = days.findIndex((day) => {
-            const monthName = day.date.toLocaleDateString("en-US", {
-                month: "long",
-            });
-            return monthName.toLowerCase() === scrollToMonth;
-        });
+        // const targetIndex = days.findIndex((day) => {
+        //     const monthName = day.date.toLocaleDateString("en-US", {
+        //         month: "long",
+        //     });
+        //     return monthName.toLowerCase() === scrollToMonth;
+        // });
+
+        if (targetIndex === -1 && onExtendDays) {
+            const firstDay = days[0].date;
+            const lastDay = days[days.length - 1].date;
+
+            if (targetMonthNumber < firstDay.getMonth()) {
+                onExtendDays("left");
+            } else if (targetMonthNumber > lastDay.getMonth()) {
+                onExtendDays("right");
+            }
+            return;
+        }
 
         if (targetIndex !== -1) {
             const containerWidth = container.offsetWidth;
