@@ -142,58 +142,63 @@ export function CreateProjectForm({
                 createProjectMutation.mutate(values),
             )}
         >
-            <Select
-                label="Template"
-                required
-                description="The project template to use"
-                error="Invalid project template"
-                placeholder="Project template"
-                searchable
-                disabled={createProjectMutation.isPending}
-                data={projectTemplates?.map((pts) => ({
-                    label: `${pts.name} (${pts.id})`,
-                    value: pts.id,
-                }))}
-                {...form.getInputProps("projectTemplateId")}
-            />
-            <TextInput
-                label="Name"
-                required
-                description="Name of the project"
-                error="Invalid project name"
-                placeholder="Project name"
-                disabled={createProjectMutation.isPending}
-                {...form.getInputProps("name")}
-            />
-            <Textarea
-                label="Description"
-                required
-                description="Enter description"
-                error="Invalid description"
-                placeholder="Add description"
-                disabled={createProjectMutation.isPending}
-                {...form.getInputProps("description")}
-            />
-            <StringDatePickerInput
-                label="Start Date"
-                required
-                description="The project's start date"
-                error="Invalid project start date"
-                placeholder="Project start date"
-                disabled={createProjectMutation.isPending}
-                {...form.getInputProps("startsAt")}
-            />
-            <div className="relative mb-4">
-                <ul className="text-red-500">
-                    {createProjectMutation.error &&
-                        getCreateErrorMessage(createProjectMutation.error)}
-                </ul>
-            </div>
-            <Group justify="flex-end">
-                <Button type="submit" loading={createProjectMutation.isPending}>
-                    Create
-                </Button>
-            </Group>
+            <Stack>
+                <Select
+                    label="Template"
+                    required
+                    description="The project template to use"
+                    error="Invalid project template"
+                    placeholder="Project template"
+                    searchable
+                    disabled={createProjectMutation.isPending}
+                    data={projectTemplates?.map((pts) => ({
+                        label: `${pts.name} (${pts.id})`,
+                        value: pts.id,
+                    }))}
+                    {...form.getInputProps("projectTemplateId")}
+                />
+                <TextInput
+                    label="Name"
+                    required
+                    description="Name of the project"
+                    error="Invalid project name"
+                    placeholder="Project name"
+                    disabled={createProjectMutation.isPending}
+                    {...form.getInputProps("name")}
+                />
+                <Textarea
+                    label="Description"
+                    required
+                    description="Enter description"
+                    error="Invalid description"
+                    placeholder="Add description"
+                    disabled={createProjectMutation.isPending}
+                    {...form.getInputProps("description")}
+                />
+                <StringDatePickerInput
+                    label="Start Date"
+                    required
+                    description="The project's start date"
+                    error="Invalid project start date"
+                    placeholder="Project start date"
+                    disabled={createProjectMutation.isPending}
+                    {...form.getInputProps("startsAt")}
+                />
+                <div className="relative mb-4">
+                    <ul className="text-red-500">
+                        {createProjectMutation.error &&
+                            getCreateErrorMessage(createProjectMutation.error)}
+                    </ul>
+                </div>
+                <Group justify="flex-end">
+                    <Button
+                        type="submit"
+                        loading={createProjectMutation.isPending}
+                    >
+                        Create
+                    </Button>
+                </Group>
+            </Stack>
         </form>
     );
 }
