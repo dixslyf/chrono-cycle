@@ -80,8 +80,8 @@ function DashboardClient({
     return (
         <div className="flex flex-col flex-1 relative">
             <LoadingOverlay
-                visible={projectsQuery.isLoading}
-                zIndex={1000}
+                visible={projectsQuery.isFetching}
+                zIndex={300}
                 overlayProps={{ blur: 2 }}
             />
             <div className="flex flex-col flex-1 h-full">
