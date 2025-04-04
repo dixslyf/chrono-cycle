@@ -84,19 +84,19 @@ export const emailReminderTask = task({
             // Send the email if user has enabled email notifications.
             TE.tap(({ user, userSettings, event, reminder }) =>
                 userSettings.enableEmailNotifications &&
-                    reminder.emailNotifications
+                reminder.emailNotifications
                     ? TE.tryCatch(
-                        () =>
-                            emailTransport.sendMail({
-                                from: FROM_ADDRESS,
-                                to: user.email,
-                                subject: `Reminder for "${event.name}"`,
-                                text: generateEmailPlainText(user, event),
-                                html: generateEmailHtmlString(user, event),
-                                messageStream: "reminders",
-                            }),
-                        (err) => err,
-                    )
+                          () =>
+                              emailTransport.sendMail({
+                                  from: FROM_ADDRESS,
+                                  to: user.email,
+                                  subject: `Reminder for "${event.name}"`,
+                                  text: generateEmailPlainText(user, event),
+                                  html: generateEmailHtmlString(user, event),
+                                  messageStream: "reminders",
+                              }),
+                          (err) => err,
+                      )
                     : TE.of(undefined),
             ),
 
