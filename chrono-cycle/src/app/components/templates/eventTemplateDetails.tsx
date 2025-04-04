@@ -219,7 +219,8 @@ export function EventTemplateDetailsModal<T extends string>({
         initialValues: {
             name: eventTemplate?.name ?? "",
             offsetWeeks: eventTemplate
-                ? Math.floor(eventTemplate.offsetDays / 7)
+                ? Math.sign(eventTemplate.offsetDays) *
+                  Math.floor(Math.abs(eventTemplate.offsetDays / 7))
                 : 0,
             offsetDays: eventTemplate ? eventTemplate.offsetDays % 7 : 0,
             duration: eventTemplate?.duration ?? 0,
@@ -264,7 +265,9 @@ export function EventTemplateDetailsModal<T extends string>({
         if (eventTemplate) {
             setFormInitialValues({
                 name: eventTemplate.name,
-                offsetWeeks: Math.floor(eventTemplate.offsetDays / 7),
+                offsetWeeks:
+                    Math.sign(eventTemplate.offsetDays) *
+                    Math.floor(Math.abs(eventTemplate.offsetDays / 7)),
                 offsetDays: eventTemplate.offsetDays % 7,
                 duration: eventTemplate.duration,
                 note: eventTemplate.note,
