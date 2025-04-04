@@ -38,7 +38,7 @@ function EventBar({
             }}
             onClick={() => onEventClick(event)}
         >
-            <Text c={textColor} size="md" fw={500}>
+            <Text c={textColor} size="md" fw={500} truncate="end">
                 {event.name}
             </Text>
         </Button>
