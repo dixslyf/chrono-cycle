@@ -92,6 +92,38 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
     const calculatedWidth = (maxEndIndex - projectStartIndex + 1) * cellWidth;
     const width = Math.max(calculatedWidth, cellWidth);
 
+    const sortedEvents = project.events.sort((e1, e2) => {
+        // Activities should be shown above tasks.
+        if (e1.eventType === "activity" && e2.eventType === "task") {
+            return -1;
+        }
+        if (e1.eventType === "task" && e2.eventType === "activity") {
+            return 1;
+        }
+
+        // At this point, both events must have the same event type.
+
+        // Earlier events should be shown first.
+        if (e1.startDate < e2.startDate) {
+            return -1;
+        }
+        if (e2.startDate > e1.startDate) {
+            return 1;
+        }
+
+        // Same date.
+
+        // Longer events should be shown first.
+        if (e1.duration > e2.duration) {
+            return -1;
+        }
+        if (e2.duration > e1.duration) {
+            return 1;
+        }
+
+        return 0;
+    });
+
     return (
         <div className="relative w-full mt-4">
             {/* Project Header */}
@@ -128,7 +160,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
             {/* Render each event under the header if expanded */}
             {expanded && (
                 <Stack gap="xs" mt="xs" className="relative w-full">
-                    {project.events.map((event) => {
+                    {sortedEvents.map((event) => {
                         // Calculate start and end dates for the event.
                         const eventStartDate = event.startDate;
                         const eventEndDate = new Date(eventStartDate);
