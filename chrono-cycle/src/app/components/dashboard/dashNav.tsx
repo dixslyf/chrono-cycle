@@ -26,9 +26,16 @@ interface DashNavProps {
     selectedMonth: string;
     onSelectMonth: (month: string) => void;
     year: number;
+    onTodayClick: () => void;
 }
 
-function DashNav({ months, selectedMonth, onSelectMonth, year }: DashNavProps) {
+function DashNav({
+    months,
+    selectedMonth,
+    onSelectMonth,
+    year,
+    onTodayClick,
+}: DashNavProps) {
     // handle back and forth arrow changes
     const handleMonthChange = (delta: number) => {
         if (!months || months.length === 0) return;
@@ -119,6 +126,13 @@ function DashNav({ months, selectedMonth, onSelectMonth, year }: DashNavProps) {
                     />
                     {/* display the dynamic year */}
                     <Text className="font-semibold text-xl">{year}</Text>
+                    <Button
+                        onClick={onTodayClick}
+                        variant="transparent"
+                        className="hover:text-palette1 text-lg"
+                    >
+                        Today
+                    </Button>
                 </div>
 
                 {/* calendar / timeline button */}

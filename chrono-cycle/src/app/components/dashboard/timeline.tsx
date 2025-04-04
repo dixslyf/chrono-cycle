@@ -18,11 +18,41 @@ import { retrieveProjectTemplateAction } from "@/features/project-templates/retr
 
 import ProjectRow from "./projectRow";
 
+type MonthKey =
+    | "january"
+    | "february"
+    | "march"
+    | "april"
+    | "may"
+    | "june"
+    | "july"
+    | "august"
+    | "september"
+    | "october"
+    | "november"
+    | "december";
+
+const monthNames: Record<MonthKey, number> = {
+    january: 0,
+    february: 1,
+    march: 2,
+    april: 3,
+    may: 4,
+    june: 5,
+    july: 6,
+    august: 7,
+    september: 8,
+    october: 9,
+    november: 10,
+    december: 11,
+};
+
 interface TimelineProps {
     days: Day[];
     projects: Project[];
     selectedMonth: string;
     scrollToMonth?: string | null;
+    scrollToToday?: boolean;
     onMonthChange?: (month: string) => void;
     onYearChange?: (year: number) => void;
     onScrolled?: () => void;
@@ -33,10 +63,13 @@ function Timeline({
     days,
     projects,
     scrollToMonth,
+    scrollToToday,
     onMonthChange,
     onYearChange,
+    onScrolled,
     onExtendDays,
 }: TimelineProps) {
+    const [isDragging, setIsDragging] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const cellWidth = 96; // fixed width for each day
 
@@ -62,6 +95,28 @@ function Timeline({
             [projectId]: !prev[projectId],
         }));
     };
+
+    // scroll to today if today button is clicked
+    useEffect(() => {
+        if (!scrollToToday) return;
+        const container = containerRef.current;
+        if (!container) return;
+
+        const todayIndex = days.findIndex(
+            (d) => new Date().toDateString() === d.date.toDateString(),
+        );
+        if (todayIndex !== -1) {
+            const containerWidth = container.offsetWidth;
+            const scrollLeft = Math.max(
+                0,
+                todayIndex * cellWidth - containerWidth / 2 + cellWidth / 2,
+            );
+            container.scrollLeft = scrollLeft;
+            if (onScrolled) {
+                onScrolled();
+            }
+        }
+    }, [scrollToToday, days, cellWidth, onScrolled]);
 
     // scroll to current day on initial load
     useEffect(() => {
@@ -155,13 +210,25 @@ function Timeline({
         const container = containerRef.current;
         if (!container) return;
 
-        // find the index of the first day with matching month
-        const targetIndex = days.findIndex((day) => {
-            const monthName = day.date.toLocaleDateString("en-US", {
-                month: "long",
-            });
-            return monthName.toLowerCase() === scrollToMonth;
-        });
+        const targetMonthNumber =
+            monthNames[scrollToMonth.toLowerCase() as MonthKey];
+        if (targetMonthNumber === undefined) return;
+
+        const targetIndex = days.findIndex(
+            (day) => day.date.getMonth() === targetMonthNumber,
+        );
+
+        if (targetIndex === -1 && onExtendDays) {
+            const firstDay = days[0].date;
+            const lastDay = days[days.length - 1].date;
+
+            if (targetMonthNumber < firstDay.getMonth()) {
+                onExtendDays("left");
+            } else if (targetMonthNumber > lastDay.getMonth()) {
+                onExtendDays("right");
+            }
+            return;
+        }
 
         if (targetIndex !== -1) {
             const containerWidth = container.offsetWidth;
@@ -184,6 +251,56 @@ function Timeline({
         // since this should only run when `scrollToMonth` changes
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scrollToMonth, days, cellWidth]);
+
+    // click and drag function
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        let isDown = false;
+        let startX = 0;
+        let scrollLeft = 0;
+
+        const handleMouseDown = (e: MouseEvent) => {
+            isDown = true;
+            // container.classList.add("dragging");
+            setIsDragging(true);
+            startX = e.pageX - container.offsetLeft;
+            scrollLeft = container.scrollLeft;
+        };
+
+        const handleMouseLeave = () => {
+            isDown = false;
+            // container.classList.remove("dragging");
+            setIsDragging(false);
+        };
+
+        const handleMouseUp = () => {
+            isDown = false;
+            // container.classList.remove("dragging");
+            setIsDragging(false);
+        };
+
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - container.offsetLeft;
+            const walk = (x - startX) * 1;
+            container.scrollLeft = scrollLeft - walk;
+        };
+
+        container.addEventListener("mousedown", handleMouseDown);
+        container.addEventListener("mouseleave", handleMouseLeave);
+        container.addEventListener("mouseup", handleMouseUp);
+        container.addEventListener("mousemove", handleMouseMove);
+
+        return () => {
+            container.removeEventListener("mousedown", handleMouseDown);
+            container.removeEventListener("mouseleave", handleMouseLeave);
+            container.removeEventListener("mouseup", handleMouseUp);
+            container.removeEventListener("mousemove", handleMouseMove);
+        };
+    }, []);
 
     // calculate a cumulative vertical offset for each project row.
     // each row's height is the header height plus additionnal height for expanded events.
@@ -253,6 +370,7 @@ function Timeline({
         <Stack
             ref={containerRef}
             className="overflow-x-auto w-full flex-1 h-full relative z-0"
+            style={{ cursor: isDragging ? "grabbing" : "auto" }}
         >
             <Modal.Stack>
                 <EventDetailsModal
@@ -270,11 +388,21 @@ function Timeline({
             <Group className="h-full flex-1 relative" align="stretch">
                 {days.map((day, i) => {
                     const isToday = areSameDay(new Date(), day.date);
+                    const isFirstDayOfMonth = day.date.getDate() === 1;
+                    const lastDayOfMonth = new Date(
+                        day.date.getFullYear(),
+                        day.date.getMonth() + 1,
+                        0,
+                    ).getDate();
+                    const isLastOfMonth = day.date.getDate() === lastDayOfMonth;
                     return (
                         <Stack
                             key={`${day.date.toISOString()}-${i}`}
-                            // className="flex-none border p-2 text-center flex flex-col gap-2"
-                            className="absolute top-0 bottom-0 border p-2 text-center gap-2"
+                            // className="absolute top-0 bottom-0 border p-2 text-center gap-2"
+                            className={`absolute top-0 bottom-0 border p-2 text-center gap-2
+                                ${isFirstDayOfMonth ? "border-l-2 border-l-black" : ""}
+                                ${isLastOfMonth ? "border-r-2 border-r-black" : ""}
+                                `}
                             style={{
                                 width: `${cellWidth}px`,
                                 left: `${i * cellWidth}px`,
