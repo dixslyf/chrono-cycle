@@ -3,6 +3,7 @@
 import { Center, Group, Paper, Stack, Text } from "@mantine/core";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import React from "react";
+import { match } from "ts-pattern";
 
 import { Event, Project } from "@/common/data/domain";
 import { areSameDay, Day } from "@/common/dates";
@@ -125,7 +126,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
 
             {/* Render each event under the header if expanded */}
             {expanded && (
-                <Stack gap="xs" className="relative w-full">
+                <Stack gap="xs" mt="xs" className="relative w-full">
                     {project.events.map((event) => {
                         // Calculate start and end dates for the event.
                         const eventStartDate = event.startDate;
@@ -143,14 +144,22 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
                         if (eventStartIndex === -1 || eventEndIndex === -1)
                             return null;
 
+                        const [bg, textColor] = match(event.status)
+                            .with("none", () => ["yellow.5", "black"])
+                            .with("not started", () => ["red", "white"])
+                            .with("in progress", () => ["blue", "white"])
+                            .with("completed", () => ["brown", "white"])
+                            .exhaustive();
+
                         return (
                             <EventBar
                                 key={event.id}
                                 event={event}
                                 startIndex={eventStartIndex}
                                 endIndex={eventEndIndex}
-                                color="bg-blue-500"
                                 cellWidth={cellWidth}
+                                bg={bg}
+                                textColor={textColor}
                                 onEventClick={onEventClick}
                             />
                         );
