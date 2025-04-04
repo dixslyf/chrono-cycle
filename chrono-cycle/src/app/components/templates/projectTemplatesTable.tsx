@@ -5,6 +5,7 @@ import {
     Loader,
     Modal,
     ScrollArea,
+    Skeleton,
     Stack,
     Text,
     useModalsStack,
@@ -94,7 +95,14 @@ export function ProjectTemplatesTable(): React.ReactNode {
                 <Group>
                     <Stack className="w-full">
                         {listPtsQuery.isFetching ? (
-                            <Loader size="md" />
+                            <>
+                                <Skeleton h={60} />
+                                <Skeleton h={60} />
+                                <Skeleton h={60} />
+                                <Skeleton h={60} />
+                                <Skeleton h={60} />
+                                <Skeleton h={60} />
+                            </>
                         ) : records.length === 0 ? (
                             <Text className="text-lg">
                                 No Project Templates
