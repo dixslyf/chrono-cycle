@@ -44,7 +44,7 @@ export default function RootLayout({
             >
                 <RootProvider>
                     {/* Mantine notifications */}
-                    <Notifications />
+                    <Notifications zIndex={1000}/>
                     {children}
                 </RootProvider>
             </body>
