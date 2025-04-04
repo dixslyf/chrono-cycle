@@ -107,7 +107,7 @@ function EventDetailsLeft({
                                   ]
                                 : [{ label: "None", value: "none" }]
                         }
-                        disabled={event.eventType === "activity"}
+                        readOnly={event.eventType === "activity"}
                         {...updateForm.getInputProps("status")}
                     />
                 </Group>
