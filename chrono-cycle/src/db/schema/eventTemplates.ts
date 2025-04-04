@@ -52,7 +52,6 @@ export const eventTemplates = pgTable(
             "event_templates_duration_check",
             sql`((${t.eventType} = 'task' AND ${t.duration} = 1) OR (${t.eventType} = 'activity' AND ${t.duration} >= 1))`,
         ),
-        check("event_templates_offset_days_check", sql`${t.offsetDays} >= 0`),
     ],
 );
 
@@ -80,7 +79,6 @@ export type DbExpandedEventTemplateUpdate = DbEventTemplateUpdate & {
 export const eventTemplateSelectSchema = createSelectSchema(eventTemplates);
 
 export const rawEventTemplateInsertSchema = createInsertSchema(eventTemplates, {
-    offsetDays: (schema) => schema.min(0),
     name: (schema) => schema.nonempty(),
 }).omit({ updatedAt: true });
 
@@ -105,7 +103,6 @@ export const eventTemplateInsertSchema = refineRawEventTemplateInsertSchema(
 );
 
 export const eventTemplateUpdateSchema = createUpdateSchema(eventTemplates, {
-    offsetDays: (schema) => schema.min(0),
     name: (schema) => schema.nonempty(),
 })
     .omit({ eventType: true, projectTemplateId: true })
