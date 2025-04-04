@@ -89,7 +89,8 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
 
     // Calculate horizontal positioning using the project start index.
     const leftOffset = projectStartIndex * cellWidth;
-    const width = (maxEndIndex - projectStartIndex + 1) * cellWidth;
+    const calculatedWidth = (maxEndIndex - projectStartIndex + 1) * cellWidth;
+    const width = Math.max(calculatedWidth, cellWidth);
 
     return (
         <div className="relative w-full mt-4">
