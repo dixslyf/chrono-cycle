@@ -126,7 +126,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
 
             {/* Render each event under the header if expanded */}
             {expanded && (
-                <Stack gap="xs" className="relative w-full">
+                <Stack gap="xs" mt="xs" className="relative w-full">
                     {project.events.map((event) => {
                         // Calculate start and end dates for the event.
                         const eventStartDate = event.startDate;
