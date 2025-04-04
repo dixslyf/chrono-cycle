@@ -93,7 +93,7 @@ export function ProjectTemplatesTable(): React.ReactNode {
             <ScrollArea className="h-[80%] w-full">
                 <Group>
                     <Stack className="w-full">
-                        {listPtsQuery.isPending ? (
+                        {listPtsQuery.isFetching ? (
                             <Loader size="md" />
                         ) : records.length === 0 ? (
                             <Text className="text-lg">
