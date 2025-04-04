@@ -75,8 +75,9 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                             </Box>
                             {/* circle help */}
                             <Box>
-                                <Link
-                                    href="/help"
+                                <a
+                                    href="/user-guide.pdf"
+                                    download
                                     className={`flex items-center gap-5 p-3 rounded-lg text-palette3 overflow-hidden ${
                                         pathname == "/help"
                                             ? "bg-[#FFFFFF18] hover:bg-[#FFFFFF30]"
@@ -87,7 +88,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                                     <Text className="font-semibold text-2xl truncate">
                                         Help
                                     </Text>
-                                </Link>
+                                </a>
                             </Box>
                             {/* settings */}
                             <Box>
