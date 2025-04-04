@@ -64,16 +64,18 @@ function InnerEventTemplatesTable<T extends string>({
                 </Table.Thead>
                 <Table.Tbody>
                     {currentPageData.map((eventTemplate) => {
-                        const offsetWeeks = Math.floor(
-                            eventTemplate.offsetDays / 7,
-                        );
+                        const sign = Math.sign(eventTemplate.offsetDays);
+                        const offsetWeeks =
+                            sign *
+                            Math.floor(Math.abs(eventTemplate.offsetDays / 7));
                         const offsetDays = eventTemplate.offsetDays % 7;
-                        const offsetWeeksText = `${offsetWeeks} ${offsetWeeks === 1 ? "week" : "weeks"}`;
-                        const offsetDaysText = `${offsetDays} ${offsetDays === 1 ? "day" : "days"}`;
-                        const offsetText =
+                        const offsetWeeksText = `${Math.abs(offsetWeeks)} ${Math.abs(offsetWeeks) === 1 ? "week" : "weeks"}`;
+                        const offsetDaysText = `${Math.abs(offsetDays)} ${Math.abs(offsetDays) === 1 ? "day" : "days"}`;
+                        const offsetTextNoSign =
                             offsetWeeks === 0
                                 ? offsetDaysText
                                 : `${offsetWeeksText} ${offsetDaysText}`;
+                        const offsetText = `${sign === -1 ? "-" : ""} ${offsetTextNoSign}`;
 
                         return (
                             <Table.Tr
