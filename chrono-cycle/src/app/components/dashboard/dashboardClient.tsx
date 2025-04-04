@@ -79,9 +79,10 @@ function DashboardClient({
 
     return (
         <div className="flex flex-col flex-1 relative">
+            {/* zIndex must be less than the modals' 200 and notifications' 1000. */}
             <LoadingOverlay
                 visible={projectsQuery.isFetching}
-                zIndex={300}
+                zIndex={150}
                 overlayProps={{ blur: 2 }}
             />
             <div className="flex flex-col flex-1 h-full">
