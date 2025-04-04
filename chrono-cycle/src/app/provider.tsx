@@ -7,6 +7,7 @@ import {
     Fieldset,
     MantineProvider,
     mergeMantineTheme,
+    SegmentedControl,
     Textarea,
 } from "@mantine/core";
 import { DatesProvider } from "@mantine/dates";
@@ -76,6 +77,12 @@ const themeOverride = createTheme({
                 },
             },
         }),
+        SegmentedControl: SegmentedControl.extend({
+            defaultProps: {
+                color: "brown",
+                bg: "gray.3",
+            }
+        })
     },
 });
 
