@@ -9,7 +9,8 @@ interface EventBarProps {
     startIndex: number;
     endIndex: number;
     cellWidth: number;
-    color: string;
+    textColor: string;
+    bg: string;
     onEventClick: (event: Event) => void;
 }
 
@@ -17,8 +18,9 @@ function EventBar({
     event,
     startIndex,
     endIndex,
-    color,
     cellWidth,
+    textColor,
+    bg,
     onEventClick,
 }: EventBarProps) {
     const leftOffset = startIndex * cellWidth;
@@ -26,14 +28,15 @@ function EventBar({
 
     return (
         <Box
-            className={`rounded-lg flex items-center justify-center ${color} mt-2 cursor-pointer`}
+            className={`rounded-lg flex items-center justify-center mt-2 cursor-pointer`}
+            bg={bg}
             style={{
                 marginLeft: `${leftOffset}px`,
                 width: `${width}px`,
             }}
             onClick={() => onEventClick(event)}
         >
-            <Text className="text-md font-medium text-palette3">
+            <Text c={textColor} className="text-md font-medium">
                 {event.name}
             </Text>
         </Box>
