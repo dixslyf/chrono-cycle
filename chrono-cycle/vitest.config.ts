@@ -12,5 +12,8 @@ export default defineConfig({
             "./src/tests/mock.setup.ts",
         ],
         hookTimeout: 30000, // Default is 10 seconds, which can be too strict for some of the tests.
+        coverage: {
+            enabled: true,
+        },
     },
 });
